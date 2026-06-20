@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kansai Group — Japanese Vehicle Imports, Malaysia</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --red: #E60012; --red-dark: #B3000E; --gold: #C8A23C; --gold-dark: #A8842C;
+    --navy: #111827; --bg-main: #FFFFFF; --bg-alt: #F8F9FA;
+    --text-main: #111827; --text-muted: #6B7280; --border: #E5E7EB; --green: #16A34A;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.02); --shadow-md: 0 10px 30px rgba(0,0,0,0.06); --shadow-hover: 0 18px 38px rgba(0,0,0,0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); overflow-x: hidden; }
+  .bebas { font-family: 'Bebas Neue', sans-serif; }
+  .rajdhani { font-family: 'Rajdhani', sans-serif; }
+  .jp { font-family: 'Noto Sans JP', sans-serif; }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 11px; }
+  .logo-mark { width: 38px; height: 38px; background: var(--red); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; letter-spacing: 1px; }
+  .logo-text .top { font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 2.5px; line-height: 1; }
+  .logo-text .btm { font-size: 8px; letter-spacing: 2.5px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+  nav ul { list-style: none; display: flex; gap: 30px; align-items: center; }
+  nav ul a { color: var(--text-muted); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; transition: color 0.2s; }
+  nav ul a:hover { color: var(--red); }
+  .nav-cta { background: var(--red); color: #fff; padding: 9px 20px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .nav-cta:hover { background: var(--red-dark); }
+  .menu-btn { display: none; background: none; border: none; cursor: pointer; }
+
+  .hero { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--bg-alt) 0%, var(--bg-main) 100%); border-bottom: 1px solid var(--border); }
+  .hero-grid { position: absolute; inset: 0; opacity: 0.5; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 48px 48px; }
+  .hero-jp-watermark { position: absolute; right: -20px; top: 50%; transform: translateY(-50%); font-family: 'Noto Sans JP', sans-serif; font-size: 220px; font-weight: 700; color: rgba(230,0,18,0.03); pointer-events: none; line-height: 1; }
+  .hero-content { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 64px 24px 56px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(230,0,18,0.07); border: 1px solid rgba(230,0,18,0.15); padding: 6px 15px; border-radius: 4px; font-size: 10.5px; letter-spacing: 2.5px; color: var(--red); text-transform: uppercase; margin-bottom: 22px; font-weight: 600; }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  h1.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 9vw, 88px); line-height: 0.93; letter-spacing: 1.5px; }
+  h1.hero-title span { color: var(--red); }
+  h1.hero-title .gold { color: var(--gold); }
+  .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 20px 0 32px; max-width: 500px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 15px 32px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 14px rgba(230,0,18,0.18); transition: all 0.2s; border: none; cursor: pointer; }
+  .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); }
+  .btn-outline { background: var(--bg-main); color: var(--text-main); padding: 15px 32px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; transition: all 0.2s; cursor: pointer; }
+  .btn-outline:hover { border-color: var(--red); color: var(--red); transform: translateY(-2px); }
+  .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 44px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); box-shadow: var(--shadow-md); overflow: hidden; }
+  .stat { padding: 18px 20px; border-right: 1px solid var(--border); text-align: center; }
+  .stat:last-child { border-right: none; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; }
+  .stat-lbl { font-size: 9.5px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+
+  .ticker-wrap { background: var(--red); padding: 11px 0; overflow: hidden; }
+  .ticker { display: flex; gap: 0; white-space: nowrap; animation: ticker 32s linear infinite; font-family: 'Rajdhani', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .ticker-item { display: inline-flex; align-items: center; gap: 10px; margin-right: 50px; }
+  .ticker-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.7); border-radius: 50%; }
+
+  section { max-width: 1200px; margin: 0 auto; padding: 56px 24px 0; }
+  .section-label { font-size: 10.5px; letter-spacing: 3px; color: var(--red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 11px; font-weight: 700; }
+  .section-label::before { content: ''; width: 28px; height: 2px; background: var(--red); }
+  h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 5vw, 52px); line-height: 1; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .accent { color: var(--red); }
+  .gold-txt { color: var(--gold); }
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
+  .sec-link { font-family: 'Rajdhani', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; cursor: pointer; }
+  .sec-link:hover { color: var(--red); }
+
+  .cars-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .car-card { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
+  .car-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+  .car-img { position: relative; aspect-ratio: 16/11; background: #ECEDF0; overflow: hidden; }
+  .car-img img { width: 100%; height: 100%; object-fit: cover; }
+  .car-badge { position: absolute; top: 10px; right: 10px; padding: 5px 11px; border-radius: 4px; font-size: 10px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; color: #fff; }
+  .badge-new { background: var(--red); }
+  .badge-auction { background: var(--gold); }
+  .badge-hot { background: #FF6B35; }
+  .badge-featured { background: var(--navy); color: var(--gold); }
+  .car-photos { position: absolute; bottom: 10px; right: 10px; background: rgba(17,24,39,0.75); color: #fff; font-size: 9.5px; font-weight: 600; padding: 3px 8px; border-radius: 5px; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; }
+  .car-info { padding: 14px 15px 15px; }
+  .car-make { font-size: 9.5px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; font-weight: 600; }
+  .car-model { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.1; }
+  .car-specs { display: flex; gap: 9px; margin: 9px 0 11px; flex-wrap: wrap; }
+  .spec { font-size: 10.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .spec::before { content: '•'; color: var(--red); }
+  .car-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 11px; }
+  .car-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+  .car-price .cur { font-size: 12px; color: var(--text-muted); margin-left: 2px; }
+  .car-enquire { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 1px; }
+
+  .incoming-scroll { display: flex; gap: 13px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+  .incoming-scroll .car-card { flex: 0 0 210px; }
+  .car-eta { position: absolute; bottom: 10px; left: 10px; background: rgba(17,24,39,0.85); color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 5px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+  .car-eta .pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+  .inv-filter { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); font-size: 11.5px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 700; white-space: nowrap; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+  .auction-teaser { max-width: 1200px; margin: 56px auto 0; padding: 0 24px; }
+  .auction-box { background: var(--navy); border-radius: 14px; padding: 36px 32px; position: relative; overflow: hidden; }
+  .auction-box::before { content: '競売'; position: absolute; right: 24px; top: 50%; transform: translateY(-50%); font-family: 'Noto Sans JP', sans-serif; font-size: 130px; font-weight: 700; color: rgba(255,255,255,0.04); pointer-events: none; line-height: 1; }
+  .auction-content { position: relative; z-index: 2; }
+  .auction-live { display: inline-flex; align-items: center; gap: 9px; background: rgba(230,0,18,0.15); border: 1px solid rgba(230,0,18,0.3); padding: 7px 16px; border-radius: 6px; margin-bottom: 16px; }
+  .auction-live .dot { width: 7px; height: 7px; background: var(--red); border-radius: 50%; animation: pulse 1s infinite; }
+  .auction-live span { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
+  .auction-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 1.5px; color: #fff; margin-bottom: 8px; line-height: 1; }
+  .auction-title .gold { color: var(--gold); }
+  .auction-desc { font-size: 13px; color: rgba(255,255,255,0.65); max-width: 480px; line-height: 1.6; margin-bottom: 20px; }
+  .auction-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .auction-soon { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--gold); border: 1px solid rgba(200,162,60,0.4); border-radius: 7px; padding: 12px 24px; }
+  .auction-notify { font-family: 'Rajdhani', sans-serif; font-size: 12.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+  .auction-notify:hover { color: var(--gold); }
+
+  .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 24px; }
+  .why-card { padding: 32px 22px; background: var(--bg-main); border-radius: 10px; border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow-sm); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
+  .why-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--gold); }
+  .why-icon { width: 60px; height: 60px; background: rgba(200,162,60,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; color: var(--gold-dark); }
+  .why-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 11px; }
+  .why-card p { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+
+  footer { background: var(--navy); color: #F9FAFB; margin-top: 56px; padding: 48px 24px 28px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 44px; }
+  .footer-logo .logo-text .top { color: #fff; }
+  .footer-logo .logo-text .btm { color: #9CA3AF; }
+  .footer-desc { font-size: 12.5px; color: #9CA3AF; line-height: 1.8; margin: 16px 0 12px; max-width: 320px; }
+  .footer-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: rgba(200,162,60,0.85); }
+  .footer-col h4 { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .footer-col a, .footer-col p { font-size: 12.5px; color: #9CA3AF; line-height: 1.9; display: block; }
+  .footer-col a:hover { color: #fff; }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: #9CA3AF; flex-wrap: wrap; gap: 8px; }
+
+  .wa-float { position: fixed; bottom: 20px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); z-index: 90; }
+
+  .empty-msg { grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
+  .skeleton { background: linear-gradient(90deg, #ECEDF0 25%, #F4F5F7 50%, #ECEDF0 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  @media (min-width: 600px) { .cars-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } .why-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 900px) {
+    nav, .hero-content, section, .auction-teaser, .footer-inner, .footer-bottom { padding-left: 40px; padding-right: 40px; }
+    .cars-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 720px) {
+    nav ul { display: none; } .menu-btn { display: block; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 440px) { .footer-grid { grid-template-columns: 1fr; } .footer-bottom { flex-direction: column; text-align: center; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-mark">KG</div>
+    <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
+  </div>
+  <ul>
+    <li><a href="#stock">Stock</a></li>
+    <li><a href="#incoming">Incoming</a></li>
+    <li><a href="#auction">Auction</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="duty-calculator.html">Duty Calc</a></li>
+  </ul>
+  <a href="https://wa.me/601151177026" class="nav-cta">WhatsApp</a>
+  <button class="menu-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</nav>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-jp-watermark jp">関西</div>
+  <div class="hero-content">
+    <div class="hero-tag">Now Open in Kuala Lumpur</div>
+    <h1 class="hero-title bebas">JAPAN'S <span>FINEST</span><br>DELIVERED TO <span class="gold">MALAYSIA</span></h1>
+    <p class="hero-sub">Premium Japanese, UK &amp; Australian import vehicles — sourced directly from Osaka's auction houses, ready stock in Kuala Lumpur. Transparent pricing, full auction grade sheets, no middleman.</p>
+    <div class="hero-actions">
+      <a href="#stock" class="btn-primary">Browse Stock</a>
+      <a href="#incoming" class="btn-outline">View Incoming</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num bebas">2,400+</div><div class="stat-lbl">Delivered</div></div>
+      <div class="stat"><div class="stat-num bebas">35 YRS</div><div class="stat-lbl">In Business</div></div>
+      <div class="stat"><div class="stat-num bebas">100%</div><div class="stat-lbl">Direct from Japan</div></div>
+      <div class="stat"><div class="stat-num bebas">KL</div><div class="stat-lbl">Physical Office</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker-wrap"><div class="ticker" id="tickerTrack"></div></div>
+
+<section id="featured">
+  <div class="sec-head">
+    <div><div class="section-label">Hand-picked</div><h2 class="bebas">FEATURED <span class="accent">STOCK</span></h2></div>
+    <a href="#stock" class="sec-link">View all →</a>
+  </div>
+  <div class="cars-grid" id="featuredGrid"></div>
+</section>
+
+<section id="incoming">
+  <div class="sec-head">
+    <div><div class="section-label">Arriving Soon</div><h2 class="bebas">INCOMING <span class="accent">UNITS</span></h2></div>
+  </div>
+  <div class="incoming-scroll" id="incomingGrid"></div>
+</section>
+
+<section id="stock">
+  <div class="sec-head">
+    <div><div class="section-label">Available Now</div><h2 class="bebas">OUR <span class="accent">STOCK</span> IN <span class="gold-txt">MALAYSIA</span></h2></div>
+    <span class="sec-link" id="stockCount" style="color:var(--text-muted); cursor:default;"></span>
+  </div>
+  <div class="inv-filter" id="bodyFilters">
+    <button class="filter-btn active" data-body="all">All</button>
+    <button class="filter-btn" data-body="SUV / 4x4">SUV / 4x4</button>
+    <button class="filter-btn" data-body="MPV">MPV</button>
+    <button class="filter-btn" data-body="Sedan">Sedan</button>
+    <button class="filter-btn" data-body="Sports">Sports</button>
+    <button class="filter-btn" data-body="Luxury">Luxury</button>
+  </div>
+  <div class="cars-grid" id="stockGrid"></div>
+</section>
+
+<div class="auction-teaser" id="auction">
+  <div class="auction-box">
+    <div class="auction-content">
+      <div class="auction-live"><span class="dot"></span><span>Coming Soon</span></div>
+      <div class="auction-title bebas">LIVE <span class="gold">AUCTION</span> FROM JAPAN</div>
+      <div class="auction-desc">Bid in real-time on hundreds of vehicles each session, direct from Osaka's auction houses. Registered bidders get first access — launching soon for Malaysia.</div>
+      <div class="auction-actions">
+        <span class="auction-soon bebas">Launching 2026</span>
+        <a href="https://wa.me/601151177026?text=I'd%20like%20to%20be%20notified%20when%20the%20live%20auction%20launches." class="auction-notify">Notify me →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="why">
+  <div class="sec-head">
+    <div><div class="section-label">Our Advantage</div><h2 class="bebas">WHY <span class="gold-txt">KANSAI</span> GROUP?</h2></div>
+  </div>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3>Trusted Source</h3>
+      <p>Every vehicle sourced directly from Japan's major Kansai auction houses. No grey-market dealings, full paper trail.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+      <h3>Pekema Registered Local KL Office</h3>
+      <p>Our Registered KL office means face-to-face meetings, test drives arranged, and real-time support for Malaysian clients.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+      <h3>Flexible Payment</h3>
+      <p>Cash, bank transfer, and end-to-end financing assistance available. We connect you with trusted Malaysian auto loan providers.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <h3>Grade Certified</h3>
+      <p>Only Grade 3.5 and above. Full Japanese auction inspection sheet provided with each vehicle, no hidden issues.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-logo">
+        <div class="logo">
+          <div class="logo-mark">KG</div>
+          <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Corporation · Osaka, Japan</div></div>
+        </div>
+        <div class="footer-desc">Japan's premier auto sourcing, now with a representative office in Kuala Lumpur — connecting Malaysian buyers to Japan's finest vehicles.</div>
+        <div class="footer-jp jp">関西グループコーポレーション</div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="#stock">Available Stock</a>
+        <a href="#incoming">Incoming Units</a>
+        <a href="#auction">Live Auction</a>
+        <a href="duty-calculator.html">Duty Calculator</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="#">Direct Stock Sales</a>
+        <a href="#">B2B Dealer Supply</a>
+        <a href="#">Import &amp; Shipping</a>
+        <a href="#">Vehicle Sourcing</a>
+      </div>
+      <div class="footer-col">
+        <h4>KL Office</h4>
+        <p>T3-15-20, 15/F, Tower 3,<br>3 Towers, Jalan Ampang,<br>50450 Kuala Lumpur</p>
+        <p style="margin-top:6px">Mon–Fri: 9am–6pm<br>Sat: 9am–1pm</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>SSM Reg: 202601018333 · © 2026 Kansai Group Malaysia Sdn. Bhd.</span>
+      <span>Designed for Malaysia 🇲🇾 · Powered by Osaka 🇯🇵</span>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/601151177026" class="wa-float">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
+</a>
+
+<script>
+const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allCars = [];
+let bodyFilter = 'all';
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function carCardHtml(c, variant = 'normal') {
+  const photos = c.photos || [];
+  const cover = photos[0]?.url || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=500';
+  let badge = '';
+  if (c.featured) badge = '<span class="car-badge badge-featured">Featured</span>';
+  else if (c.tag === 'Hot Deal') badge = '<span class="car-badge badge-hot">Hot</span>';
+  else if (c.tag === 'New In') badge = '<span class="car-badge badge-new">New In</span>';
+
+  if (variant === 'incoming') {
+    return `<a class="car-card" href="car.html?id=${c.id}">
+      <div class="car-img"><img src="${cover}" loading="lazy"><span class="car-eta"><span class="pulse"></span>ETA ${escapeHtml(c.eta || 'TBA')}</span></div>
+      <div class="car-info"><div class="car-make">${escapeHtml(c.brand)}</div><div class="car-model rajdhani">${escapeHtml(c.model.toUpperCase())}</div><div class="car-specs"><span class="spec">${c.year}</span><span class="spec">${escapeHtml(c.engine||'')}</span></div><div class="car-foot"><span class="car-enquire">Reserve →</span></div></div>
+    </a>`;
+  }
+
+  const enquireLabel = c.status === 'Incoming' ? 'Reserve →' : (c.tag === 'Hot Deal' ? 'Enquire →' : 'Enquire →');
+  return `<a class="car-card" href="car.html?id=${c.id}">
+    <div class="car-img"><img src="${cover}" loading="lazy">${badge}<span class="car-photos">${photos.length} photo${photos.length===1?'':'s'}</span></div>
+    <div class="car-info">
+      <div class="car-make">${escapeHtml(c.brand)}</div>
+      <div class="car-model rajdhani">${escapeHtml(c.model.toUpperCase())}</div>
+      <div class="car-specs"><span class="spec">${c.year}</span><span class="spec">${escapeHtml(c.engine||'')}</span><span class="spec">${(c.mileage||0).toLocaleString()} km</span></div>
+      <div class="car-foot"><div class="car-price bebas">${Number(c.price).toLocaleString()} <span class="cur">RM</span></div><span class="car-enquire">${enquireLabel}</span></div>
+    </div>
+  </a>`;
+}
+
+function renderTicker() {
+  const priced = allCars.filter(c => c.status !== 'Incoming').slice(0, 8);
+  if (!priced.length) { document.getElementById('tickerTrack').innerHTML = ''; return; }
+  const items = priced.map(c => `<span class="ticker-item"><span class="ticker-dot"></span>${escapeHtml(c.brand)} ${escapeHtml(c.model)} ${c.year} — RM ${Number(c.price).toLocaleString()}</span>`).join('');
+  document.getElementById('tickerTrack').innerHTML = items + items; // duplicate for seamless loop
+}
+
+function renderFeatured() {
+  const featured = allCars.filter(c => c.featured && c.status !== 'Sold').slice(0, 8);
+  const grid = document.getElementById('featuredGrid');
+  if (!featured.length) { grid.innerHTML = '<div class="empty-msg">No featured vehicles right now — check back soon.</div>'; return; }
+  grid.innerHTML = featured.map(c => carCardHtml(c)).join('');
+}
+
+function renderIncoming() {
+  const incoming = allCars.filter(c => c.status === 'Incoming');
+  const grid = document.getElementById('incomingGrid');
+  const section = document.getElementById('incoming');
+  if (!incoming.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  grid.innerHTML = incoming.map(c => carCardHtml(c, 'incoming')).join('');
+}
+
+function renderStock() {
+  let list = allCars.filter(c => c.status !== 'Sold');
+  if (bodyFilter !== 'all') list = list.filter(c => c.body_type === bodyFilter);
+  document.getElementById('stockCount').textContent = `${list.length} vehicle${list.length===1?'':'s'}`;
+  const grid = document.getElementById('stockGrid');
+  if (!list.length) { grid.innerHTML = '<div class="empty-msg">No vehicles match this filter yet.</div>'; return; }
+  grid.innerHTML = list.map(c => carCardHtml(c)).join('');
+}
+
+document.querySelectorAll('#bodyFilters .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#bodyFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    bodyFilter = btn.dataset.body;
+    renderStock();
+  });
+});
+
+async function loadCars() {
+  const { data, error } = await sb.from('cars').select('*').order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('stockGrid').innerHTML = '<div class="empty-msg">Could not load stock right now. Please refresh.</div>';
+    console.error(error);
+    return;
+  }
+  allCars = data || [];
+  renderTicker();
+  renderFeatured();
+  renderIncoming();
+  renderStock();
+}
+
+loadCars();
+</script>
+
+</body>
+</html>

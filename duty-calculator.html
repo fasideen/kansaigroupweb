@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kansai Group — Import Duty Calculator</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── 2-colour core: navy + red, on cool neutrals ── */
+  --bg:      #F4F5F8;
+  --surface: #FFFFFF;
+  --ink:     #14182A;   /* near-black navy — primary text/headers */
+  --ink-mid: #58607A;
+  --ink-soft:#9AA2B8;
+  --border:  #E6E8F0;
+  --red:     #DC2626;   /* Kansai red — accent / actions / selection */
+  --red-light: #FDECEC;
+  --red-dark:  #B91C1C;
+  --gold:    #D4AF37;   /* brand accent — used sparingly */
+  /* result green is semantic, not part of the core 2 */
+  --green:      #16A34A;
+  --green-bg:   #E9FBF1;
+  --green-text: #0F7A38;
+  --shadow: 0 1px 2px rgba(20,24,42,0.04), 0 4px 16px rgba(20,24,42,0.04);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
+.brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #1B2038 0%, var(--ink) 60%);
+  padding: 0 24px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 3px solid var(--red);
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.logo-mark {
+  width: 42px; height: 42px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.kg-hex { fill: var(--red); }
+.kg-text { fill: #fff; }
+.header-title { font-weight: 700; font-size: 19px; color: #fff; }
+.header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+.rate-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rate-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+.header-count { font-size: 12px; color: rgba(255,255,255,0.55); font-weight: 500; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
+.lang-toggle {
+  display: flex; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; overflow: hidden;
+}
+.lang-toggle button {
+  background: transparent; color: rgba(255,255,255,0.6); border: none; cursor: pointer;
+  font-size: 11px; font-weight: 700; padding: 6px 10px; font-family: 'Inter', sans-serif;
+  letter-spacing: 0.05em; transition: all 0.15s;
+}
+.lang-toggle button.active { background: var(--red); color: #fff; }
+.lang-toggle button:not(.active):hover { color: #fff; }
+
+/* ── LAYOUT ── */
+.layout {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-header h2 { font-size: 16px; font-weight: 600; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+.card-header .count {
+  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink-mid);
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.card-body { padding: 18px 20px; }
+
+/* ── SEARCH BAR ── */
+.search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.search-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+label.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+input[type="text"], input[type="number"], select {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input::placeholder { color: var(--ink-soft); }
+input:focus, select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(224,48,61,0.10);
+}
+select { cursor: pointer; }
+input.mono, .mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap { position: relative; }
+.ac-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(28,32,48,.10);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 300;
+  list-style: none;
+  padding: 6px;
+  display: none;
+}
+.ac-list.open { display: block; }
+.ac-item { padding: 8px 10px; font-size: 13px; cursor: pointer; border-radius: 7px; }
+.ac-item:hover, .ac-item.hl { background: var(--red-light); color: var(--red-dark); }
+.ac-empty { padding: 10px 12px; font-size: 12px; color: var(--ink-soft); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead { position: sticky; top: 0; background: var(--bg); }
+th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tbody tr { cursor: pointer; transition: background 0.1s; }
+tbody tr:nth-child(even) { background: #FAFBFC; }
+tbody tr:hover { background: var(--bg); }
+tbody tr.active-row { background: var(--red-light) !important; }
+tbody tr.active-row td { border-bottom-color: #FBD5D5; }
+.td-brand { font-weight: 700; font-size: 13px; white-space: nowrap; color: var(--ink); display: flex; align-items: center; gap: 9px; }
+.brand-badge {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.td-model { color: var(--ink-mid); font-size: 12px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-cc { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mid); }
+.td-cur {
+  display: inline-block; background: var(--bg); border: 1px solid var(--border);
+  color: var(--ink-mid); font-size: 11px; padding: 2px 7px; border-radius: 5px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.td-fob { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--ink); }
+.no-results { text-align: center; padding: 48px 24px; color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+
+/* ── PAGINATION ── */
+.pagination {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-soft);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pag-btns { display: flex; gap: 4px; }
+.pag-btn {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 5px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.1s;
+}
+.pag-btn:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+.pag-btn.cur { background: var(--red); border-color: var(--red); color: #fff; }
+.pag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── CALCULATOR CARD ── */
+.rate-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+.rate-row .field-label { font-size: 10px; }
+.rate-link { font-size: 11px; color: var(--ink-soft); margin-top: 10px; line-height: 1.6; }
+.rate-link a { color: var(--red); text-decoration: none; font-weight: 600; }
+.rate-link a:hover { text-decoration: underline; }
+
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* ── DUTY GAUGE ── */
+.gauge-label { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.duty-gauge {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+.gauge-seg {
+  flex: 1;
+  background: var(--bg);
+  padding: 10px 4px;
+  text-align: center;
+  border-right: 1.5px solid var(--border);
+  transition: all 0.15s;
+}
+.gauge-seg:last-child { border-right: none; }
+.gauge-seg .g-cc { font-size: 10px; color: var(--ink-mid); font-weight: 600; line-height: 1.3; }
+.gauge-seg .g-pct { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 3px; }
+.gauge-seg.active { background: var(--red); border-right-color: var(--red); }
+.gauge-seg.active .g-cc { color: rgba(255,255,255,.75); }
+.gauge-seg.active .g-pct { color: #fff; }
+
+/* ── CALC PANEL ── */
+.sel-info { margin-bottom: 14px; }
+.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+.sel-model { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
+.sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tag {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink-mid);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.tag.red { background: var(--red); border-color: var(--red); color: #fff; }
+
+.fob-display {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 6px;
+}
+
+.calc-steps { margin-top: 14px; }
+.step {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.step:last-child { border-bottom: none; }
+.step-left { flex: 1; }
+.step-letter {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 20px;
+  margin-right: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.step-name { font-weight: 600; font-size: 13px; color: var(--ink); }
+.step-sub { font-size: 11px; color: var(--ink-soft); margin-top: 2px; margin-left: 28px; }
+.step-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  text-align: right;
+}
+.step-val.big { font-size: 15px; color: var(--red); }
+
+/* ── COST BREAKDOWN ── */
+.breakdown { margin-top: 18px; }
+.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Oswald', sans-serif; }
+.breakdown-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; }
+.breakdown-seg { transition: flex-basis 0.3s ease; }
+.breakdown-seg.fob  { background: var(--ink); }
+.breakdown-seg.fees { background: var(--ink-soft); }
+.breakdown-seg.duty { background: var(--red); }
+.breakdown-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--ink-mid); }
+.breakdown-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.breakdown-legend .dot.fob  { background: var(--ink); }
+.breakdown-legend .dot.fees { background: var(--ink-soft); }
+.breakdown-legend .dot.duty { background: var(--red); }
+
+/* ── RESULT BOX ── */
+.result-box {
+  background: var(--green-bg);
+  border: 1.5px solid #BBF0CF;
+  border-top: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 22px;
+  text-align: center;
+  margin-top: 16px;
+}
+.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Oswald', sans-serif; }
+.result-value { font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
+.result-sub { font-size: 12px; color: var(--green-text); margin-top: 6px; font-weight: 500; }
+
+/* ── FADE-IN ── */
+@keyframes calcFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#calcBody > * { animation: calcFadeIn 0.35s ease-out; }
+
+/* ── ACTIONS ── */
+.action-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.action-row .btn { flex: 1 1 30%; min-width: 110px; }
+.btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 9px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--red); color: #fff; border-color: var(--red); box-shadow: 0 2px 8px rgba(220,38,38,0.25); }
+.btn-primary:hover { background: var(--red-dark); border-color: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+.btn-ghost { background: var(--surface); color: var(--ink-mid); border-color: var(--border); }
+.btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); transform: translateY(-1px); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 36px 16px; color: var(--ink-soft); }
+.empty .icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--ink-soft); opacity: 0.4; }
+.empty p { font-size: 13px; line-height: 1.6; }
+
+/* ── COMPARE ── */
+.td-check { width: 36px; text-align: center; }
+.td-check input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--red); }
+.compare-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  background: var(--red-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 10px 20px; font-size: 12px; font-weight: 600; color: var(--red-dark);
+}
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th, .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.compare-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+.compare-table td.metric-label { font-weight: 600; color: var(--ink-mid); white-space: nowrap; }
+.compare-table .compare-model { font-weight: 700; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
+.compare-table .compare-sub { font-size: 11px; color: var(--ink-mid); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
+.compare-table .compare-duty { color: var(--red); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.compare-table .compare-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+.compare-remove { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; margin-top: 4px; }
+.compare-empty { text-align: center; padding: 30px; color: var(--ink-soft); font-size: 13px; }
+
+/* ── FAQ ── */
+.faq-body { padding: 8px 20px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 14px 0; font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Inter', sans-serif;
+}
+.faq-icon { font-size: 18px; color: var(--red); font-weight: 700; flex-shrink: 0; transition: transform 0.2s; }
+.faq-a {
+  max-height: 0; overflow: hidden; transition: max-height 0.25s ease, padding 0.25s ease;
+  font-size: 13px; color: var(--ink-mid); line-height: 1.7;
+}
+.faq-a.open { max-height: 400px; padding-bottom: 14px; }
+.faq-icon.open { transform: rotate(45deg); }
+
+/* ── PASSWORD GATE ── */
+.gate-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.gate-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 40px 40px;
+  max-width: 400px; width: 100%;
+  text-align: center;
+}
+.gate-logo {
+  margin: 0 auto 20px;
+  display: block;
+}
+.gate-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.gate-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+.gate-input-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+.gate-input-wrap input {
+  width: 100%;
+  padding: 13px 48px 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+  outline: none;
+  letter-spacing: 0.15em;
+}
+.gate-input-wrap input:focus { border-color: var(--navy); }
+.gate-input-wrap input.error { border-color: var(--red); }
+.gate-lock-icon {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-soft); pointer-events: none;
+}
+.gate-btn {
+  width: 100%;
+  background: var(--red) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Oswald', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.gate-btn:active { transform: scale(0.98); }
+.gate-error {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+.gate-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 28px 0 20px;
+}
+.gate-footer {
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 4px 20px 32px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ── LOADING ── */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+/* ── PRINT ── */
+.print-header { display: none; }
+@media print {
+  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active), .gauge-label, .compare-bar, #compareCard, .faq-card, .lang-toggle, .td-check { display: none !important; }
+  .layout { max-width: 100%; }
+  body { background: white; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+  .print-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 0 16px 0;
+    border-bottom: 3px solid var(--red);
+    margin-bottom: 16px;
+  }
+  .print-header .ph-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
+  .print-header .ph-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
+  #calcBody > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+@media (max-width: 980px) {
+  .layout { padding: 14px; }
+  .search-row-4 { grid-template-columns: 1fr 1fr; }
+  .header { padding: 0 14px; }
+}
+@media (max-width: 520px) {
+  .search-row, .search-row-4, .rate-row { grid-template-columns: 1fr 1fr; }
+  .duty-gauge { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .gauge-seg { border-right: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); }
+  .gauge-seg:nth-child(3n) { border-right: none; }
+  .gauge-seg:nth-child(n+4) { border-bottom: none; }
+  .gauge-seg.active { border-color: var(--red); }
+  .header-count { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title brand-font">Kansai Group</div>
+      <div class="header-sub">Import Duty Calculator</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="lang-toggle">
+      <button id="langEN" onclick="setLang('en')">EN</button>
+      <button id="langBM" onclick="setLang('bm')">BM</button>
+    </div>
+    <span class="header-count" id="totalCount"></span>
+    <span class="rate-pill"><span class="dot"></span>JPY <span id="jpyBadge">0.0315</span></span>
+  </div>
+</div>
+
+<!-- PASSWORD GATE -->
+<div id="gate" class="gate-overlay">
+  <div class="gate-box">
+
+    <svg class="gate-logo" width="52" height="52" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
+      <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+    </svg>
+
+    <div class="gate-title">Kansai Group</div>
+    <div class="gate-sub">Import Duty Calculator<br>Please enter your password to continue.</div>
+
+    <div class="gate-input-wrap">
+      <input type="password" id="gatePw" placeholder="Enter password" autocomplete="off">
+      <svg class="gate-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+    </div>
+
+    <button class="gate-btn" onclick="checkPassword()">Unlock</button>
+
+    <div class="gate-error" id="gateError">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
+      Incorrect password — please try again.
+    </div>
+
+    <hr class="gate-divider">
+    <div class="gate-footer">This tool is for authorised Kansai Group staff only.<br>Duty estimates are for reference purposes.</div>
+
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="loading-screen">Loading vehicle database…</div>
+</div>
+
+<div class="site-footer" id="siteFooter" style="display:none">
+  Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.
+  Official rates: <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank" style="color:var(--ink-mid)">customsgc.gov.my</a>.
+  © <span id="footYear"></span> Kansai Group.
+</div>
+
+<script>
+const STAFF_PASSWORD = 'kansai2026'; // ← change this to your own password
+
+function checkPassword() {
+  const input = document.getElementById('gatePw');
+  const val = input.value;
+  if (val === STAFF_PASSWORD) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('siteFooter').style.display = 'block';
+    try { sessionStorage.setItem('kansaiDutyAuth', '1'); } catch(e) {}
+  } else {
+    input.classList.add('error');
+    document.getElementById('gateError').style.display = 'flex';
+    input.select();
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const gatePw = document.getElementById('gatePw');
+  gatePw.addEventListener('keydown', e => {
+    gatePw.classList.remove('error');
+    document.getElementById('gateError').style.display = 'none';
+    if (e.key === 'Enter') checkPassword();
+  });
+  try {
+    if (sessionStorage.getItem('kansaiDutyAuth') === '1') {
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('siteFooter').style.display = 'block';
+    }
+  } catch(e) {}
+});
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const PER_PAGE = 25;
+document.getElementById('footYear').textContent = new Date().getFullYear();
+let DB = [];          // [no, brand, model, cc, currency, fob12, fob24, fob36, fob48, fob60]
+let filtered = [];
+let pg = 1;
+let sel = null;
+
+// Autocomplete keyboard-nav state
+const acState = {
+  brand: { items: [], idx: -1, onPick: null },
+  model: { items: [], idx: -1, onPick: null },
+};
+
+// Compare feature state
+let compareList = []; // array of car "no"
+
+// ═══════════════════════════════════════════════════
+// LANGUAGE / TRANSLATIONS
+// ═══════════════════════════════════════════════════
+let LANG = (function(){ try { return localStorage.getItem('kansaiLang') || 'en'; } catch(e){ return 'en'; } })();
+
+const i18n = {
+  en: {
+    subtitle: 'Import Duty Calculator',
+    vehicleList: 'Vehicle List',
+    brand: 'Brand',
+    modelKeywords: 'Model / Keywords',
+    brandPlaceholder: 'e.g. Toyota, Honda...',
+    modelPlaceholder: 'e.g. Alphard, Land Cruiser...',
+    vehicleAge: 'Vehicle Age',
+    ageLabels: ['12 – 24 months','24 – 36 months','36 – 48 months','48 – 60 months','60+ months'],
+    currency: 'Currency',
+    all: 'All',
+    ccRange: 'CC Range',
+    allCC: 'All CC',
+    sortFob: 'Sort FOB',
+    default: 'Default',
+    fobLowHigh: 'FOB Low → High',
+    fobHighLow: 'FOB High → Low',
+    thNo: '#', thBrand: 'Brand', thModel: 'Model', thCC: 'CC', thCur: 'Cur', thFob: 'FOB Value', thCompare: 'Compare',
+    prev: '← Prev', next: 'Next →',
+    vehicles: 'vehicles', totalLbl: 'total',
+    startTyping: (n) => `Start typing a Brand or Model above to search the ${n} vehicles in the database.`,
+    noResults: 'No vehicles match your search.',
+    resultsPage: (n,p,t) => `${n} results — Page ${p} of ${t}`,
+    dutyCalculator: 'Duty Calculator',
+    exchangeRates: 'Exchange Rates (RM per unit)',
+    shipLabel: 'Ship (RM)',
+    officialRates: 'Official rates updated every 2 weeks by Customs:',
+    dutyBracket: 'Duty Bracket (by engine size)',
+    aboveLabel: '& above',
+    emptyCalc: 'Click any vehicle in the table to calculate its import duty.',
+    fobFromDb: 'FOB from database',
+    overrideFob: 'Override FOB (optional)',
+    overridePlaceholder: 'Leave blank to use database value',
+    stepA: 'FOB × Exchange Rate', stepB: 'Insurance (A × 1.5%)', stepC: 'B + Shipping', stepD: 'T/S Value (A + C)',
+    stepE: (pct) => `Duty (D × ${pct})`,
+    breakdownTitle: 'Cost Composition',
+    legendFob: 'Vehicle (FOB)', legendFees: 'Insurance & Shipping', legendDuty: 'Import Duty',
+    resultLabel: 'Estimated Import Duty',
+    printPdf: 'Print / PDF', copyResultBtn: 'Copy Result', copied: 'Copied ✓', clear: 'Clear',
+    shareLink: 'Share Link', linkCopied: 'Link Copied ✓', whatsapp: 'WhatsApp',
+    ev: 'Electric / EV', dutySuffix: 'duty',
+    faqTitle: 'Frequently Asked Questions',
+    faqItems: [
+      ['Is this an official calculation?', 'No. This tool gives an estimate based on the formula used by Malaysian Customs. The final duty amount is determined by the Royal Malaysian Customs Department (JKDM) upon inspection.'],
+      ['Where do the FOB values come from?', 'FOB (Free On Board) values are based on the official price guide issued by Customs for Japanese, UK, and Australian used vehicles.'],
+      ['What exchange rate should I use?', 'Use the official rate published by Customs (linked above), updated every 2 weeks. This calculator remembers your last entered rates for convenience.'],
+      ["What's not included in this estimate?", 'This covers import duty only. Excise duty (for applicable vehicles), sales tax, registration fees (JPJ), and road tax are calculated separately and not included here.'],
+      ['Can I override the FOB value?', "Yes — after selecting a vehicle, use the 'Override FOB' field if you have a different invoice value to calculate against."],
+      ["I can't find my vehicle model — what should I do?", "Try searching with just the brand name, or a shorter keyword from the model. If it's still not listed, contact our team directly for a manual estimate."],
+    ],
+    footerDisclaimer: 'Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.',
+    officialRatesLink: 'Official rates:',
+    compareTitle: 'Compare Vehicles',
+    compareEmpty: 'Tick up to 3 vehicles using the checkboxes in the table to compare them side by side.',
+    compareBarText: (n) => `${n} vehicle${n>1?'s':''} selected for comparison`,
+    compareView: 'View Comparison', compareClear: 'Clear', compareRemove: 'Remove',
+    compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Vehicle Value + Import Duty' },
+    dutyNote: 'Based on the Customs guide FOB value, not your actual invoice price. Other taxes (excise duty, SST, JPJ registration, road tax) are calculated separately.',
+    printTitle: 'Kansai Group — Import Duty Estimate',
+    printSub: (date) => `Generated ${date} · For reference only, subject to official customs assessment`,
+  },
+  bm: {
+    subtitle: 'Kalkulator Duti Import',
+    vehicleList: 'Senarai Kenderaan',
+    brand: 'Jenama',
+    modelKeywords: 'Model / Kata Kunci',
+    brandPlaceholder: 'cth. Toyota, Honda...',
+    modelPlaceholder: 'cth. Alphard, Land Cruiser...',
+    vehicleAge: 'Usia Kenderaan',
+    ageLabels: ['12 – 24 bulan','24 – 36 bulan','36 – 48 bulan','48 – 60 bulan','60+ bulan'],
+    currency: 'Mata Wang',
+    all: 'Semua',
+    ccRange: 'Julat CC',
+    allCC: 'Semua CC',
+    sortFob: 'Susun FOB',
+    default: 'Lalai',
+    fobLowHigh: 'FOB Rendah → Tinggi',
+    fobHighLow: 'FOB Tinggi → Rendah',
+    thNo: '#', thBrand: 'Jenama', thModel: 'Model', thCC: 'CC', thCur: 'Mata Wang', thFob: 'Nilai FOB', thCompare: 'Banding',
+    prev: '← Sebelum', next: 'Seterus →',
+    vehicles: 'kenderaan', totalLbl: 'jumlah',
+    startTyping: (n) => `Mula menaip Jenama atau Model di atas untuk mencari ${n} kenderaan dalam pangkalan data.`,
+    noResults: 'Tiada kenderaan sepadan dengan carian anda.',
+    resultsPage: (n,p,t) => `${n} keputusan — Halaman ${p} drpd ${t}`,
+    dutyCalculator: 'Kalkulator Duti',
+    exchangeRates: 'Kadar Tukaran (RM setiap unit)',
+    shipLabel: 'Penghantaran (RM)',
+    officialRates: 'Kadar rasmi dikemas kini setiap 2 minggu oleh Kastam:',
+    dutyBracket: 'Kategori Duti (mengikut saiz enjin)',
+    aboveLabel: '& ke atas',
+    emptyCalc: 'Klik mana-mana kenderaan dalam jadual untuk mengira duti import.',
+    fobFromDb: 'FOB daripada pangkalan data',
+    overrideFob: 'Ganti FOB (pilihan)',
+    overridePlaceholder: 'Biarkan kosong untuk guna nilai pangkalan data',
+    stepA: 'FOB × Kadar Tukaran', stepB: 'Insurans (A × 1.5%)', stepC: 'B + Penghantaran', stepD: 'Nilai T/S (A + C)',
+    stepE: (pct) => `Duti (D × ${pct})`,
+    breakdownTitle: 'Komposisi Kos',
+    legendFob: 'Kenderaan (FOB)', legendFees: 'Insurans & Penghantaran', legendDuty: 'Duti Import',
+    resultLabel: 'Anggaran Duti Import',
+    printPdf: 'Cetak / PDF', copyResultBtn: 'Salin Keputusan', copied: 'Disalin ✓', clear: 'Kosongkan',
+    shareLink: 'Kongsi Pautan', linkCopied: 'Pautan Disalin ✓', whatsapp: 'WhatsApp',
+    ev: 'Elektrik / EV', dutySuffix: 'duti',
+    faqTitle: 'Soalan Lazim',
+    faqItems: [
+      ['Adakah ini pengiraan rasmi?', 'Tidak. Alat ini memberikan anggaran berdasarkan formula yang digunakan oleh Kastam Malaysia. Jumlah duti muktamad ditentukan oleh Jabatan Kastam Diraja Malaysia (JKDM) semasa pemeriksaan.'],
+      ['Dari mana nilai FOB diperoleh?', 'Nilai FOB (Free On Board) adalah berdasarkan garis panduan harga rasmi yang dikeluarkan oleh Kastam untuk kenderaan terpakai dari Jepun, UK, dan Australia.'],
+      ['Kadar tukaran apa yang perlu saya guna?', 'Gunakan kadar rasmi yang diterbitkan oleh Kastam (pautan di atas), dikemas kini setiap 2 minggu. Kalkulator ini akan ingat kadar terakhir anda untuk kemudahan.'],
+      ['Apa yang tidak termasuk dalam anggaran ini?', 'Ini hanya meliputi duti import. Duti eksais (untuk kenderaan berkenaan), cukai jualan, yuran pendaftaran (JPJ), dan cukai jalan dikira berasingan dan tidak termasuk di sini.'],
+      ['Bolehkah saya menggantikan nilai FOB?', "Boleh — selepas memilih kenderaan, gunakan ruangan 'Ganti FOB' jika anda mempunyai nilai invois berbeza untuk dikira."],
+      ['Saya tidak jumpa model kenderaan saya — apa yang perlu saya buat?', 'Cuba cari dengan nama jenama sahaja, atau kata kunci lebih pendek daripada model. Jika masih tidak disenaraikan, hubungi pasukan kami terus untuk anggaran manual.'],
+    ],
+    footerDisclaimer: 'Hanya anggaran, untuk tujuan rujukan. Kadar tukaran dan pengiraan duti adalah berdasarkan nilai yang anda masukkan dan mungkin berbeza daripada penilaian rasmi oleh Jabatan Kastam Diraja Malaysia.',
+    officialRatesLink: 'Kadar rasmi:',
+    compareTitle: 'Banding Kenderaan',
+    compareEmpty: 'Tandakan sehingga 3 kenderaan menggunakan kotak semak dalam jadual untuk membandingkannya.',
+    compareBarText: (n) => `${n} kenderaan dipilih untuk perbandingan`,
+    compareView: 'Lihat Perbandingan', compareClear: 'Kosongkan', compareRemove: 'Buang',
+    compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Nilai Kenderaan + Duti Import' },
+    dutyNote: 'Berdasarkan nilai FOB panduan Kastam, bukan harga invois sebenar anda. Cukai lain (duti eksais, SST, pendaftaran JPJ, cukai jalan) dikira berasingan.',
+    printTitle: 'Kansai Group — Anggaran Duti Import',
+    printSub: (date) => `Dijana ${date} · Untuk rujukan sahaja, tertakluk kepada penilaian rasmi kastam`,
+  },
+};
+
+function t(key) {
+  const v = (i18n[LANG] && i18n[LANG][key] !== undefined) ? i18n[LANG][key] : i18n.en[key];
+  return v;
+}
+
+function setLang(lang) {
+  LANG = lang;
+  try { localStorage.setItem('kansaiLang', lang); } catch(e) {}
+  rebuild();
+}
+
+function updateLangButtons() {
+  document.getElementById('langEN').classList.toggle('active', LANG === 'en');
+  document.getElementById('langBM').classList.toggle('active', LANG === 'bm');
+}
+
+// ═══════════════════════════════════════════════════
+// LOAD DATA, THEN BUILD PAGE
+// ═══════════════════════════════════════════════════
+fetch('cars.json')
+  .then(r => r.json())
+  .then(data => {
+    DB = data;
+    const params = new URLSearchParams(location.search);
+    if (params.has('lang') && i18n[params.get('lang')]) LANG = params.get('lang');
+    document.getElementById('totalCount').textContent = DB.length.toLocaleString() + ' ' + t('vehicles');
+    buildPage();
+    applySharedLink();
+  })
+  .catch(err => {
+    document.getElementById('app').innerHTML =
+      '<div class="loading-screen">Could not load cars.json — make sure it is uploaded in the same folder as index.html.</div>';
+    console.error(err);
+  });
+
+// ═══════════════════════════════════════════════════
+// BUILD PAGE HTML (after data is ready)
+// ═══════════════════════════════════════════════════
+function buildPage() {
+  const al = t('ageLabels');
+  document.getElementById('app').innerHTML = `
+  <div class="layout">
+
+    <!-- Print-only branded header -->
+    <div class="print-header">
+      <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+      </svg>
+      <div>
+        <div class="ph-title">${t('printTitle')}</div>
+        <div class="ph-sub">${t('printSub')(new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' }))}</div>
+      </div>
+    </div>
+
+    <!-- LEFT: Vehicle Table -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <h2>${t('vehicleList')}</h2>
+          <span class="count" id="countBadge">—</span>
+        </div>
+
+        <div class="card-body">
+          <div class="search-row">
+            <div class="ac-wrap">
+              <label class="field-label">${t('brand')}</label>
+              <input type="text" id="sBrand" placeholder="${t('brandPlaceholder')}" autocomplete="off">
+              <ul class="ac-list" id="brandList"></ul>
+            </div>
+            <div class="ac-wrap">
+              <label class="field-label">${t('modelKeywords')}</label>
+              <input type="text" id="sModel" placeholder="${t('modelPlaceholder')}" autocomplete="off">
+              <ul class="ac-list" id="modelList"></ul>
+            </div>
+          </div>
+          <div class="search-row-4">
+            <div>
+              <label class="field-label">${t('vehicleAge')}</label>
+              <select id="sAge">
+                <option value="0">${al[0]}</option>
+                <option value="1">${al[1]}</option>
+                <option value="2">${al[2]}</option>
+                <option value="3">${al[3]}</option>
+                <option value="4">${al[4]}</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">${t('currency')}</label>
+              <select id="sCur">
+                <option value="">${t('all')}</option>
+                <option value="JPY">JPY</option>
+                <option value="GBP">GBP</option>
+                <option value="AUD">AUD</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">${t('ccRange')}</label>
+              <select id="sCC">
+                <option value="">${t('allCC')}</option>
+                <option value="0-1499">0 – 1499</option>
+                <option value="1500-1799">1500 – 1799</option>
+                <option value="1800-1999">1800 – 1999</option>
+                <option value="2000-2499">2000 – 2499</option>
+                <option value="2500+">2500+</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">${t('sortFob')}</label>
+              <select id="sSort">
+                <option value="">${t('default')}</option>
+                <option value="asc">${t('fobLowHigh')}</option>
+                <option value="desc">${t('fobHighLow')}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compare bar -->
+        <div class="compare-bar" id="compareBar" style="display:none">
+          <span id="compareBarText"></span>
+          <div style="display:flex; gap:8px">
+            <button class="pag-btn" onclick="toggleCompareView()" id="compareViewBtn">${t('compareView')}</button>
+            <button class="pag-btn" onclick="clearCompare()">${t('compareClear')}</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>${t('thCompare')}</th>
+                <th>${t('thNo')}</th>
+                <th>${t('thBrand')}</th>
+                <th>${t('thModel')}</th>
+                <th>${t('thCC')}</th>
+                <th>${t('thCur')}</th>
+                <th>${t('thFob')}</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <span id="pgInfo" style="font-size:12px"></span>
+          <div class="pag-btns">
+            <button class="pag-btn" id="prevBtn" onclick="goPage(pg-1)" disabled>${t('prev')}</button>
+            <span id="pgNums" style="display:flex;gap:4px"></span>
+            <button class="pag-btn" id="nextBtn" onclick="goPage(pg+1)">${t('next')}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare view (hidden until vehicles are selected) -->
+    <div class="card" id="compareCard" style="display:none">
+      <div class="card-header"><h2>${t('compareTitle')}</h2></div>
+      <div class="card-body" id="compareBody"></div>
+    </div>
+
+    <!-- Duty Calculator (full width, below the vehicle list) -->
+    <div class="card">
+        <div class="card-header"><h2>${t('dutyCalculator')}</h2></div>
+        <div class="card-body">
+
+          <!-- Exchange rates -->
+          <label class="field-label">${t('exchangeRates')}</label>
+          <div class="rate-row">
+            <div>
+              <label class="field-label">JPY</label>
+              <input type="number" class="mono" id="rJPY" value="0.0315" step="0.0001" min="0">
+            </div>
+            <div>
+              <label class="field-label">GBP</label>
+              <input type="number" class="mono" id="rGBP" value="5.95" step="0.001" min="0">
+            </div>
+            <div>
+              <label class="field-label">AUD</label>
+              <input type="number" class="mono" id="rAUD" value="3.05" step="0.001" min="0">
+            </div>
+            <div>
+              <label class="field-label">${t('shipLabel')}</label>
+              <input type="number" class="mono" id="rShip" value="1800" step="100" min="0">
+            </div>
+          </div>
+          <div class="rate-link">${t('officialRates')}
+            <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank">customsgc.gov.my ↗</a>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Duty gauge -->
+          <div class="gauge-label">${t('dutyBracket')}</div>
+          <div class="duty-gauge">
+            <div class="gauge-seg" id="dr0"><div class="g-cc">0–1,499cc<br>/ EV</div><div class="g-pct">135.95%</div></div>
+            <div class="gauge-seg" id="dr1"><div class="g-cc">1,500–<br>1,799cc</div><div class="g-pct">150.25%</div></div>
+            <div class="gauge-seg" id="dr2"><div class="g-cc">1,800–<br>1,999cc</div><div class="g-pct">157.40%</div></div>
+            <div class="gauge-seg" id="dr3"><div class="g-cc">2,000–<br>2,499cc</div><div class="g-pct">171.70%</div></div>
+            <div class="gauge-seg" id="dr4"><div class="g-cc">2,500cc<br>${t('aboveLabel')}</div><div class="g-pct">193.15%</div></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Dynamic calc body -->
+          <div id="calcBody">
+            <div class="empty">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 12l2-5h14l2 5M5 12h14v6a1 1 0 01-1 1H6a1 1 0 01-1-1v-6z"/>
+                <circle cx="7.5" cy="17" r="0.5" fill="currentColor"/>
+                <circle cx="16.5" cy="17" r="0.5" fill="currentColor"/>
+              </svg>
+              <p>${t('emptyCalc')}</p>
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="card faq-card">
+      <div class="card-header"><h2>${t('faqTitle')}</h2></div>
+      <div class="card-body faq-body">
+        ${t('faqItems').map((item, i) => `
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(${i})">
+              <span>${escapeHtml(item[0])}</span>
+              <span class="faq-icon" id="faqIcon${i}">+</span>
+            </button>
+            <div class="faq-a" id="faqA${i}">${escapeHtml(item[1])}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+  `;
+
+  initEvents();
+  loadRates();
+  showEmptyPrompt();
+  updateLangButtons();
+  refreshCompareBar();
+}
+
+// ═══════════════════════════════════════════════════
+// EVENT BINDING
+// ═══════════════════════════════════════════════════
+function initEvents() {
+  document.getElementById('sBrand').addEventListener('input', () => { onBrandInput(); doFilter(); });
+  document.getElementById('sModel').addEventListener('input', () => { onModelInput(); doFilter(); });
+  document.getElementById('sCur').addEventListener('change', doFilter);
+  document.getElementById('sCC').addEventListener('change', doFilter);
+  document.getElementById('sSort').addEventListener('change', doFilter);
+  document.getElementById('sAge').addEventListener('change', () => { doFilter(); if (sel) renderCalc(); });
+
+  document.getElementById('rJPY').addEventListener('input', () => { syncBadge(); saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rGBP').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rAUD').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
+  document.getElementById('rShip').addEventListener('input', () => { saveRates(); if (sel) renderCalc(); });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.ac-wrap')) {
+      document.getElementById('brandList').classList.remove('open');
+      document.getElementById('modelList').classList.remove('open');
+    }
+  });
+
+  document.getElementById('sBrand').addEventListener('focus', onBrandInput);
+  document.getElementById('sModel').addEventListener('focus', onModelInput);
+
+  document.getElementById('sBrand').addEventListener('keydown', (e) => handleAcKey(e, 'brand', 'brandList'));
+  document.getElementById('sModel').addEventListener('keydown', (e) => handleAcKey(e, 'model', 'modelList'));
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE — KEYBOARD NAVIGATION
+// ═══════════════════════════════════════════════════
+function handleAcKey(e, key, listId) {
+  const state = acState[key];
+  const ul = document.getElementById(listId);
+  if (!ul.classList.contains('open') || !state.items.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    state.idx = Math.min(state.idx + 1, state.items.length - 1);
+    updateAcHl(listId, state);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    state.idx = Math.max(state.idx - 1, 0);
+    updateAcHl(listId, state);
+  } else if (e.key === 'Enter') {
+    if (state.idx >= 0 && state.idx < state.items.length) {
+      e.preventDefault();
+      state.onPick(state.items[state.idx]);
+    }
+  } else if (e.key === 'Escape') {
+    ul.classList.remove('open');
+  }
+}
+
+function updateAcHl(listId, state) {
+  const ul = document.getElementById(listId);
+  [...ul.children].forEach((li, i) => li.classList.toggle('hl', i === state.idx));
+  const active = ul.children[state.idx];
+  if (active) active.scrollIntoView({ block: 'nearest' });
+}
+
+function showEmptyPrompt() {
+  filtered = [];
+  document.getElementById('countBadge').textContent = `${DB.length.toLocaleString()} ${t('totalLbl')}`;
+  document.getElementById('tbody').innerHTML =
+    `<tr><td colspan="7" class="no-results">${t('startTyping')(DB.length.toLocaleString())}</td></tr>`;
+  document.getElementById('pgInfo').textContent = '';
+  document.getElementById('pgNums').innerHTML = '';
+  document.getElementById('prevBtn').disabled = true;
+  document.getElementById('nextBtn').disabled = true;
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE
+// ═══════════════════════════════════════════════════
+function onBrandInput() {
+  const val = document.getElementById('sBrand').value.toLowerCase().trim();
+  const all = [...new Set(DB.map(c => c[1]))].sort();
+  const matches = val ? all.filter(b => b.toLowerCase().includes(val)) : all;
+  const onPick = (picked) => {
+    document.getElementById('sBrand').value = picked;
+    document.getElementById('sModel').value = '';
+    document.getElementById('brandList').classList.remove('open');
+    doFilter();
+  };
+  renderAcList('brandList', matches, onPick, 'brand');
+}
+
+function onModelInput() {
+  const brandVal = document.getElementById('sBrand').value.toLowerCase().trim();
+  const val = document.getElementById('sModel').value.toLowerCase().trim();
+  let pool = DB;
+  if (brandVal) pool = pool.filter(c => c[1].toLowerCase() === brandVal);
+  const all = [...new Set(pool.map(c => c[2]))].sort();
+  const matches = val ? all.filter(m => m.toLowerCase().includes(val)) : all;
+  const onPick = (picked) => {
+    document.getElementById('sModel').value = picked;
+    document.getElementById('modelList').classList.remove('open');
+    doFilter();
+  };
+  renderAcList('modelList', matches, onPick, 'model');
+}
+
+function renderAcList(listId, items, onPick, key) {
+  const ul = document.getElementById(listId);
+  acState[key].items = items;
+  acState[key].idx = -1;
+  acState[key].onPick = onPick;
+  if (!items.length) {
+    ul.innerHTML = '<li class="ac-empty">No matches</li>';
+  } else {
+    ul.innerHTML = items.slice(0, 100).map(item =>
+      `<li class="ac-item">${escapeHtml(item)}</li>`
+    ).join('');
+    [...ul.children].forEach((li, i) => {
+      li.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        onPick(items[i]);
+      });
+    });
+  }
+  ul.classList.add('open');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function getRate(cur) {
+  const m = { JPY: 'rJPY', GBP: 'rGBP', AUD: 'rAUD' };
+  const el = document.getElementById(m[cur] || 'rJPY');
+  return el ? (parseFloat(el.value) || 0) : 0;
+}
+
+function getDuty(cc) {
+  if (cc === 0)    return { pct: 1.3595, lbl: '135.95%', row: 'dr0' }; // EV
+  if (cc <= 1499)  return { pct: 1.3595, lbl: '135.95%', row: 'dr0' };
+  if (cc <= 1799)  return { pct: 1.5025, lbl: '150.25%', row: 'dr1' };
+  if (cc <= 1999)  return { pct: 1.5740, lbl: '157.40%', row: 'dr2' };
+  if (cc <= 2499)  return { pct: 1.7170, lbl: '171.70%', row: 'dr3' };
+  return           { pct: 1.9315, lbl: '193.15%', row: 'dr4' };
+}
+
+function getFOB(car) {
+  const idx = parseInt(document.getElementById('sAge').value);
+  return car[5 + idx];
+}
+
+function getCCBucket(cc) {
+  if (cc === 0 || cc <= 1499) return '0-1499';
+  if (cc <= 1799) return '1500-1799';
+  if (cc <= 1999) return '1800-1999';
+  if (cc <= 2499) return '2000-2499';
+  return '2500+';
+}
+
+function rm(n) {
+  return 'RM ' + n.toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function syncBadge() {
+  const v = parseFloat(document.getElementById('rJPY').value) || 0;
+  document.getElementById('jpyBadge').textContent = v.toFixed(4);
+}
+
+// ═══════════════════════════════════════
+// REMEMBER EXCHANGE RATES (localStorage)
+// ═══════════════════════════════════════
+function saveRates() {
+  try {
+    const rates = {
+      rJPY: document.getElementById('rJPY').value,
+      rGBP: document.getElementById('rGBP').value,
+      rAUD: document.getElementById('rAUD').value,
+      rShip: document.getElementById('rShip').value,
+    };
+    localStorage.setItem('kansaiDutyRates', JSON.stringify(rates));
+  } catch (e) { /* localStorage unavailable — ignore */ }
+}
+
+function loadRates() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('kansaiDutyRates'));
+    if (!saved) return;
+    ['rJPY','rGBP','rAUD','rShip'].forEach(id => {
+      if (saved[id] !== undefined && saved[id] !== '') {
+        document.getElementById(id).value = saved[id];
+      }
+    });
+    syncBadge();
+  } catch (e) { /* ignore */ }
+}
+
+// ═══════════════════════════════════════
+// FILTER + RENDER TABLE
+// ═══════════════════════════════════════
+function doFilter() {
+  const brand = document.getElementById('sBrand').value.toLowerCase().trim();
+  const model = document.getElementById('sModel').value.toLowerCase().trim();
+  const cur   = document.getElementById('sCur').value;
+  const ccB   = document.getElementById('sCC').value;
+  const sort  = document.getElementById('sSort').value;
+
+  if (!brand && !model) {
+    showEmptyPrompt();
+    return;
+  }
+
+  filtered = DB.filter(c => {
+    if (brand && !c[1].toLowerCase().includes(brand)) return false;
+    if (model && !c[2].toLowerCase().includes(model)) return false;
+    if (cur && c[4] !== cur) return false;
+    if (ccB && getCCBucket(c[3]) !== ccB) return false;
+    return true;
+  });
+
+  if (sort === 'asc')  filtered.sort((a,b) => getFOB(a) - getFOB(b));
+  if (sort === 'desc') filtered.sort((a,b) => getFOB(b) - getFOB(a));
+
+  pg = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tbody');
+  document.getElementById('countBadge').textContent = `${filtered.length.toLocaleString()} ${t('vehicles')}`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="no-results">${t('noResults')}</td></tr>`;
+    renderPagination();
+    return;
+  }
+
+  const start = (pg - 1) * PER_PAGE;
+  const slice = filtered.slice(start, start + PER_PAGE);
+
+  tbody.innerHTML = slice.map(c => {
+    const fob = getFOB(c);
+    const isActive = sel && sel[0] === c[0];
+    const isCompared = compareList.includes(c[0]);
+    return `<tr class="${isActive ? 'active-row' : ''}" onclick="clickRow(${c[0]})">
+      <td class="td-check"><input type="checkbox" ${isCompared ? 'checked' : ''} onclick="event.stopPropagation(); toggleCompare(${c[0]})"></td>
+      <td style="color:var(--ink-soft);font-size:11px;width:40px">${c[0]}</td>
+      <td class="td-brand"><span class="brand-badge">${escapeHtml(c[1].slice(0,2))}</span>${escapeHtml(c[1])}</td>
+      <td class="td-model" title="${escapeHtml(c[2])}">${escapeHtml(c[2])}</td>
+      <td class="td-cc">${c[3] === 0 ? 'EV' : c[3].toLocaleString()}</td>
+      <td><span class="td-cur">${c[4]}</span></td>
+      <td class="td-fob">${fob.toLocaleString()}</td>
+    </tr>`;
+  }).join('');
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PER_PAGE) || 1;
+  document.getElementById('pgInfo').textContent = t('resultsPage')(filtered.length.toLocaleString(), pg, total);
+  document.getElementById('prevBtn').disabled = pg <= 1;
+  document.getElementById('nextBtn').disabled = pg >= total;
+
+  let nums = '';
+  const range = 2;
+  for (let i = Math.max(1, pg - range); i <= Math.min(total, pg + range); i++) {
+    nums += `<button class="pag-btn ${i===pg?'cur':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  document.getElementById('pgNums').innerHTML = nums;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  pg = Math.max(1, Math.min(total, n));
+  renderTable();
+}
+
+// ═══════════════════════════════════════
+// COMPARE VEHICLES
+// ═══════════════════════════════════════
+function toggleCompare(no) {
+  const idx = compareList.indexOf(no);
+  if (idx >= 0) {
+    compareList.splice(idx, 1);
+  } else {
+    if (compareList.length >= 3) {
+      compareList.shift(); // drop oldest, keep max 3
+    }
+    compareList.push(no);
+  }
+  refreshCompareBar();
+  renderTable();
+  if (document.getElementById('compareCard').style.display !== 'none') renderCompare();
+}
+
+function refreshCompareBar() {
+  const bar = document.getElementById('compareBar');
+  if (!bar) return;
+  if (compareList.length === 0) {
+    bar.style.display = 'none';
+    document.getElementById('compareCard').style.display = 'none';
+    return;
+  }
+  bar.style.display = 'flex';
+  document.getElementById('compareBarText').textContent = t('compareBarText')(compareList.length);
+}
+
+function clearCompare() {
+  compareList = [];
+  document.getElementById('compareCard').style.display = 'none';
+  refreshCompareBar();
+  renderTable();
+}
+
+function toggleCompareView() {
+  const card = document.getElementById('compareCard');
+  if (card.style.display === 'none') {
+    renderCompare();
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    card.style.display = 'none';
+  }
+}
+
+function renderCompare() {
+  const cars = compareList.map(no => DB.find(c => c[0] === no)).filter(Boolean);
+  const body = document.getElementById('compareBody');
+  if (!cars.length) {
+    body.innerHTML = `<div class="compare-empty">${t('compareEmpty')}</div>`;
+    return;
+  }
+
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+  const ageIdx = parseInt(document.getElementById('sAge').value);
+  const L = t('compareLabels');
+
+  const rows = cars.map(c => {
+    const [no, brand, model, cc, cur] = c;
+    const fob = getFOB(c);
+    const rate = getRate(cur);
+    const duty = getDuty(cc);
+    const A = fob * rate;
+    const B = A * 0.015;
+    const C = B + ship;
+    const D = A + C;
+    const E = D * duty.pct;
+    return { no, brand, model, cc, cur, fob, duty, E };
+  });
+
+  body.innerHTML = `
+  <div style="overflow-x:auto">
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>${L.brand}</th>
+        ${rows.map(r => `<th>
+            <div class="compare-model">${escapeHtml(r.brand)}</div>
+            <div class="compare-sub">${escapeHtml(r.model)}</div>
+            <button class="compare-remove" onclick="toggleCompare(${r.no})">${t('compareRemove')}</button>
+          </th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="metric-label">${L.cc}</td>${rows.map(r => `<td>${r.cc === 0 ? 'EV' : r.cc.toLocaleString() + ' cc'}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.cur}</td>${rows.map(r => `<td>${r.cur}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.fob}</td>${rows.map(r => `<td class="mono">${r.fob.toLocaleString()} ${r.cur}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.dutyPct}</td>${rows.map(r => `<td>${r.duty.lbl}</td>`).join('')}</tr>
+      <tr><td class="metric-label">${L.dutyAmt}</td>${rows.map(r => `<td class="compare-duty">${rm(r.E)}</td>`).join('')}</tr>
+    </tbody>
+  </table>
+  </div>
+  <div style="font-size:11px; color:var(--ink-soft); margin-top:10px; padding:0 4px;">*${t('dutyNote')}</div>`;
+}
+
+// ═══════════════════════════════════════
+// FAQ ACCORDION
+// ═══════════════════════════════════════
+function toggleFaq(i) {
+  const a = document.getElementById('faqA' + i);
+  const icon = document.getElementById('faqIcon' + i);
+  a.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════
+// SELECT & CALCULATE
+// ═══════════════════════════════════════
+function clickRow(bil) {
+  sel = DB.find(c => c[0] === bil) || null;
+  renderTable();
+  if (sel) {
+    renderCalc();
+    setTimeout(() => {
+      document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+}
+
+function renderCalc() {
+  if (!sel) return;
+
+  const [bil, brand, model, cc, cur] = sel;
+  const fob = getFOB(sel);
+  const rate = getRate(cur);
+  const duty = getDuty(cc);
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+
+  const ovEl = document.getElementById('ovFOB');
+  const ov = ovEl ? parseFloat(ovEl.value) : NaN;
+  const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
+
+  const A = useFOB * rate;
+  const B = A * 0.015;
+  const C = B + ship;
+  const D = A + C;
+  const E = D * duty.pct;
+
+  ['dr0','dr1','dr2','dr3','dr4'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById(duty.row).classList.add('active');
+
+  const ageLabels = t('ageLabels');
+  const ageIdx = parseInt(document.getElementById('sAge').value);
+  const ageLbl = ageLabels[ageIdx];
+
+  document.getElementById('calcBody').innerHTML = `
+    <div class="sel-info">
+      <div class="sel-brand">${escapeHtml(brand)}</div>
+      <div class="sel-model">${escapeHtml(model)}</div>
+      <div class="sel-tags">
+        <span class="tag">${cc === 0 ? t('ev') : cc.toLocaleString() + ' cc'}</span>
+        <span class="tag">${cur}</span>
+        <span class="tag">${ageLbl}</span>
+        <span class="tag red">${duty.lbl} ${t('dutySuffix')}</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="field-label">${t('fobFromDb')} (${cur})</label>
+      <div class="fob-display">${fob.toLocaleString()} ${cur}</div>
+      <label class="field-label" style="margin-top:10px">${t('overrideFob')}</label>
+      <input type="number" class="mono" id="ovFOB" placeholder="${t('overridePlaceholder')}"
+        min="0" step="1" style="margin-top:4px"
+        value="${(!isNaN(ov) && ov > 0) ? ov : ''}">
+    </div>
+
+    <div class="calc-steps">
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">A</span>
+          <span class="step-name">${t('stepA')}</span>
+          <div class="step-sub">${useFOB.toLocaleString()} ${cur} × ${rate.toFixed(4)}</div>
+        </div>
+        <div class="step-val">${rm(A)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">B</span>
+          <span class="step-name">${t('stepB')}</span>
+          <div class="step-sub">${rm(A)} × 1.5%</div>
+        </div>
+        <div class="step-val">${rm(B)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">C</span>
+          <span class="step-name">${t('stepC')}</span>
+          <div class="step-sub">${rm(B)} + RM ${ship.toLocaleString()}</div>
+        </div>
+        <div class="step-val">${rm(C)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">D</span>
+          <span class="step-name">${t('stepD')}</span>
+          <div class="step-sub">${rm(A)} + ${rm(C)}</div>
+        </div>
+        <div class="step-val big">${rm(D)}</div>
+      </div>
+      <div class="step">
+        <div class="step-left">
+          <span class="step-letter">E</span>
+          <span class="step-name">${t('stepE')(duty.lbl)}</span>
+          <div class="step-sub">${rm(D)} × ${duty.lbl}</div>
+        </div>
+        <div class="step-val big">${rm(E)}</div>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">${t('resultLabel')}</div>
+      <div class="result-value">${rm(E)}</div>
+      <div class="result-sub">${escapeHtml(brand)} · ${duty.lbl} · ${ageLbl}</div>
+    </div>
+    <div style="font-size:11px; color:var(--ink-soft); margin-top:8px; line-height:1.6;">*${t('dutyNote')}</div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="window.print()">${t('printPdf')}</button>
+      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil})">${t('copyResultBtn')}</button>
+      <button class="btn btn-ghost" id="shareBtn" onclick="copyShareLink(${bil})">${t('shareLink')}</button>
+      <button class="btn btn-ghost" onclick="sendWhatsApp(${bil})">${t('whatsapp')}</button>
+      <button class="btn btn-ghost" onclick="clearSel()">${t('clear')}</button>
+    </div>
+  `;
+
+  document.getElementById('ovFOB').addEventListener('input', renderCalc);
+}
+
+// ═══════════════════════════════════════
+// COPY RESULT TO CLIPBOARD
+// ═══════════════════════════════════════
+// SHARED CALCULATION HELPER
+// ═══════════════════════════════════════
+function computeCalc(car) {
+  const [, brand, model, cc, cur] = car;
+  const fob = getFOB(car);
+  const rate = getRate(cur);
+  const duty = getDuty(cc);
+  const ship = parseFloat(document.getElementById('rShip').value) || 0;
+  const ovEl = document.getElementById('ovFOB');
+  const ov = ovEl ? parseFloat(ovEl.value) : NaN;
+  const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
+  const A = useFOB * rate;
+  const B = A * 0.015;
+  const C = B + ship;
+  const D = A + C;
+  const E = D * duty.pct;
+  const total = D + E;
+  return { brand, model, cc, cur, fob, rate, duty, ship, useFOB, A, B, C, D, E, total };
+}
+
+// ═══════════════════════════════════════
+// COPY RESULT TO CLIPBOARD
+// ═══════════════════════════════════════
+function copyResult(bil) {
+  const car = DB.find(c => c[0] === bil);
+  if (!car) return;
+  const v = computeCalc(car);
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
+  const evLbl = v.cc === 0 ? t('ev') : v.cc.toLocaleString() + ' cc';
+
+  const text =
+`${t('printTitle')}
+${v.brand} ${v.model}
+${evLbl} · ${v.cur} · ${ageLbl}
+
+FOB: ${v.useFOB.toLocaleString()} ${v.cur} (rate ${v.rate.toFixed(4)})
+${t('stepA')} (A): ${rm(v.A)}
+${t('stepC')} (C): ${rm(v.C)}
+${t('stepD')} (D): ${rm(v.D)}
+${t('dutySuffix')}: ${v.duty.lbl}
+
+${t('resultLabel').toUpperCase()}: ${rm(v.E)}
+*${t('dutyNote')}
+
+${t('printSub')('').split('·')[1]?.trim() || ''}`;
+
+  const btn = document.getElementById('copyBtn');
+  const showCopied = () => {
+    const original = btn.textContent;
+    btn.textContent = t('copied');
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
+
+// ═══════════════════════════════════════
+// SHARE LINK
+// ═══════════════════════════════════════
+function copyShareLink(bil) {
+  const params = new URLSearchParams();
+  params.set('car', bil);
+  params.set('age', document.getElementById('sAge').value);
+  params.set('jpy', document.getElementById('rJPY').value);
+  params.set('gbp', document.getElementById('rGBP').value);
+  params.set('aud', document.getElementById('rAUD').value);
+  params.set('ship', document.getElementById('rShip').value);
+  params.set('lang', LANG);
+  const url = `${location.origin}${location.pathname}?${params.toString()}`;
+
+  const btn = document.getElementById('shareBtn');
+  const showCopied = () => {
+    const original = btn.textContent;
+    btn.textContent = t('linkCopied');
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showCopied).catch(() => fallbackCopy(url, showCopied));
+  } else {
+    fallbackCopy(url, showCopied);
+  }
+}
+
+// ═══════════════════════════════════════
+// WHATSAPP ENQUIRY
+// ═══════════════════════════════════════
+function sendWhatsApp(bil) {
+  const car = DB.find(c => c[0] === bil);
+  if (!car) return;
+  const v = computeCalc(car);
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
+  const evLbl = v.cc === 0 ? t('ev') : v.cc.toLocaleString() + ' cc';
+
+  const text =
+`${t('printTitle')}
+${v.brand} ${v.model}
+${evLbl} · ${v.cur} · ${ageLbl}
+${t('resultLabel')}: ${rm(v.E)}
+*${t('dutyNote')}`;
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); cb(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+function clearSel() {
+  sel = null;
+  ['dr0','dr1','dr2','dr3','dr4'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('calcBody').innerHTML = `
+    <div class="empty">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 12l2-5h14l2 5M5 12h14v6a1 1 0 01-1 1H6a1 1 0 01-1-1v-6z"/>
+        <circle cx="7.5" cy="17" r="0.5" fill="currentColor"/>
+        <circle cx="16.5" cy="17" r="0.5" fill="currentColor"/>
+      </svg>
+      <p>${t('emptyCalc')}</p>
+    </div>`;
+  renderTable();
+}
+
+// ═══════════════════════════════════════
+// REBUILD (on language switch) — preserves search/selection state
+// ═══════════════════════════════════════
+function rebuild() {
+  const state = {
+    brand: document.getElementById('sBrand')?.value || '',
+    model: document.getElementById('sModel')?.value || '',
+    age: document.getElementById('sAge')?.value,
+    cur: document.getElementById('sCur')?.value,
+    cc: document.getElementById('sCC')?.value,
+    sort: document.getElementById('sSort')?.value,
+    jpy: document.getElementById('rJPY')?.value,
+    gbp: document.getElementById('rGBP')?.value,
+    aud: document.getElementById('rAUD')?.value,
+    ship: document.getElementById('rShip')?.value,
+  };
+  buildPage();
+  document.getElementById('sBrand').value = state.brand;
+  document.getElementById('sModel').value = state.model;
+  if (state.age  !== undefined) document.getElementById('sAge').value  = state.age;
+  if (state.cur  !== undefined) document.getElementById('sCur').value  = state.cur;
+  if (state.cc   !== undefined) document.getElementById('sCC').value   = state.cc;
+  if (state.sort !== undefined) document.getElementById('sSort').value = state.sort;
+  if (state.jpy)  document.getElementById('rJPY').value  = state.jpy;
+  if (state.gbp)  document.getElementById('rGBP').value  = state.gbp;
+  if (state.aud)  document.getElementById('rAUD').value  = state.aud;
+  if (state.ship) document.getElementById('rShip').value = state.ship;
+  syncBadge();
+  if (state.brand || state.model) doFilter();
+  if (sel) renderCalc();
+}
+
+// ═══════════════════════════════════════
+// SHARE LINK — apply params from URL on first load
+// ═══════════════════════════════════════
+function applySharedLink() {
+  const params = new URLSearchParams(location.search);
+  if (!params.has('car')) return;
+  const no = parseInt(params.get('car'), 10);
+  const car = DB.find(c => c[0] === no);
+  if (!car) return;
+
+  if (params.has('age'))  document.getElementById('sAge').value  = params.get('age');
+  if (params.has('jpy'))  document.getElementById('rJPY').value  = params.get('jpy');
+  if (params.has('gbp'))  document.getElementById('rGBP').value  = params.get('gbp');
+  if (params.has('aud'))  document.getElementById('rAUD').value  = params.get('aud');
+  if (params.has('ship')) document.getElementById('rShip').value = params.get('ship');
+  syncBadge();
+  saveRates();
+
+  document.getElementById('sBrand').value = car[1];
+  doFilter();
+  sel = car;
+  renderTable();
+  renderCalc();
+  setTimeout(() => {
+    document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+</script>
+</body>
+</html>

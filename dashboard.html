@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kansai Group — Staff Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --red: #E60012; --red-dark: #B3000E; --gold: #C8A23C;
+    --navy: #111827; --bg-main: #FFFFFF; --bg-alt: #F4F5F7;
+    --text-main: #111827; --text-muted: #6B7280; --border: #E5E7EB;
+    --green: #16A34A; --amber: #D97706; --blue: #2563EB;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg-alt); color: var(--text-main); -webkit-font-smoothing: antialiased; }
+  .bebas { font-family: 'Bebas Neue', sans-serif; }
+  .rajdhani { font-family: 'Rajdhani', sans-serif; }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+  .hidden { display: none !important; }
+  input, select, textarea, button { font-family: 'Inter', sans-serif; }
+
+  .login-screen { position: fixed; inset: 0; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+  .login-box { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 40px 36px; max-width: 380px; width: 100%; text-align: center; box-shadow: var(--shadow-md); }
+  .login-mark { width: 52px; height: 52px; background: var(--red); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; margin: 0 auto 18px; }
+  .login-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; }
+  .login-sub { font-size: 12px; color: var(--text-muted); margin: 4px 0 26px; }
+  .login-field { text-align: left; margin-bottom: 14px; }
+  .login-field label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+  .login-field input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 9px; font-size: 14px; background: var(--bg-alt); outline: none; }
+  .login-field input:focus { border-color: var(--navy); background: #fff; }
+  .login-btn { width: 100%; background: var(--red); color: #fff; border: none; border-radius: 9px; padding: 13px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; margin-top: 6px; }
+  .login-btn:hover { background: var(--red-dark); }
+  .login-btn:disabled { opacity: 0.6; cursor: wait; }
+  .login-error { background: rgba(230,0,18,0.08); border: 1px solid rgba(230,0,18,0.2); color: var(--red); font-size: 12.5px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; text-align: left; display: none; }
+
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 230px; background: var(--navy); color: #fff; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+  .sb-logo { display: flex; align-items: center; gap: 10px; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sb-mark { width: 36px; height: 36px; background: var(--red); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; }
+  .sb-logo-text .top { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 2px; line-height: 1; }
+  .sb-logo-text .btm { font-size: 8px; letter-spacing: 1.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-top: 2px; }
+  .sb-nav { padding: 16px 12px; flex: 1; }
+  .sb-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 9px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.65); cursor: pointer; margin-bottom: 4px; transition: all 0.15s; }
+  .sb-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .sb-item.active { background: var(--red); color: #fff; }
+  .sb-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .sb-user { padding: 16px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 11px; }
+  .sb-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .sb-user-info { flex: 1; min-width: 0; }
+  .sb-user-name { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sb-user-role { font-size: 10.5px; color: rgba(255,255,255,0.5); }
+  .sb-logout { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; }
+  .sb-logout:hover { color: #fff; }
+
+  .main { flex: 1; min-width: 0; }
+  .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; flex-wrap: wrap; gap: 10px; }
+  .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1.5px; }
+  .topbar-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .btn-add { background: var(--red); color: #fff; border: none; border-radius: 9px; padding: 11px 20px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 7px; }
+  .btn-add:hover { background: var(--red-dark); }
+  .content { padding: 24px 28px; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-top: 5px; }
+  .stat-card.accent .stat-num { color: var(--red); }
+
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 200px; position: relative; }
+  .search-box input { width: 100%; padding: 10px 14px 10px 38px; border: 1px solid var(--border); border-radius: 9px; font-size: 13px; background: #fff; outline: none; }
+  .search-box input:focus { border-color: var(--navy); }
+  .search-box svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg-btn { padding: 9px 15px; border-radius: 8px; border: 1px solid var(--border); background: #fff; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .seg-btn:hover { border-color: var(--navy); color: var(--text-main); }
+  .seg-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  .car-table { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .ct-row { display: grid; grid-template-columns: 64px 2fr 1fr 1fr 1fr 110px 90px; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  .ct-row:last-child { border-bottom: none; }
+  .ct-head { background: var(--bg-alt); font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding-top: 11px; padding-bottom: 11px; }
+  .ct-row.car:hover { background: #FAFAFB; }
+  .ct-thumb { width: 56px; height: 42px; border-radius: 7px; object-fit: cover; background: var(--bg-alt); }
+  .ct-name { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; }
+  .ct-make { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .ct-price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.5px; }
+  .ct-cell { font-size: 13px; color: var(--text-muted); }
+  .status-pill { font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px; display: inline-block; }
+  .st-available { background: rgba(22,163,74,0.1); color: var(--green); }
+  .st-reserved { background: rgba(217,119,6,0.1); color: var(--amber); }
+  .st-sold { background: rgba(107,114,128,0.12); color: var(--text-muted); }
+  .st-incoming { background: rgba(37,99,235,0.1); color: var(--blue); }
+  .ct-actions { display: flex; gap: 6px; }
+  .icon-btn { width: 32px; height: 32px; border: 1px solid var(--border); background: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+  .icon-btn:hover { border-color: var(--navy); color: var(--text-main); }
+  .icon-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .feat-star { color: var(--gold); }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-state svg { margin-bottom: 14px; opacity: 0.4; }
+
+  .form-page { max-width: 920px; }
+  .form-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+  .form-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+  .form-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .form-card .card-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+  .field { margin-bottom: 15px; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 6px; }
+  .field label .req { color: var(--red); }
+  .field label .opt { color: var(--text-muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .field input, .field select, .field textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 9px; font-size: 14px; background: var(--bg-alt); outline: none; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--navy); background: #fff; }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 30px 20px; text-align: center; background: var(--bg-alt); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--red); background: #fff; }
+  .dz-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(230,0,18,0.08); color: var(--red); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .dz-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+  .dz-sub { font-size: 12px; color: var(--text-muted); }
+  .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-top: 14px; }
+  .photo-thumb { position: relative; aspect-ratio: 4/3; border-radius: 9px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-alt); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb .cover-badge { position: absolute; top: 5px; left: 5px; background: var(--gold); color: var(--navy); font-size: 8.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .photo-thumb .ph-del { position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; background: rgba(17,24,39,0.7); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; }
+  .photo-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+  .photo-uploading { font-size: 11.5px; color: var(--red); margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px; background: var(--bg-alt); border-radius: 10px; margin-bottom: 12px; }
+  .toggle-label { font-size: 13.5px; font-weight: 600; }
+  .toggle-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+  .switch { width: 44px; height: 25px; background: var(--border); border-radius: 20px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+  .switch.on { background: var(--red); }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 19px; height: 19px; background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .switch.on::after { transform: translateX(19px); }
+
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+  .btn-cancel { background: #fff; border: 1px solid var(--border); border-radius: 9px; padding: 12px 24px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; color: var(--text-muted); }
+  .btn-cancel:hover { border-color: var(--navy); color: var(--text-main); }
+  .btn-publish { background: var(--red); color: #fff; border: none; border-radius: 9px; padding: 12px 32px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .btn-publish:hover { background: var(--red-dark); }
+  .btn-publish:disabled { opacity: 0.6; cursor: wait; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); cursor: pointer; margin-bottom: 14px; font-weight: 500; }
+  .back-link:hover { color: var(--red); }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--navy); color: #fff; padding: 13px 26px; border-radius: 8px; font-size: 13.5px; font-weight: 500; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; box-shadow: var(--shadow-md); }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .ct-row { grid-template-columns: 50px 2fr 1fr 80px; }
+    .ct-col-hide { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-mark">KG</div>
+    <div class="login-title bebas">Staff Dashboard</div>
+    <div class="login-sub">Sign in to manage stock listings</div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="you@kansaigroup.my">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPw" placeholder="Your password">
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<div class="app hidden" id="app">
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-mark">KG</div>
+      <div class="sb-logo-text"><div class="top">KANSAI</div><div class="btm">Staff Dashboard</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-item active" onclick="showView('list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        All Stock
+      </div>
+      <div class="sb-item" onclick="newCarForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add New Car
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">--</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sbUserName">--</div>
+        <div class="sb-user-role">Staff · KL Office</div>
+      </div>
+      <button class="sb-logout" onclick="doLogout()" title="Sign out">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div id="view-list">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title bebas">All Stock</div>
+          <div class="topbar-sub" id="topbarSub">Loading…</div>
+        </div>
+        <button class="btn-add" onclick="newCarForm()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add New Car
+        </button>
+      </div>
+      <div class="content">
+        <div class="stat-row" id="statRow">
+          <div class="stat-card"><div class="stat-num bebas" id="statTotal">–</div><div class="stat-lbl">Total Listed</div></div>
+          <div class="stat-card accent"><div class="stat-num bebas" id="statAvail">–</div><div class="stat-lbl">Available</div></div>
+          <div class="stat-card"><div class="stat-num bebas" id="statReserved">–</div><div class="stat-lbl">Reserved</div></div>
+          <div class="stat-card"><div class="stat-num bebas" id="statIncoming">–</div><div class="stat-lbl">Incoming</div></div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search by brand or model..." oninput="renderCars()">
+          </div>
+          <div class="seg" id="statusFilters">
+            <button class="seg-btn active" data-status="all" onclick="setStatusFilter('all', this)">All</button>
+            <button class="seg-btn" data-status="Available" onclick="setStatusFilter('Available', this)">Available</button>
+            <button class="seg-btn" data-status="Reserved" onclick="setStatusFilter('Reserved', this)">Reserved</button>
+            <button class="seg-btn" data-status="Incoming" onclick="setStatusFilter('Incoming', this)">Incoming</button>
+            <button class="seg-btn" data-status="Sold" onclick="setStatusFilter('Sold', this)">Sold</button>
+          </div>
+        </div>
+
+        <div class="car-table">
+          <div class="ct-row ct-head">
+            <div></div><div>Vehicle</div>
+            <div class="ct-col-hide">Year / Mileage</div>
+            <div class="ct-col-hide">Body</div>
+            <div>Price</div><div>Status</div><div>Actions</div>
+          </div>
+          <div id="carTableBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-form" class="hidden">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title bebas" id="formTitle">Add New Car</div>
+          <div class="topbar-sub">Fill in the details and publish to the website</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="back-link" onclick="showView('list')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to all stock
+        </div>
+
+        <div class="form-page">
+          <div class="form-card">
+            <h3>Photos</h3>
+            <div class="card-hint">Upload 5–10 photos. The first photo is the cover. Photos are automatically compressed for fast loading.</div>
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+              <div class="dz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+              <div class="dz-title">Drag photos here, or click to browse</div>
+              <div class="dz-sub">JPG or PNG · up to 10 photos</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" multiple class="hidden" onchange="handleFiles(this.files)">
+            <div class="photo-grid" id="photoGrid"></div>
+            <div class="photo-hint" id="photoHint">0 of 10 photos added</div>
+            <div class="photo-uploading hidden" id="photoUploading">Compressing &amp; uploading photo…</div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <div class="form-card">
+                <h3>The Essentials</h3>
+                <div class="card-hint">These appear on the listing cards.</div>
+                <div class="field-row">
+                  <div class="field"><label>Brand <span class="req">*</span></label>
+                    <select id="f_brand">
+                      <option>Toyota</option><option>Honda</option><option>Lexus</option><option>BMW</option>
+                      <option>Mercedes-Benz</option><option>Nissan</option><option>Mazda</option><option>Audi</option>
+                      <option>Land Rover</option><option>Porsche</option><option>Subaru</option><option>Other</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>Model <span class="req">*</span></label><input type="text" id="f_model" placeholder="e.g. Alphard Exec Lounge"></div>
+                </div>
+                <div class="field-row-3">
+                  <div class="field"><label>Year <span class="req">*</span></label>
+                    <select id="f_year"></select>
+                  </div>
+                  <div class="field"><label>Price RM <span class="req">*</span></label><input type="number" id="f_price" placeholder="388000"></div>
+                  <div class="field"><label>Mileage <span class="req">*</span></label><input type="number" id="f_mileage" placeholder="8200"></div>
+                </div>
+              </div>
+
+              <div class="form-card">
+                <h3>Specifications</h3>
+                <div class="card-hint">Shown on the car's detail page.</div>
+                <div class="field-row">
+                  <div class="field"><label>Engine <span class="req">*</span></label><input type="text" id="f_engine" placeholder="e.g. 3.5L V6"></div>
+                  <div class="field"><label>Body Type <span class="req">*</span></label>
+                    <select id="f_body">
+                      <option>SUV / 4x4</option><option>MPV</option><option>Sedan</option><option>Sports</option><option>Luxury</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-row-3">
+                  <div class="field"><label>Transmission</label><select id="f_trans"><option>Auto</option><option>Manual</option></select></div>
+                  <div class="field"><label>Fuel</label><select id="f_fuel"><option>Petrol</option><option>Diesel</option><option>Hybrid</option><option>EV</option></select></div>
+                  <div class="field"><label>Seats</label><select id="f_seats"><option>2</option><option>4</option><option selected>5</option><option>7</option><option>8</option></select></div>
+                </div>
+                <div class="field-row">
+                  <div class="field"><label>Drive</label><select id="f_drive"><option>2WD</option><option>AWD</option><option>4WD</option></select></div>
+                  <div class="field"><label>Auction Grade <span class="opt">(optional)</span></label><input type="text" id="f_grade" placeholder="e.g. 4.5"></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="form-card">
+                <h3>Status &amp; Display</h3>
+                <div class="card-hint">Controls how the car appears on the site.</div>
+                <div class="field"><label>Status <span class="req">*</span></label>
+                  <select id="f_status" onchange="toggleEta(this)">
+                    <option>Available</option><option>Reserved</option><option>Sold</option><option>Incoming</option>
+                  </select>
+                </div>
+                <div class="field hidden" id="etaField"><label>ETA <span class="opt">(for incoming)</span></label><input type="text" id="f_eta" placeholder="e.g. 3 weeks"></div>
+                <div class="field"><label>Tag <span class="opt">(badge)</span></label><select id="f_tag"><option>None</option><option>Hot Deal</option><option>New In</option></select></div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Featured</div><div class="toggle-desc">Show in the featured section</div></div>
+                  <div class="switch" id="f_featured" onclick="this.classList.toggle('on')"></div>
+                </div>
+              </div>
+
+              <div class="form-card">
+                <h3>Description <span class="opt" style="font-size:11px;color:var(--text-muted);font-weight:500;text-transform:none;">(optional)</span></h3>
+                <div class="field" style="margin-bottom:0"><textarea id="f_desc" placeholder="Any extra notes — condition highlights, extras, service history..."></textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-cancel" onclick="showView('list')">Cancel</button>
+            <button class="btn-publish" id="publishBtn" onclick="saveCar()">Publish Car</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// SUPABASE SETUP
+// ═══════════════════════════════════════
+const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allCars = [];
+let currentPhotos = []; // {url, path} for the car being edited/added
+let editingCarId = null;
+let statusFilter = 'all';
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPw').value;
+  const btn = document.getElementById('loginBtn');
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+
+  if (!email || !password) {
+    errBox.textContent = 'Please enter your email and password.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In';
+
+  if (error) {
+    errBox.textContent = error.message === 'Invalid login credentials'
+      ? 'Incorrect email or password.'
+      : error.message;
+    errBox.style.display = 'block';
+    return;
+  }
+
+  enterApp(data.user);
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+
+function enterApp(user) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  const name = user.email.split('@')[0];
+  document.getElementById('sbUserName').textContent = name;
+  document.getElementById('sbAvatar').textContent = name.slice(0, 2).toUpperCase();
+  loadCars();
+}
+
+// Check if already logged in (persisted session)
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) enterApp(data.session.user);
+});
+
+document.getElementById('loginPw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ═══════════════════════════════════════
+// LOAD & RENDER CARS
+// ═══════════════════════════════════════
+async function loadCars() {
+  const { data, error } = await sb.from('cars').select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load cars: ' + error.message, true); return; }
+  allCars = data || [];
+  renderStats();
+  renderCars();
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = allCars.length;
+  document.getElementById('statAvail').textContent = allCars.filter(c => c.status === 'Available').length;
+  document.getElementById('statReserved').textContent = allCars.filter(c => c.status === 'Reserved').length;
+  document.getElementById('statIncoming').textContent = allCars.filter(c => c.status === 'Incoming').length;
+  document.getElementById('topbarSub').textContent =
+    `${allCars.length} vehicles · ${allCars.filter(c=>c.featured).length} featured · ${allCars.filter(c=>c.status==='Incoming').length} incoming`;
+}
+
+function setStatusFilter(status, btn) {
+  statusFilter = status;
+  document.querySelectorAll('#statusFilters .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCars();
+}
+
+function renderCars() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let list = allCars.filter(c => {
+    const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
+    const matchesSearch = !search || (c.brand + ' ' + c.model).toLowerCase().includes(search);
+    return matchesStatus && matchesSearch;
+  });
+
+  const body = document.getElementById('carTableBody');
+  if (!list.length) {
+    body.innerHTML = `<div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <div>No cars match your search.</div>
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = list.map(c => {
+    const photos = c.photos || [];
+    const thumb = photos[0]?.url || '';
+    const statusClass = { Available: 'st-available', Reserved: 'st-reserved', Sold: 'st-sold', Incoming: 'st-incoming' }[c.status] || 'st-available';
+    return `
+    <div class="ct-row car">
+      ${thumb ? `<img class="ct-thumb" src="${thumb}">` : `<div class="ct-thumb"></div>`}
+      <div>
+        <div class="ct-name rajdhani">${escapeHtml(c.model)} ${c.featured ? '<svg class="feat-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-1px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>' : ''}</div>
+        <div class="ct-make">${escapeHtml(c.brand)}</div>
+      </div>
+      <div class="ct-cell ct-col-hide">${c.year} · ${c.status==='Incoming' ? (c.eta||'TBA') : (c.mileage||0).toLocaleString()+' km'}</div>
+      <div class="ct-cell ct-col-hide">${escapeHtml(c.body_type||'–')}</div>
+      <div class="ct-price bebas">${Number(c.price).toLocaleString()}</div>
+      <div><span class="status-pill ${statusClass}">${c.status}</span></div>
+      <div class="ct-actions">
+        <div class="icon-btn" onclick="editCar('${c.id}')" title="Edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        <div class="icon-btn danger" onclick="deleteCar('${c.id}')" title="Delete"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ═══════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════
+function showView(v) {
+  document.getElementById('view-list').classList.toggle('hidden', v !== 'list');
+  document.getElementById('view-form').classList.toggle('hidden', v !== 'form');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (v === 'list') { document.querySelectorAll('.sb-item')[0].classList.add('active'); loadCars(); }
+  if (v === 'form') document.querySelectorAll('.sb-item')[1].classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleEta(sel) {
+  document.getElementById('etaField').classList.toggle('hidden', sel.value !== 'Incoming');
+}
+
+// populate year dropdown
+(function initYears() {
+  const sel = document.getElementById('f_year');
+  const thisYear = new Date().getFullYear();
+  for (let y = thisYear + 1; y >= thisYear - 15; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    sel.appendChild(opt);
+  }
+})();
+
+function newCarForm() {
+  editingCarId = null;
+  currentPhotos = [];
+  document.getElementById('formTitle').textContent = 'Add New Car';
+  document.getElementById('publishBtn').textContent = 'Publish Car';
+  ['f_model','f_price','f_mileage','f_engine','f_grade','f_eta','f_desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f_brand').selectedIndex = 0;
+  document.getElementById('f_body').selectedIndex = 0;
+  document.getElementById('f_trans').selectedIndex = 0;
+  document.getElementById('f_fuel').selectedIndex = 0;
+  document.getElementById('f_drive').selectedIndex = 0;
+  document.getElementById('f_status').selectedIndex = 0;
+  document.getElementById('f_tag').selectedIndex = 0;
+  document.getElementById('f_featured').classList.remove('on');
+  document.getElementById('etaField').classList.add('hidden');
+  renderPhotoGrid();
+  showView('form');
+}
+
+function editCar(id) {
+  const c = allCars.find(x => x.id === id);
+  if (!c) return;
+  editingCarId = id;
+  currentPhotos = (c.photos || []).slice();
+  document.getElementById('formTitle').textContent = 'Edit Car';
+  document.getElementById('publishBtn').textContent = 'Save Changes';
+  document.getElementById('f_brand').value = c.brand || 'Toyota';
+  document.getElementById('f_model').value = c.model || '';
+  document.getElementById('f_year').value = c.year || new Date().getFullYear();
+  document.getElementById('f_price').value = c.price || '';
+  document.getElementById('f_mileage').value = c.mileage || '';
+  document.getElementById('f_engine').value = c.engine || '';
+  document.getElementById('f_body').value = c.body_type || 'SUV / 4x4';
+  document.getElementById('f_trans').value = c.transmission || 'Auto';
+  document.getElementById('f_fuel').value = c.fuel || 'Petrol';
+  document.getElementById('f_seats').value = c.seats || '5';
+  document.getElementById('f_drive').value = c.drive || '2WD';
+  document.getElementById('f_grade').value = c.grade || '';
+  document.getElementById('f_status').value = c.status || 'Available';
+  document.getElementById('f_eta').value = c.eta || '';
+  document.getElementById('f_tag').value = c.tag || 'None';
+  document.getElementById('f_desc').value = c.description || '';
+  document.getElementById('f_featured').classList.toggle('on', !!c.featured);
+  document.getElementById('etaField').classList.toggle('hidden', c.status !== 'Incoming');
+  renderPhotoGrid();
+  showView('form');
+}
+
+async function deleteCar(id) {
+  const c = allCars.find(x => x.id === id);
+  if (!c) return;
+  if (!confirm(`Delete "${c.brand} ${c.model}"? This cannot be undone.`)) return;
+
+  // delete photos from storage first
+  const paths = (c.photos || []).map(p => p.path).filter(Boolean);
+  if (paths.length) await sb.storage.from('car-photos').remove(paths);
+
+  const { error } = await sb.from('cars').delete().eq('id', id);
+  if (error) { showToast('Failed to delete: ' + error.message, true); return; }
+  showToast('Car deleted.');
+  loadCars();
+}
+
+// ═══════════════════════════════════════
+// PHOTO UPLOAD — compress in-browser, then upload to Supabase Storage
+// ═══════════════════════════════════════
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+function compressImage(file, maxDim = 1600, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > maxDim) { height *= maxDim / width; width = maxDim; }
+      else if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+  const remaining = 10 - currentPhotos.length;
+  if (remaining <= 0) { showToast('Maximum 10 photos reached.', true); return; }
+
+  const toProcess = files.slice(0, remaining);
+  document.getElementById('photoUploading').classList.remove('hidden');
+
+  for (const file of toProcess) {
+    try {
+      const blob = await compressImage(file);
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+      const { error: upErr } = await sb.storage.from('car-photos').upload(path, blob, { contentType: 'image/jpeg' });
+      if (upErr) { showToast('Upload failed: ' + upErr.message, true); continue; }
+      const { data: urlData } = sb.storage.from('car-photos').getPublicUrl(path);
+      currentPhotos.push({ url: urlData.publicUrl, path });
+      renderPhotoGrid();
+    } catch (err) {
+      showToast('Could not process photo.', true);
+    }
+  }
+
+  document.getElementById('photoUploading').classList.add('hidden');
+  document.getElementById('fileInput').value = '';
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = currentPhotos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.url}">
+      ${i === 0 ? '<span class="cover-badge">Cover</span>' : ''}
+      <div class="ph-del" onclick="removePhoto(${i})">✕</div>
+    </div>
+  `).join('');
+  document.getElementById('photoHint').textContent = `${currentPhotos.length} of 10 photos added`;
+}
+
+async function removePhoto(index) {
+  const p = currentPhotos[index];
+  if (p.path) await sb.storage.from('car-photos').remove([p.path]);
+  currentPhotos.splice(index, 1);
+  renderPhotoGrid();
+}
+
+// ═══════════════════════════════════════
+// SAVE CAR (insert or update)
+// ═══════════════════════════════════════
+async function saveCar() {
+  const brand = document.getElementById('f_brand').value;
+  const model = document.getElementById('f_model').value.trim();
+  const year = parseInt(document.getElementById('f_year').value);
+  const price = parseFloat(document.getElementById('f_price').value);
+  const mileage = parseInt(document.getElementById('f_mileage').value);
+  const engine = document.getElementById('f_engine').value.trim();
+  const body_type = document.getElementById('f_body').value;
+
+  if (!model || !year || !price || isNaN(mileage) || !engine) {
+    showToast('Please fill in all required fields (marked with *).', true);
+    return;
+  }
+  if (currentPhotos.length === 0) {
+    if (!confirm('No photos added. Publish without photos?')) return;
+  }
+
+  const payload = {
+    brand, model, year, price, mileage, engine, body_type,
+    transmission: document.getElementById('f_trans').value,
+    fuel: document.getElementById('f_fuel').value,
+    seats: document.getElementById('f_seats').value,
+    drive: document.getElementById('f_drive').value,
+    grade: document.getElementById('f_grade').value.trim(),
+    status: document.getElementById('f_status').value,
+    eta: document.getElementById('f_eta').value.trim(),
+    tag: document.getElementById('f_tag').value,
+    featured: document.getElementById('f_featured').classList.contains('on'),
+    description: document.getElementById('f_desc').value.trim(),
+    photos: currentPhotos,
+  };
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  let error;
+  if (editingCarId) {
+    ({ error } = await sb.from('cars').update(payload).eq('id', editingCarId));
+  } else {
+    ({ error } = await sb.from('cars').insert(payload));
+  }
+
+  btn.disabled = false;
+  btn.textContent = editingCarId ? 'Save Changes' : 'Publish Car';
+
+  if (error) { showToast('Failed to save: ' + error.message, true); return; }
+  showToast(editingCarId ? 'Car updated.' : 'Car published.');
+  showView('list');
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+
+</body>
+</html>

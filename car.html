@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading… — Kansai Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --red: #E60012; --red-dark: #B3000E; --gold: #C8A23C; --gold-dark: #A8842C;
+    --navy: #111827; --bg-main: #FFFFFF; --bg-alt: #F8F9FA;
+    --text-main: #111827; --text-muted: #6B7280; --border: #E5E7EB; --green: #16A34A;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.02); --shadow-md: 0 10px 30px rgba(0,0,0,0.06); --shadow-hover: 0 18px 38px rgba(0,0,0,0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); overflow-x: hidden; }
+  .bebas { font-family: 'Bebas Neue', sans-serif; }
+  .rajdhani { font-family: 'Rajdhani', sans-serif; }
+  .jp { font-family: 'Noto Sans JP', sans-serif; }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+  .hidden { display: none !important; }
+
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 11px; }
+  .logo-mark { width: 38px; height: 38px; background: var(--red); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; letter-spacing: 1px; }
+  .logo-text .top { font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 2.5px; line-height: 1; }
+  .logo-text .btm { font-size: 8px; letter-spacing: 2.5px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+  nav ul { list-style: none; display: flex; gap: 30px; align-items: center; }
+  nav ul a { color: var(--text-muted); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
+  nav ul a:hover { color: var(--red); }
+  .nav-cta { background: var(--red); color: #fff; padding: 9px 20px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .nav-cta:hover { background: var(--red-dark); }
+  .menu-btn { display: none; background: none; border: none; cursor: pointer; }
+
+  .breadcrumb { max-width: 1200px; margin: 0 auto; padding: 18px 24px 0; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .breadcrumb a:hover { color: var(--red); }
+  .breadcrumb .sep { color: var(--border); }
+
+  .detail { max-width: 1200px; margin: 0 auto; padding: 18px 24px 0; display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; }
+
+  .gallery-main { position: relative; aspect-ratio: 4/3; border-radius: 16px; overflow: hidden; background: #ECEDF0; box-shadow: var(--shadow-md); }
+  .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery-badge { position: absolute; top: 16px; left: 16px; background: var(--gold); color: var(--navy); font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 13px; border-radius: 5px; }
+  .gallery-count { position: absolute; bottom: 16px; right: 16px; background: rgba(17,24,39,0.8); color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 6px; }
+  .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .gallery-nav:hover { background: #fff; }
+  .gallery-nav.prev { left: 14px; }
+  .gallery-nav.next { right: 14px; }
+  .thumb-strip { display: flex; gap: 9px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .thumb { flex: 0 0 88px; aspect-ratio: 4/3; border-radius: 9px; overflow: hidden; cursor: pointer; border: 2px solid transparent; }
+  .thumb.active { border-color: var(--red); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .info-panel { position: sticky; top: 84px; align-self: start; }
+  .info-make { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+  .info-model { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 1px; line-height: 1; margin-bottom: 12px; }
+  .info-status { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 18px; }
+  .info-status .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .st-available { background: rgba(22,163,74,0.1); color: var(--green); } .st-available .dot { background: var(--green); }
+  .st-reserved { background: rgba(217,119,6,0.1); color: #D97706; } .st-reserved .dot { background: #D97706; }
+  .st-sold { background: rgba(107,114,128,0.12); color: var(--text-muted); } .st-sold .dot { background: var(--text-muted); }
+  .st-incoming { background: rgba(37,99,235,0.1); color: #2563EB; } .st-incoming .dot { background: #2563EB; }
+  .info-price-box { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  .info-price-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px; }
+  .info-price { font-family: 'Bebas Neue', sans-serif; font-size: 46px; letter-spacing: 1px; line-height: 1; }
+  .info-price .cur { font-size: 20px; color: var(--text-muted); }
+  .info-price-note { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
+  .info-actions { display: flex; flex-direction: column; gap: 10px; }
+  .btn-whatsapp { background: #25D366; color: #fff; border: none; border-radius: 9px; padding: 15px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .btn-whatsapp:hover { background: #1FB855; }
+  .btn-calc { background: #fff; color: var(--text-main); border: 1px solid var(--border); border-radius: 9px; padding: 14px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-calc:hover { border-color: var(--red); color: var(--red); }
+
+  .grade-row { display: flex; gap: 10px; margin-top: 18px; }
+  .grade-card { flex: 1; background: var(--navy); border-radius: 10px; padding: 14px; text-align: center; }
+  .grade-card .gc-val { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--gold); line-height: 1; }
+  .grade-card .gc-lbl { font-size: 9px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
+
+  .specs-section { max-width: 1200px; margin: 40px auto 0; padding: 0 24px; }
+  .sec-label { font-size: 10.5px; letter-spacing: 3px; color: var(--red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 11px; font-weight: 700; }
+  .sec-label::before { content: ''; width: 28px; height: 2px; background: var(--red); }
+  .sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; margin-bottom: 20px; }
+  .specs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .spec-tile { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 11px; padding: 18px; }
+  .spec-tile .st-icon { color: var(--red); margin-bottom: 10px; }
+  .spec-tile .st-val { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; }
+  .spec-tile .st-key { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; font-weight: 600; }
+  .desc-box { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 16px; font-size: 14px; color: var(--text-muted); line-height: 1.8; }
+
+  .similar { max-width: 1200px; margin: 44px auto 0; padding: 0 24px; }
+  .cars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .car-card { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
+  .car-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+  .car-img { position: relative; aspect-ratio: 16/11; background: #ECEDF0; overflow: hidden; }
+  .car-img img { width: 100%; height: 100%; object-fit: cover; }
+  .car-photos { position: absolute; bottom: 10px; right: 10px; background: rgba(17,24,39,0.75); color: #fff; font-size: 9.5px; font-weight: 600; padding: 3px 8px; border-radius: 5px; font-family: 'Rajdhani', sans-serif; }
+  .car-info { padding: 14px 15px 15px; }
+  .car-make { font-size: 9.5px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; font-weight: 600; }
+  .car-model { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.1; }
+  .car-specs { display: flex; gap: 9px; margin: 9px 0 11px; flex-wrap: wrap; }
+  .spec { font-size: 10.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .spec::before { content: '•'; color: var(--red); }
+  .car-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 11px; }
+  .car-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+  .car-price .cur { font-size: 12px; color: var(--text-muted); }
+  .car-enquire { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 1px; }
+
+  footer { background: var(--navy); color: #F9FAFB; margin-top: 56px; padding: 40px 24px 24px; text-align: center; }
+  .footer-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: rgba(200,162,60,0.85); margin-bottom: 8px; }
+  .footer-text { font-size: 12px; color: #9CA3AF; line-height: 1.7; }
+  .wa-float { position: fixed; bottom: 20px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); z-index: 90; }
+
+  .loading-screen, .error-screen { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .error-screen a { color: var(--red); font-weight: 600; margin-top: 10px; }
+
+  @media (max-width: 880px) {
+    .detail { grid-template-columns: 1fr; gap: 22px; }
+    .info-panel { position: static; }
+    .specs-grid { grid-template-columns: repeat(2, 1fr); }
+    .cars-grid { grid-template-columns: repeat(2, 1fr); }
+    nav ul { display: none; } .menu-btn { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-mark">KG</div>
+    <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
+  </div>
+  <ul>
+    <li><a href="index.html#stock">Stock</a></li>
+    <li><a href="index.html#incoming">Incoming</a></li>
+    <li><a href="index.html#auction">Auction</a></li>
+    <li><a href="index.html#why">Why Us</a></li>
+    <li><a href="duty-calculator.html">Duty Calc</a></li>
+  </ul>
+  <a href="https://wa.me/601151177026" class="nav-cta">WhatsApp</a>
+  <button class="menu-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</nav>
+
+<div id="loadingScreen" class="loading-screen">Loading vehicle…</div>
+
+<div id="errorScreen" class="error-screen hidden">
+  <div class="bebas" style="font-size:28px">VEHICLE NOT FOUND</div>
+  <p style="margin-top:6px">This listing may have been sold or removed.</p>
+  <a href="index.html">← Back to all stock</a>
+</div>
+
+<div id="carContent" class="hidden">
+  <div class="breadcrumb">
+    <a href="index.html">Stock</a><span class="sep">/</span><span id="bcBrand"></span><span class="sep">/</span><span id="bcModel" style="color:var(--text-main)"></span>
+  </div>
+
+  <div class="detail">
+    <div>
+      <div class="gallery-main">
+        <img src="" alt="" id="mainImg">
+        <span class="gallery-badge hidden" id="featuredBadge">Featured</span>
+        <div class="gallery-nav prev" id="prevBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="gallery-nav next" id="nextBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="gallery-count" id="galleryCount"></div>
+      </div>
+      <div class="thumb-strip" id="thumbStrip"></div>
+    </div>
+
+    <div class="info-panel">
+      <div class="info-make" id="infoMake"></div>
+      <div class="info-model bebas" id="infoModel"></div>
+      <div class="info-status" id="infoStatus"></div>
+
+      <div class="info-price-box">
+        <div class="info-price-label">Price</div>
+        <div class="info-price bebas"><span id="infoPrice"></span> <span class="cur">RM</span></div>
+        <div class="info-price-note">Excludes import duty &amp; registration. Use our duty calculator for an estimate.</div>
+      </div>
+
+      <div class="info-actions">
+        <a class="btn-whatsapp" id="waBtn" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg> WhatsApp Us</a>
+        <a class="btn-calc" href="duty-calculator.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg> Estimate Import Duty</a>
+      </div>
+
+      <div class="grade-row">
+        <div class="grade-card"><div class="gc-val bebas" id="gradeVal">–</div><div class="gc-lbl">Grade</div></div>
+        <div class="grade-card"><div class="gc-val bebas" id="mileageVal">–</div><div class="gc-lbl">KM</div></div>
+        <div class="grade-card"><div class="gc-val bebas" id="yearVal">–</div><div class="gc-lbl">Year</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="specs-section">
+    <div class="sec-label">Full Details</div>
+    <div class="sec-title bebas">SPECIFICATIONS</div>
+    <div class="specs-grid" id="specsGrid"></div>
+    <div class="desc-box hidden" id="descBox"></div>
+  </div>
+
+  <div class="similar hidden" id="similarSection">
+    <div class="sec-label">You May Also Like</div>
+    <div class="sec-title bebas">SIMILAR VEHICLES</div>
+    <div class="cars-grid" id="similarGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-jp jp">関西グループコーポレーション</div>
+  <div class="footer-text">SSM Reg: 202601018333 · © 2026 Kansai Group Malaysia Sdn. Bhd.<br>3 Towers, Jalan Ampang, 50450 Kuala Lumpur · Mon–Fri 9am–6pm</div>
+</footer>
+
+<a href="https://wa.me/601151177026" class="wa-float">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
+</a>
+
+<script>
+const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let photos = [];
+let activeIdx = 0;
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function getCarId() {
+  return new URLSearchParams(location.search).get('id');
+}
+
+function setMainImage(i) {
+  if (!photos.length) return;
+  activeIdx = ((i % photos.length) + photos.length) % photos.length;
+  document.getElementById('mainImg').src = photos[activeIdx].url;
+  document.getElementById('galleryCount').textContent = `${activeIdx + 1} / ${photos.length}`;
+  document.querySelectorAll('.thumb').forEach((t, idx) => t.classList.toggle('active', idx === activeIdx));
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => setMainImage(activeIdx - 1));
+document.getElementById('nextBtn').addEventListener('click', () => setMainImage(activeIdx + 1));
+
+function renderCarCard(c) {
+  const cover = (c.photos && c.photos[0]?.url) || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400';
+  return `<a class="car-card" href="car.html?id=${c.id}">
+    <div class="car-img"><img src="${cover}" loading="lazy"><span class="car-photos">${(c.photos||[]).length} photos</span></div>
+    <div class="car-info">
+      <div class="car-make">${escapeHtml(c.brand)}</div>
+      <div class="car-model rajdhani">${escapeHtml(c.model.toUpperCase())}</div>
+      <div class="car-specs"><span class="spec">${c.year}</span><span class="spec">${escapeHtml(c.engine||'')}</span></div>
+      <div class="car-foot"><div class="car-price bebas">${Number(c.price).toLocaleString()} <span class="cur">RM</span></div><span class="car-enquire">View →</span></div>
+    </div>
+  </a>`;
+}
+
+async function loadCar() {
+  const id = getCarId();
+  if (!id) { showError(); return; }
+
+  const { data: car, error } = await sb.from('cars').select('*').eq('id', id).single();
+  if (error || !car) { showError(); return; }
+
+  document.title = `${car.brand} ${car.model} — Kansai Group`;
+  photos = (car.photos && car.photos.length) ? car.photos : [{ url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=900' }];
+
+  document.getElementById('bcBrand').textContent = car.brand;
+  document.getElementById('bcModel').textContent = car.model;
+  document.getElementById('infoMake').textContent = car.brand;
+  document.getElementById('infoModel').textContent = car.model;
+  document.getElementById('infoPrice').textContent = Number(car.price).toLocaleString();
+  document.getElementById('gradeVal').textContent = car.grade || '–';
+  document.getElementById('mileageVal').textContent = car.status === 'Incoming' ? (car.eta || 'TBA') : Number(car.mileage || 0).toLocaleString();
+  document.getElementById('yearVal').textContent = car.year;
+
+  const statusClass = { Available: 'st-available', Reserved: 'st-reserved', Sold: 'st-sold', Incoming: 'st-incoming' }[car.status] || 'st-available';
+  const statusLabel = { Available: 'Available Now', Reserved: 'Reserved', Sold: 'Sold', Incoming: `Incoming · ETA ${car.eta || 'TBA'}` }[car.status] || car.status;
+  document.getElementById('infoStatus').className = 'info-status ' + statusClass;
+  document.getElementById('infoStatus').innerHTML = `<span class="dot"></span>${escapeHtml(statusLabel)}`;
+
+  if (car.featured) document.getElementById('featuredBadge').classList.remove('hidden');
+
+  const waText = encodeURIComponent(`Hi Kansai Group, I'm interested in the ${car.brand} ${car.model} (${car.year}) listed at RM ${Number(car.price).toLocaleString()}. Could you share more details?`);
+  document.getElementById('waBtn').href = `https://wa.me/601151177026?text=${waText}`;
+
+  // gallery
+  document.getElementById('thumbStrip').innerHTML = photos.map((p, i) =>
+    `<div class="thumb" data-idx="${i}"><img src="${p.url}"></div>`
+  ).join('');
+  document.querySelectorAll('.thumb').forEach(t => t.addEventListener('click', () => setMainImage(parseInt(t.dataset.idx))));
+  setMainImage(0);
+
+  // specs
+  const specs = [
+    [car.engine, 'Engine'],
+    [car.transmission, 'Transmission'],
+    [car.fuel, 'Fuel'],
+    [car.seats ? car.seats + ' Seats' : null, 'Seating'],
+    [car.drive, 'Drive'],
+    [car.body_type, 'Body Type'],
+    [car.grade ? 'Grade ' + car.grade : null, 'Condition'],
+  ].filter(s => s[0]);
+  document.getElementById('specsGrid').innerHTML = specs.map(([val, key]) => `
+    <div class="spec-tile">
+      <div class="st-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+      <div class="st-val rajdhani">${escapeHtml(val)}</div>
+      <div class="st-key">${key}</div>
+    </div>`).join('');
+
+  if (car.description) {
+    document.getElementById('descBox').textContent = car.description;
+    document.getElementById('descBox').classList.remove('hidden');
+  }
+
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('carContent').classList.remove('hidden');
+
+  loadSimilar(car);
+}
+
+async function loadSimilar(car) {
+  const { data, error } = await sb.from('cars')
+    .select('*')
+    .eq('body_type', car.body_type)
+    .neq('id', car.id)
+    .neq('status', 'Sold')
+    .limit(4);
+  if (error || !data || !data.length) return;
+  document.getElementById('similarGrid').innerHTML = data.map(renderCarCard).join('');
+  document.getElementById('similarSection').classList.remove('hidden');
+}
+
+function showError() {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('errorScreen').classList.remove('hidden');
+}
+
+loadCar();
+</script>
+
+</body>
+</html>
