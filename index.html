@@ -432,11 +432,14 @@ function carCardHtml(c, variant = 'normal') {
 
 function renderTicker() {
   const priced = allCars.filter(c => c.status !== 'Incoming').slice(0, 8);
-  if (!priced.length) { document.getElementById('tickerTrack').innerHTML = ''; return; }
-  const items = priced.map(c => `<span class="ticker-item"><span class="ticker-dot"></span>${escapeHtml(c.brand)} ${escapeHtml(c.model)} ${c.year} — RM ${Number(c.price).toLocaleString()}</span>`).join('');
-  document.getElementById('tickerTrack').innerHTML = items + items; // duplicate for seamless loop
+  const track = document.getElementById('tickerTrack');
+  if (!priced.length) { track.innerHTML = ''; return; }
+  const oneSet = priced.map(c => `<span class="ticker-item"><span class="ticker-dot"></span>${escapeHtml(c.brand)} ${escapeHtml(c.model)} ${c.year} — RM ${Number(c.price).toLocaleString()}</span>`).join('');
+  // Repeat enough times so the ticker always fills the screen width and loops seamlessly,
+  // even when there are only 1-2 cars listed.
+  const repeats = Math.max(8, Math.ceil(16 / priced.length));
+  track.innerHTML = oneSet.repeat(repeats);
 }
-
 function renderFeatured() {
   const featured = allCars.filter(c => c.featured && c.status !== 'Sold').slice(0, 8);
   const grid = document.getElementById('featuredGrid');
