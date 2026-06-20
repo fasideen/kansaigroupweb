@@ -124,6 +124,30 @@
   .why-icon { width: 60px; height: 60px; background: rgba(200,162,60,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; color: var(--gold-dark); }
   .why-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 11px; }
   .why-card p { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+  /* ── CONTACT ── */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px; }
+  .contact-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group label { font-size: 11px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-main);
+    padding: 12px 16px; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif;
+    outline: none; transition: border-color 0.2s, background 0.2s; width: 100%;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--red); background: #fff; }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .btn-send { background: var(--red); color: #fff; border: none; border-radius: 6px; padding: 16px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; width: 100%; }
+  .btn-send:hover { background: var(--red-dark); }
+  .contact-info { display: flex; flex-direction: column; gap: 16px; }
+  .contact-item { display: flex; gap: 16px; align-items: flex-start; padding: 20px; background: var(--bg-main); border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+  .ci-icon { width: 42px; height: 42px; background: rgba(230,0,18,0.06); border: 1px solid rgba(230,0,18,0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--red); }
+  .ci-lbl { font-size: 10.5px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+  .ci-val { font-size: 14px; font-weight: 600; margin-top: 5px; line-height: 1.5; }
+  .contact-wa-box { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; }
+  .contact-wa-box .lbl { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; font-weight: 700; color: var(--text-main); }
+  .success-msg { display: none; background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.25); padding: 14px; border-radius: 6px; color: var(--green); font-size: 13px; text-align: center; margin-top: 4px; font-weight: 500; }
+  @media (max-width: 720px) { .contact-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
 
   footer { background: var(--navy); color: #F9FAFB; margin-top: 56px; padding: 48px 24px 28px; }
   .footer-inner { max-width: 1200px; margin: 0 auto; }
@@ -269,6 +293,59 @@
     </div>
   </div>
 </section>
+
+<section id="contact">
+  <div class="sec-head">
+    <div><div class="section-label">Get In Touch</div><h2 class="bebas">CONTACT <span class="accent">US</span></h2></div>
+  </div>
+  <p style="color:var(--text-muted); font-size:14px; margin-bottom:8px; max-width:560px; line-height:1.7;">Whether you are looking to purchase, bid, or partner with us as a dealer, reach out and our KL team will respond within 24 hours.</p>
+  <div class="contact-grid">
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input type="text" id="cName" placeholder="Your Name"></div>
+        <div class="form-group"><label>Phone / WhatsApp</label><input type="tel" id="cPhone" placeholder="+60 1X XXXXXXX"></div>
+      </div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="cEmail" placeholder="your@email.com"></div>
+      <div class="form-group">
+        <label>I Am A</label>
+        <select id="cType">
+          <option value="">Select customer type</option>
+          <option>Individual Buyer (B2C)</option>
+          <option>Car Dealer (B2B)</option>
+          <option>Corporate / Fleet</option>
+          <option>Investor / Partner</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Enquiry / Message</label><textarea id="cMsg" placeholder="Tell us what you are looking for or any questions you have..."></textarea></div>
+      <button class="btn-send" onclick="submitContact()">Send Enquiry</button>
+      <div class="success-msg" id="contactSuccess">✓ Thank you! Our KL team will contact you within 24 hours.</div>
+    </div>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="ci-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div><div class="ci-lbl">KL Representative Office</div><div class="ci-val">3 Towers, Jalan Ampang<br>50450 Kuala Lumpur, Malaysia</div></div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 12 19.79 19.79 0 011.61 3.36 2 2 0 013.58 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.91 8.55a16 16 0 006 6l1.87-1.87a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+        <div><div class="ci-lbl">WhatsApp &amp; Phone</div><div class="ci-val">+60 1151177026 (KL Office)<br>+81 6-6445 3361 (Osaka HQ)</div></div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div><div class="ci-lbl">Email</div><div class="ci-val">sales@kansaigroupcorp.com<br>info@kansaigroupcorp.com</div></div>
+      </div>
+      <div class="contact-item">
+        <div class="ci-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div><div class="ci-lbl">Office Hours (KL)</div><div class="ci-val">Mon – Fri: 9:00am – 6:00pm<br>Sat: 9:00am – 5:00pm</div></div>
+      </div>
+      <div class="contact-wa-box">
+        <div class="lbl">WhatsApp Us Directly</div>
+        <a href="https://wa.me/601151177026" class="btn-send" style="display:inline-block; width:auto; padding:13px 30px;">Chat on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
 
 <footer>
   <div class="footer-inner">
