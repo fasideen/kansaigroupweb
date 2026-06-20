@@ -188,11 +188,12 @@
     <div class="logo-mark">KG</div>
     <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
   </div>
-  <ul>
+<ul>
     <li><a href="#stock">Stock</a></li>
     <li><a href="#incoming">Incoming</a></li>
     <li><a href="#auction">Auction</a></li>
     <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
     <li><a href="duty-calculator.html">Duty Calc</a></li>
   </ul>
   <a href="https://wa.me/601151177026" class="nav-cta">WhatsApp</a>
@@ -485,6 +486,29 @@ async function loadCars() {
 }
 
 loadCars();
+  // ═══════════════════════════════════════
+// CONTACT FORM
+// ═══════════════════════════════════════
+function submitContact() {
+  const name = document.getElementById('cName').value.trim();
+  const phone = document.getElementById('cPhone').value.trim();
+  const email = document.getElementById('cEmail').value.trim();
+  const type = document.getElementById('cType').value;
+  const msg = document.getElementById('cMsg').value.trim();
+
+  if (!name || !phone) {
+    alert('Please fill in at least your name and phone number.');
+    return;
+  }
+
+  const waText = encodeURIComponent(
+    `New Enquiry — Kansai Group Website\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || '-'}\nCustomer Type: ${type || '-'}\nMessage: ${msg || '-'}`
+  );
+  window.open(`https://wa.me/601151177026?text=${waText}`, '_blank');
+
+  document.getElementById('contactSuccess').style.display = 'block';
+  setTimeout(() => { document.getElementById('contactSuccess').style.display = 'none'; }, 5000);
+}
 </script>
 
 </body>
