@@ -35,16 +35,16 @@
   .menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
   .mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; }
   .mobile-menu-overlay.open { display: block; }
-  .mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: 280px; background: var(--navy); z-index: 201; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column; padding: 24px 0; }
+  .mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: 280px; background: var(--navy); z-index: 201; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column; padding: 0; }
   .mobile-menu.open { transform: translateX(0); }
-  .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 0 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .mobile-menu-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: #fff; }
   .mobile-menu-close { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 4px; }
   .mobile-menu-close:hover { color: #fff; }
-  .mobile-menu-nav { flex: 1; padding: 16px 0; }
-  .mobile-menu-nav a { display: block; padding: 14px 24px; color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06); transition: color 0.15s, background 0.15s; }
+  .mobile-menu-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+  .mobile-menu-nav a { display: block; padding: 15px 24px; color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06); transition: color 0.15s, background 0.15s; }
   .mobile-menu-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); }
-  .mobile-menu-footer { padding: 20px 24px; }
+  .mobile-menu-footer { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
   .mobile-menu-wa { display: flex; align-items: center; justify-content: center; gap: 9px; background: #25D366; color: #fff; padding: 14px; border-radius: 8px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
   .hero { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--bg-alt) 0%, var(--bg-main) 100%); border-bottom: 1px solid var(--border); }
@@ -137,17 +137,14 @@
   .why-icon { width: 60px; height: 60px; background: rgba(200,162,60,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; color: var(--gold-dark); }
   .why-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 11px; }
   .why-card p { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+
   /* ── CONTACT ── */
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px; }
   .contact-form { display: flex; flex-direction: column; gap: 16px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 7px; }
   .form-group label { font-size: 11px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-  .form-group input, .form-group select, .form-group textarea {
-    background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-main);
-    padding: 12px 16px; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif;
-    outline: none; transition: border-color 0.2s, background 0.2s; width: 100%;
-  }
+  .form-group input, .form-group select, .form-group textarea { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-main); padding: 12px 16px; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; width: 100%; }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--red); background: #fff; }
   .form-group textarea { resize: vertical; min-height: 120px; }
   .btn-send { background: var(--red); color: #fff; border: none; border-radius: 6px; padding: 16px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; width: 100%; }
@@ -201,7 +198,7 @@
     <div class="logo-mark">KG</div>
     <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
   </div>
-<ul>
+  <ul>
     <li><a href="#stock">Stock</a></li>
     <li><a href="#incoming">Incoming</a></li>
     <li><a href="#auction">Auction</a></li>
@@ -210,8 +207,8 @@
     <li><a href="duty-calculator.html">Duty Calc</a></li>
   </ul>
   <a href="https://wa.me/601151177026" class="nav-cta">WhatsApp</a>
-  <button class="menu-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-  </nav>
+  <button class="menu-btn" onclick="openMobileMenu()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</nav>
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
@@ -244,15 +241,15 @@
   <div class="hero-content">
     <div class="hero-tag">Now Open in Kuala Lumpur</div>
     <h1 class="hero-title bebas">JAPAN'S <span>FINEST</span><br>DELIVERED TO <span class="gold">MALAYSIA</span></h1>
-    <p class="hero-sub">Direct from Japan to Malaysia, Premium Japanese Recon vehicles — sourced directly from Japan's auction houses, ready stock in Kuala Lumpur. Transparent pricing, full auction grade sheets, no middleman.</p>
+    <p class="hero-sub">Premium Japanese, UK &amp; Australian import vehicles — sourced directly from Osaka's auction houses, ready stock in Kuala Lumpur. Transparent pricing, full auction grade sheets, no middleman.</p>
     <div class="hero-actions">
       <a href="#stock" class="btn-primary">Browse Stock</a>
       <a href="#incoming" class="btn-outline">View Incoming</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num bebas">5,400+</div><div class="stat-lbl">Vehicles Sold</div></div>
-      <div class="stat"><div class="stat-num bebas">35+ YRS</div><div class="stat-lbl">In Business</div></div>
-      <div class="stat"><div class="stat-num bebas">RM2B+</div><div class="stat-lbl">Transaction Value</div></div>
+      <div class="stat"><div class="stat-num bebas">2,400+</div><div class="stat-lbl">Delivered</div></div>
+      <div class="stat"><div class="stat-num bebas">35 YRS</div><div class="stat-lbl">In Business</div></div>
+      <div class="stat"><div class="stat-num bebas">100%</div><div class="stat-lbl">Direct from Japan</div></div>
       <div class="stat"><div class="stat-num bebas">KL</div><div class="stat-lbl">Physical Office</div></div>
     </div>
   </div>
@@ -317,7 +314,7 @@
     </div>
     <div class="why-card">
       <div class="why-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-      <h3>Pekema Registered Supplier with Local KL Office</h3>
+      <h3>Pekema Registered Local KL Office</h3>
       <p>Our Registered KL office means face-to-face meetings, test drives arranged, and real-time support for Malaysian clients.</p>
     </div>
     <div class="why-card">
@@ -378,13 +375,11 @@
       </div>
       <div class="contact-wa-box">
         <div class="lbl">WhatsApp Us Directly</div>
-        <a href="https://wa.me/601151177026" class="btn-send" style="display:inline-block; width:auto; padding:13px 30px;">Chat on WhatsApp</a>
+        <a href="https://wa.me/601151177026" class="btn-send" style="display:inline-block; width:auto; padding:13px 30px; text-decoration:none;">Chat on WhatsApp</a>
       </div>
     </div>
   </div>
 </section>
-
-<footer>
 
 <footer>
   <div class="footer-inner">
@@ -414,7 +409,7 @@
       <div class="footer-col">
         <h4>KL Office</h4>
         <p>T3-15-20, 15/F, Tower 3,<br>3 Towers, Jalan Ampang,<br>50450 Kuala Lumpur</p>
-        <p style="margin-top:6px">Mon–Fri: 9am–6pm<br>Sat: 9am–5pm</p>
+        <p style="margin-top:6px">Mon–Fri: 9am–6pm<br>Sat: 9am–1pm</p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -478,6 +473,7 @@ function renderTicker() {
   const repeats = Math.max(8, Math.ceil(16 / priced.length));
   track.innerHTML = oneSet.repeat(repeats);
 }
+
 function renderFeatured() {
   const featured = allCars.filter(c => c.featured && c.status !== 'Sold').slice(0, 8);
   const grid = document.getElementById('featuredGrid');
@@ -527,7 +523,8 @@ async function loadCars() {
 }
 
 loadCars();
-  // ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
 // MOBILE MENU
 // ═══════════════════════════════════════
 function openMobileMenu() {
@@ -540,7 +537,8 @@ function closeMobileMenu() {
   document.getElementById('mobileOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
-  // ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
 // CONTACT FORM
 // ═══════════════════════════════════════
 function submitContact() {
@@ -549,17 +547,9 @@ function submitContact() {
   const email = document.getElementById('cEmail').value.trim();
   const type = document.getElementById('cType').value;
   const msg = document.getElementById('cMsg').value.trim();
-
-  if (!name || !phone) {
-    alert('Please fill in at least your name and phone number.');
-    return;
-  }
-
-  const waText = encodeURIComponent(
-    `New Enquiry — Kansai Group Website\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || '-'}\nCustomer Type: ${type || '-'}\nMessage: ${msg || '-'}`
-  );
+  if (!name || !phone) { alert('Please fill in at least your name and phone number.'); return; }
+  const waText = encodeURIComponent(`New Enquiry — Kansai Group Website\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || '-'}\nCustomer Type: ${type || '-'}\nMessage: ${msg || '-'}`);
   window.open(`https://wa.me/601151177026?text=${waText}`, '_blank');
-
   document.getElementById('contactSuccess').style.display = 'block';
   setTimeout(() => { document.getElementById('contactSuccess').style.display = 'none'; }, 5000);
 }
