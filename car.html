@@ -308,8 +308,14 @@ async function loadCar() {
       <div class="st-key">${key}</div>
     </div>`).join('');
 
-  if (car.description) {
-    document.getElementById('descBox').textContent = car.description;
+ if (car.description) {
+    // Convert line breaks to <br> and preserve formatting
+    const formatted = car.description
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
+    document.getElementById('descBox').innerHTML = formatted;
     document.getElementById('descBox').classList.remove('hidden');
   }
 
