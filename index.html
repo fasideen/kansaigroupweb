@@ -54,7 +54,7 @@
   .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(230,0,18,0.07); border: 1px solid rgba(230,0,18,0.15); padding: 6px 15px; border-radius: 4px; font-size: 10.5px; letter-spacing: 2.5px; color: var(--red); text-transform: uppercase; margin-bottom: 22px; font-weight: 600; }
   .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  h1.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 9vw, 88px); line-height: 0.93; letter-spacing: 1.5px; }
+  h1.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 9vw, 96px); line-height: 0.95; letter-spacing: 2px; }
   h1.hero-title span { color: var(--red); }
   h1.hero-title .gold { color: var(--gold); }
   .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 20px 0 32px; max-width: 500px; }
@@ -76,9 +76,9 @@
   .ticker-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.7); border-radius: 50%; }
 
   section { max-width: 1200px; margin: 0 auto; padding: 56px 24px 0; }
-  .section-label { font-size: 10.5px; letter-spacing: 3px; color: var(--red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 11px; font-weight: 700; }
+  .section-label { font-size: 11px; letter-spacing: 4px; color: var(--red); text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; font-weight: 700; }
   .section-label::before { content: ''; width: 28px; height: 2px; background: var(--red); }
-  h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 5vw, 52px); line-height: 1; letter-spacing: 1.5px; margin-bottom: 8px; }
+  h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: 1.5px; margin-bottom: 8px; }
   .accent { color: var(--red); }
   .gold-txt { color: var(--gold); }
   .sec-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
@@ -98,12 +98,12 @@
   .car-photos { position: absolute; bottom: 10px; right: 10px; background: rgba(17,24,39,0.75); color: #fff; font-size: 9.5px; font-weight: 600; padding: 3px 8px; border-radius: 5px; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; }
   .car-info { padding: 14px 15px 15px; }
   .car-make { font-size: 9.5px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; font-weight: 600; }
-  .car-model { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.1; }
+  .car-model { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 1px; line-height: 1.1; }
   .car-specs { display: flex; gap: 9px; margin: 9px 0 11px; flex-wrap: wrap; }
   .spec { font-size: 10.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
   .spec::before { content: '•'; color: var(--red); }
   .car-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 11px; }
-  .car-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+  .car-price { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; }
   .car-price .cur { font-size: 12px; color: var(--text-muted); margin-left: 2px; }
   .car-enquire { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 1px; }
 
@@ -137,6 +137,23 @@
   .why-icon { width: 60px; height: 60px; background: rgba(200,162,60,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; color: var(--gold-dark); }
   .why-card h3 { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 11px; }
   .why-card p { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+
+  /* ── WHO WE ARE ── */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 24px; }
+  .about-text p { color: var(--text-muted); line-height: 1.8; font-size: 15px; margin-bottom: 18px; }
+  .about-offices { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+  .office-card { flex: 1; min-width: 200px; border: 1px solid var(--border); border-radius: 10px; padding: 22px; background: var(--bg-main); position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .office-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); }
+  .office-flag { font-size: 26px; margin-bottom: 10px; }
+  .office-city { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; }
+  .office-addr { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; line-height: 1.6; }
+  .about-visual { background: var(--bg-alt); border: 1px solid var(--border); border-radius: 14px; padding: 36px; position: relative; overflow: hidden; }
+  .about-visual-bg { position: absolute; inset: 0; font-family: 'Bebas Neue', sans-serif; font-size: 120px; color: rgba(20,24,42,0.04); display: flex; align-items: center; justify-content: center; pointer-events: none; letter-spacing: 4px; }
+  .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; position: relative; z-index: 1; }
+  .trust-item { background: var(--bg-main); border-radius: 9px; padding: 18px; border-left: 3px solid var(--red); box-shadow: var(--shadow-sm); }
+  .trust-item-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; }
+  .trust-item-lbl { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+  @media (max-width: 720px) { .about-grid { grid-template-columns: 1fr; gap: 30px; } .trust-grid { grid-template-columns: 1fr 1fr; } }
 
   /* ── CONTACT ── */
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px; }
@@ -194,15 +211,16 @@
 <body>
 
 <nav>
-  <div class="logo">
+  <a href="index.html" class="logo" style="text-decoration:none;color:inherit;">
     <div class="logo-mark">KG</div>
     <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
-  </div>
+  </a>
   <ul>
     <li><a href="#stock">Stock</a></li>
     <li><a href="#incoming">Incoming</a></li>
     <li><a href="#auction">Auction</a></li>
     <li><a href="#why">Why Us</a></li>
+    <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="duty-calculator.html">Duty Calc</a></li>
   </ul>
@@ -224,6 +242,7 @@
     <a href="#incoming" onclick="closeMobileMenu()">Incoming</a>
     <a href="#auction" onclick="closeMobileMenu()">Auction</a>
     <a href="#why" onclick="closeMobileMenu()">Why Us</a>
+    <a href="#about" onclick="closeMobileMenu()">About</a>
     <a href="#contact" onclick="closeMobileMenu()">Contact</a>
     <a href="duty-calculator.html" onclick="closeMobileMenu()">Duty Calculator</a>
   </div>
@@ -330,6 +349,44 @@
   </div>
 </section>
 
+</section>
+
+<section id="about">
+  <div class="sec-head">
+    <div><div class="section-label">Who We Are</div><h2 class="bebas">DRIVEN BY <span class="accent">TRUST,</span><br>BUILT IN <span class="gold-txt">JAPAN</span></h2></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Kansai Group Corporation was founded in Osaka, Japan — the heartland of Japan's automotive trade. For over 35 years, we have been exporting premium Japanese vehicles to markets across Asia, earning a reputation for transparency, quality, and unmatched selection.</p>
+      <p>Our representative office at 3 Towers, Jalan Ampang, Kuala Lumpur marks our commitment to the Malaysian market. We bring Japan's most trusted auto auction experience directly to Malaysian buyers — both businesses and individuals.</p>
+      <p>Whether you are a dealer looking to source quality stock, or a buyer seeking your dream car at the right price, Kansai Group Corporation is your trusted Japanese automotive partner in Malaysia.</p>
+      <div class="about-offices">
+        <div class="office-card">
+          <div class="office-flag">🇯🇵</div>
+          <div class="office-city bebas">Osaka HQ</div>
+          <div class="office-addr">1-7-22 Utsubohonmachi Nishi-ku,<br>Osaka 〒550-0004, Japan<br>Main Operations</div>
+        </div>
+        <div class="office-card">
+          <div class="office-flag">🇲🇾</div>
+          <div class="office-city bebas">Kuala Lumpur</div>
+          <div class="office-addr">Unit T3-15-20, 15/F, Tower 3,<br>3 Towers, Jalan Ampang,<br>50450 Kuala Lumpur</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="about-visual-bg">KGC</div>
+      <div class="trust-grid">
+        <div class="trust-item"><div class="trust-item-num bebas">35+</div><div class="trust-item-lbl">Years Experience</div></div>
+        <div class="trust-item"><div class="trust-item-num bebas">2,400+</div><div class="trust-item-lbl">Cars Delivered</div></div>
+        <div class="trust-item"><div class="trust-item-num bebas">B2B</div><div class="trust-item-lbl">Dealer Network</div></div>
+        <div class="trust-item"><div class="trust-item-num bebas">B2C</div><div class="trust-item-lbl">Direct to Buyers</div></div>
+        <div class="trust-item"><div class="trust-item-num bebas">JPN</div><div class="trust-item-lbl">Direct Sourcing</div></div>
+        <div class="trust-item"><div class="trust-item-num bebas">LIVE</div><div class="trust-item-lbl">Online Auctions</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="contact">
   <div class="sec-head">
     <div><div class="section-label">Get In Touch</div><h2 class="bebas">CONTACT <span class="accent">US</span></h2></div>
@@ -385,10 +442,10 @@
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-logo">
-        <div class="logo">
+        <a href="index.html" class="logo" style="text-decoration:none;color:inherit;">
           <div class="logo-mark">KG</div>
           <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Corporation · Osaka, Japan</div></div>
-        </div>
+        </a>
         <div class="footer-desc">Japan's premier auto sourcing, now with a representative office in Kuala Lumpur — connecting Malaysian buyers to Japan's finest vehicles.</div>
         <div class="footer-jp jp">関西グループコーポレーション</div>
       </div>
