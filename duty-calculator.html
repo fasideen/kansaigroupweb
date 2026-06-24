@@ -6,7 +6,7 @@
 <title>Kansai Group — Import Duty Calculator</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,7 +18,7 @@
   --ink-mid: #58607A;
   --ink-soft:#9AA2B8;
   --border:  #E6E8F0;
-  --red:     #DC2626;   /* Kansai red — accent / actions / selection */
+  --red:     #E60012;   /* Kansai red — accent / actions / selection */
   --red-light: #FDECEC;
   --red-dark:  #B91C1C;
   --gold:    #D4AF37;   /* brand accent — used sparingly */
@@ -39,8 +39,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
-.brand-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+h1, h2, h3, .display { font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+.brand-font { font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* ── HEADER ── */
 .header {
@@ -64,7 +64,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
 }
 .kg-hex { fill: var(--red); }
 .kg-text { fill: #fff; }
-.header-title { font-weight: 700; font-size: 19px; color: #fff; }
+.header-title { font-weight: 400; font-size: 22px; color: #fff; letter-spacing: 2px; }
 .header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 .rate-pill {
@@ -118,7 +118,7 @@ h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
   align-items: center;
   justify-content: space-between;
 }
-.card-header h2 { font-size: 16px; font-weight: 600; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+.card-header h2 { font-size: 20px; font-weight: 400; color: var(--ink); font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; }
 .card-header .count {
   font-size: 11px;
   background: var(--bg);
@@ -217,7 +217,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 11px;
   font-weight: 600;
   display: flex;
@@ -298,7 +298,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
 /* ── CALC PANEL ── */
 .sel-info { margin-bottom: 14px; }
-.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+.sel-brand { font-weight: 700; font-size: 19px; color: var(--ink); font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
 .sel-model { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
 .sel-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .tag {
@@ -362,7 +362,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
 /* ── COST BREAKDOWN ── */
 .breakdown { margin-top: 18px; }
-.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Oswald', sans-serif; }
+.breakdown-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 9px; font-family: 'Bebas Neue', sans-serif; }
 .breakdown-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; }
 .breakdown-seg { transition: flex-basis 0.3s ease; }
 .breakdown-seg.fob  { background: var(--ink); }
@@ -384,7 +384,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   text-align: center;
   margin-top: 16px;
 }
-.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Oswald', sans-serif; }
+.result-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green-text); margin-bottom: 6px; font-family: 'Bebas Neue', sans-serif; }
 .result-value { font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
 .result-sub { font-size: 12px; color: var(--green-text); margin-top: 6px; font-weight: 500; }
 
@@ -431,7 +431,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .compare-table th, .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
 .compare-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
 .compare-table td.metric-label { font-weight: 600; color: var(--ink-mid); white-space: nowrap; }
-.compare-table .compare-model { font-weight: 700; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
+.compare-table .compare-model { font-weight: 700; font-family: 'Bebas Neue', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
 .compare-table .compare-sub { font-size: 11px; color: var(--ink-mid); font-weight: 400; text-transform: none; letter-spacing: 0; margin-top: 2px; }
 .compare-table .compare-duty { color: var(--red); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 .compare-table .compare-total { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
@@ -475,7 +475,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   display: block;
 }
 .gate-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 22px;
   font-weight: 700;
   text-transform: uppercase;
@@ -522,7 +522,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   padding: 13px;
   font-size: 14px;
   font-weight: 700;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Bebas Neue', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -585,7 +585,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
     border-bottom: 3px solid var(--red);
     margin-bottom: 16px;
   }
-  .print-header .ph-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
+  .print-header .ph-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); }
   .print-header .ph-sub { font-size: 12px; color: var(--ink-mid); margin-top: 2px; }
   #calcBody > * { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
@@ -614,7 +614,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
     <div class="logo-mark">
       <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
     </div>
     <div>
@@ -638,7 +638,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
     <svg class="gate-logo" width="52" height="52" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-      <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+      <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
     </svg>
 
     <div class="gate-title">Kansai Group</div>
@@ -905,7 +905,7 @@ function buildPage() {
     <div class="print-header">
       <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
+        <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Bebas Neue, sans-serif" font-weight="700" font-size="34">KG</text>
       </svg>
       <div>
         <div class="ph-title">${t('printTitle')}</div>
