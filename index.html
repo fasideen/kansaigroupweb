@@ -58,9 +58,9 @@
   h1.hero-title span { color: var(--red); }
   h1.hero-title .gold { color: var(--gold); }
   .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 20px 0 32px; max-width: 500px; }
-  .btn-primary { background: var(--red); color: #fff; padding: 15px 32px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 14px rgba(230,0,18,0.18); transition: all 0.2s; border: none; cursor: pointer; }
+  .btn-primary { background: var(--red); color: #fff; padding: 0 32px; height: 52px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(230,0,18,0.18); transition: all 0.2s; border: none; cursor: pointer; }
   .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); }
-  .btn-outline { background: var(--bg-main); color: var(--text-main); padding: 15px 32px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; transition: all 0.2s; cursor: pointer; }
+  .btn-outline { background: var(--bg-main); color: var(--text-main); padding: 0 32px; height: 52px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; cursor: pointer; }
   .btn-outline:hover { border-color: var(--red); color: var(--red); transform: translateY(-2px); }
   .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 44px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); box-shadow: var(--shadow-md); overflow: hidden; }
   .stat { padding: 18px 20px; border-right: 1px solid var(--border); text-align: center; }
@@ -262,7 +262,7 @@
     <p class="hero-sub">Premium Japanese, UK &amp; Australian import vehicles — sourced directly from Osaka's auction houses, ready stock in Kuala Lumpur. Transparent pricing, full auction grade sheets, no middleman.</p>
     <div class="hero-actions">
       <a href="#stock" class="btn-primary">Browse Stock</a>
-      <a href="find.html" class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find My Car</a>
+      <a href="find.html" class="btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find My Car</a>
       <a href="#incoming" class="btn-outline">View Incoming</a>
     </div>
     <div class="hero-stats">
