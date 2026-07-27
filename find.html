@@ -8,118 +8,126 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --red: #E60012; --red-dark: #B3000E; --gold: #C8A23C;
-    --navy: #111827; --bg-main: #FFFFFF; --bg-alt: #F8F9FA;
-    --text-main: #111827; --text-muted: #6B7280; --border: #E5E7EB; --green: #16A34A;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.04); --shadow-md: 0 10px 30px rgba(0,0,0,0.08); --shadow-hover: 0 18px 38px rgba(0,0,0,0.12);
+    --red:#E60012;--red-dark:#B3000E;--gold:#C8A23C;
+    --navy:#111827;--bg-main:#FFFFFF;--bg-alt:#F8F9FA;
+    --text-main:#111827;--text-muted:#6B7280;--border:#E5E7EB;--green:#16A34A;
+    --shadow-sm:0 2px 4px rgba(0,0,0,0.04);--shadow-md:0 10px 30px rgba(0,0,0,0.08);--shadow-hover:0 18px 38px rgba(0,0,0,0.12);
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg-alt); color: var(--text-main); min-height: 100vh; }
-  .bebas { font-family: 'Bebas Neue', sans-serif; }
-  .rajdhani { font-family: 'Rajdhani', sans-serif; }
-  a { text-decoration: none; color: inherit; }
-  img { display: block; max-width: 100%; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Inter',sans-serif;background:var(--bg-alt);color:var(--text-main);min-height:100vh;}
+  .bebas{font-family:'Bebas Neue',sans-serif;}
+  .rajdhani{font-family:'Rajdhani',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  img{display:block;max-width:100%;}
 
   /* NAV */
-  nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 50; }
-  .logo { display: flex; align-items: center; gap: 11px; }
-  .logo-mark { width: 38px; height: 38px; background: var(--red); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #fff; }
-  .logo-text .top { font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 2.5px; line-height: 1; }
-  .logo-text .btm { font-size: 8px; letter-spacing: 2.5px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
-  .back-link { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
-  .back-link:hover { color: var(--red); }
+  nav{background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:50;}
+  .logo{display:flex;align-items:center;gap:11px;}
+  .logo-mark{width:38px;height:38px;background:var(--red);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;}
+  .logo-text .top{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2.5px;line-height:1;}
+  .logo-text .btm{font-size:8px;letter-spacing:2.5px;color:var(--text-muted);text-transform:uppercase;margin-top:2px;}
+  .back-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text-muted);font-weight:500;}
+  .back-link:hover{color:var(--red);}
 
-  /* HERO BAND */
-  .find-hero { background: var(--navy); padding: 48px 24px 56px; text-align: center; position: relative; overflow: hidden; }
-  .find-hero::before { content: '探す'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); font-family: 'Noto Sans JP', sans-serif; font-size: 180px; font-weight: 700; color: rgba(255,255,255,0.03); pointer-events: none; line-height: 1; }
-  .find-hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(230,0,18,0.15); border: 1px solid rgba(230,0,18,0.3); padding: 6px 15px; border-radius: 4px; font-size: 10.5px; letter-spacing: 2.5px; color: rgba(255,255,255,0.8); text-transform: uppercase; margin-bottom: 18px; font-weight: 600; }
-  .find-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px, 7vw, 72px); color: #fff; letter-spacing: 2px; line-height: 1; margin-bottom: 12px; }
-  .find-title span { color: var(--red); }
-  .find-sub { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 480px; margin: 0 auto 32px; line-height: 1.6; }
+  /* HERO — matches website light style */
+  .find-hero{background:linear-gradient(135deg,var(--bg-alt) 0%,var(--bg-main) 100%);border-bottom:1px solid var(--border);padding:56px 24px 64px;position:relative;overflow:hidden;}
+  .find-hero-grid{position:absolute;inset:0;opacity:0.5;background-image:linear-gradient(rgba(0,0,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.03) 1px,transparent 1px);background-size:48px 48px;}
+  .find-hero-watermark{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-family:'Noto Sans JP',sans-serif;font-size:200px;font-weight:700;color:rgba(230,0,18,0.03);pointer-events:none;line-height:1;}
+  .find-hero-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;text-align:center;}
+  .find-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(230,0,18,0.07);border:1px solid rgba(230,0,18,0.15);padding:6px 15px;border-radius:4px;font-size:10.5px;letter-spacing:2.5px;color:var(--red);text-transform:uppercase;margin-bottom:20px;font-weight:600;}
+  .find-tag::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .find-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);line-height:0.93;letter-spacing:2px;margin-bottom:16px;}
+  .find-title span{color:var(--red);}
+  .find-sub{font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:36px;}
 
   /* SEARCH BOX */
-  .search-wrap { max-width: 640px; margin: 0 auto; position: relative; }
-  .search-input-row { display: flex; gap: 0; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.2); border: 2px solid transparent; transition: border-color 0.2s; }
-  .search-input-row:focus-within { border-color: var(--red); }
-  .search-icon { padding: 0 16px; display: flex; align-items: center; color: var(--text-muted); flex-shrink: 0; }
-  .search-input-row input { flex: 1; padding: 18px 12px; font-family: 'Inter', sans-serif; font-size: 16px; color: var(--text-main); border: none; outline: none; background: transparent; }
-  .search-input-row input::placeholder { color: var(--text-muted); }
-  .search-clear { padding: 0 16px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; display: none; align-items: center; }
-  .search-clear:hover { color: var(--red); }
-  .search-clear.show { display: flex; }
-  .search-btn { background: var(--red); color: #fff; border: none; padding: 0 24px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; flex-shrink: 0; }
-  .search-btn:hover { background: var(--red-dark); }
+  .search-wrap{position:relative;max-width:620px;margin:0 auto;}
+  .search-box{display:flex;background:#fff;border:2px solid var(--border);border-radius:10px;overflow:visible;box-shadow:var(--shadow-md);transition:border-color 0.2s,box-shadow 0.2s;position:relative;z-index:10;}
+  .search-box:focus-within{border-color:var(--red);box-shadow:0 8px 32px rgba(230,0,18,0.12);}
+  .search-icon{padding:0 16px;display:flex;align-items:center;color:var(--text-muted);flex-shrink:0;}
+  .search-box input{flex:1;padding:18px 8px;font-family:'Inter',sans-serif;font-size:15px;color:var(--text-main);border:none;outline:none;background:transparent;min-width:0;}
+  .search-box input::placeholder{color:var(--text-muted);}
+  .search-clear{padding:0 14px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:22px;line-height:1;display:none;align-items:center;flex-shrink:0;}
+  .search-clear:hover{color:var(--red);}
+  .search-clear.show{display:flex;}
+  .search-btn{background:var(--red);color:#fff;border:none;padding:0 28px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;flex-shrink:0;border-radius:0 8px 8px 0;transition:background 0.15s;}
+  .search-btn:hover{background:var(--red-dark);}
 
   /* DROPDOWN */
-  .dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid var(--border); overflow: hidden; z-index: 100; display: none; }
-  .dropdown.open { display: block; }
-  .dd-section-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 12px 18px 6px; background: var(--bg-alt); border-bottom: 1px solid var(--border); }
-  .dd-item { display: flex; align-items: center; gap: 14px; padding: 13px 18px; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid var(--border); }
-  .dd-item:last-child { border-bottom: none; }
-  .dd-item:hover, .dd-item.hl { background: rgba(230,0,18,0.04); }
-  .dd-thumb { width: 56px; height: 42px; border-radius: 6px; object-fit: cover; background: var(--bg-alt); flex-shrink: 0; }
-  .dd-thumb-placeholder { width: 56px; height: 42px; border-radius: 6px; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .dd-info { flex: 1; min-width: 0; }
-  .dd-make { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .dd-model { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dd-specs { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
-  .dd-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; text-align: right; flex-shrink: 0; }
-  .dd-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 10px; text-align: center; margin-top: 4px; }
-  .st-available { background: rgba(22,163,74,0.1); color: var(--green); }
-  .st-incoming { background: rgba(37,99,235,0.1); color: #2563EB; }
-  .st-reserved { background: rgba(217,119,6,0.1); color: #D97706; }
-  .st-japan { background: rgba(230,0,18,0.08); color: var(--red); }
-  .dd-not-found { padding: 28px 18px; text-align: center; }
-  .dd-not-found .nf-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; }
-  .dd-not-found p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
-  .dd-not-found .btn-wa { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #fff; padding: 11px 22px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
-  .dd-footer { padding: 11px 18px; background: var(--bg-alt); border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-muted); text-align: center; }
+  .dropdown{position:absolute;top:calc(100% + 10px);left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--border);z-index:200;display:none;overflow:hidden;}
+  .dropdown.open{display:block;}
+  .dd-section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:12px 18px 8px;background:var(--bg-alt);border-bottom:1px solid var(--border);}
+  .dd-item{display:flex;align-items:center;gap:14px;padding:13px 18px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);}
+  .dd-item:last-of-type{border-bottom:none;}
+  .dd-item:hover,.dd-item.hl{background:rgba(230,0,18,0.04);}
+  .dd-thumb{width:60px;height:44px;border-radius:7px;object-fit:cover;background:var(--bg-alt);flex-shrink:0;}
+  .dd-thumb-ph{width:60px;height:44px;border-radius:7px;background:var(--bg-alt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .dd-info{flex:1;min-width:0;}
+  .dd-make{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+  .dd-model{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dd-specs{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+  .dd-right{text-align:right;flex-shrink:0;}
+  .dd-price{font-family:'Bebas Neue',sans-serif;font-size:19px;}
+  .dd-price .cur{font-size:11px;color:var(--text-muted);}
+  .dd-status{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;margin-top:4px;display:inline-block;}
+  .st-available{background:rgba(22,163,74,0.1);color:var(--green);}
+  .st-incoming{background:rgba(37,99,235,0.1);color:#2563EB;}
+  .st-reserved{background:rgba(217,119,6,0.1);color:#D97706;}
+  .st-japan{background:rgba(230,0,18,0.08);color:var(--red);}
+  .dd-footer-row{padding:11px 18px;background:var(--bg-alt);border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);text-align:center;cursor:pointer;font-weight:600;}
+  .dd-footer-row:hover{color:var(--red);}
+  .dd-not-found{padding:28px 20px;text-align:center;}
+  .dd-not-found .nf-t{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:8px;}
+  .dd-not-found p{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}
+  .btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:11px 22px;border-radius:6px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;}
 
-  /* RESULTS SECTION */
-  .results-section { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
-  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-  .results-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1.5px; }
-  .results-count { font-size: 13px; color: var(--text-muted); }
-  .cars-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  .car-card { background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; }
-  .car-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
-  .car-img { position: relative; aspect-ratio: 16/11; background: #ECEDF0; overflow: hidden; }
-  .car-img img { width: 100%; height: 100%; object-fit: cover; }
-  .car-badge { position: absolute; top: 10px; right: 10px; padding: 5px 11px; border-radius: 4px; font-size: 10px; letter-spacing: 1px; font-weight: 700; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; color: #fff; }
-  .badge-available { background: var(--green); }
-  .badge-incoming { background: #2563EB; }
-  .badge-reserved { background: #D97706; }
-  .badge-japan { background: var(--red); }
-  .car-photos { position: absolute; bottom: 10px; right: 10px; background: rgba(17,24,39,0.75); color: #fff; font-size: 9.5px; font-weight: 600; padding: 3px 8px; border-radius: 5px; font-family: 'Rajdhani', sans-serif; }
-  .car-info { padding: 14px 15px 15px; }
-  .car-make { font-size: 9.5px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 3px; font-weight: 600; }
-  .car-model { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 1px; line-height: 1.1; }
-  .car-specs { display: flex; gap: 9px; margin: 9px 0 11px; flex-wrap: wrap; }
-  .spec { font-size: 10.5px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-  .spec::before { content: '•'; color: var(--red); }
-  .car-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 11px; }
-  .car-price { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
-  .car-price .cur { font-size: 12px; color: var(--text-muted); }
-  .car-enquire { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 1px; }
+  /* RESULTS */
+  .results-section{max-width:1140px;margin:0 auto;padding:40px 24px;}
+  .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+  .results-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1.5px;}
+  .results-count{font-size:13px;color:var(--text-muted);}
+  .filter-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .filter-chip{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.15s;}
+  .filter-chip:hover,.filter-chip.active{background:var(--red);border-color:var(--red);color:#fff;}
 
-  /* PROMPTS */
-  .idle-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
-  .idle-state svg { margin: 0 auto 16px; opacity: 0.3; }
-  .idle-state p { font-size: 14px; line-height: 1.7; max-width: 340px; margin: 0 auto; }
-  .not-found-state { text-align: center; padding: 60px 20px; }
-  .not-found-state .nf-big { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; margin-bottom: 10px; }
-  .not-found-state p { color: var(--text-muted); font-size: 14px; line-height: 1.7; max-width: 420px; margin: 0 auto 24px; }
-  .not-found-state .btn-source { display: inline-flex; align-items: center; gap: 9px; background: #25D366; color: #fff; padding: 14px 28px; border-radius: 8px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
-  .not-found-state .btn-browse { display: inline-flex; align-items: center; gap: 9px; background: var(--navy); color: #fff; padding: 14px 28px; border-radius: 8px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+  /* CARDS */
+  .cars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .car-card{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm);transition:transform 0.25s,box-shadow 0.25s;cursor:pointer;}
+  .car-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-hover);}
+  .car-img{position:relative;aspect-ratio:16/11;background:#ECEDF0;overflow:hidden;}
+  .car-img img{width:100%;height:100%;object-fit:cover;}
+  .car-badge{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:4px;font-size:10px;letter-spacing:1px;font-weight:700;text-transform:uppercase;font-family:'Rajdhani',sans-serif;color:#fff;}
+  .badge-available{background:var(--green);}
+  .badge-incoming{background:#2563EB;}
+  .badge-reserved{background:#D97706;}
+  .badge-japan{background:var(--red);}
+  .car-photos{position:absolute;bottom:10px;right:10px;background:rgba(17,24,39,0.75);color:#fff;font-size:9.5px;font-weight:600;padding:3px 8px;border-radius:5px;font-family:'Rajdhani',sans-serif;}
+  .car-info{padding:14px 15px 15px;}
+  .car-make{font-size:9.5px;letter-spacing:1.5px;color:var(--text-muted);text-transform:uppercase;margin-bottom:3px;font-weight:600;}
+  .car-model{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;line-height:1.1;}
+  .car-specs{display:flex;gap:9px;margin:9px 0 11px;flex-wrap:wrap;}
+  .spec{font-size:10.5px;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+  .spec::before{content:'•';color:var(--red);}
+  .car-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:11px;}
+  .car-price{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+  .car-price .cur{font-size:12px;color:var(--text-muted);}
+  .car-enquire{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;}
 
-  /* FILTERS */
-  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .filter-chip { padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); background: #fff; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; }
-  .filter-chip:hover, .filter-chip.active { background: var(--red); border-color: var(--red); color: #fff; }
+  /* STATES */
+  .idle-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+  .idle-state svg{margin:0 auto 16px;opacity:0.25;}
+  .idle-state p{font-size:14px;line-height:1.7;max-width:340px;margin:0 auto;}
+  .not-found-state{text-align:center;padding:60px 20px;}
+  .not-found-state .nf-big{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;margin-bottom:10px;}
+  .not-found-state p{color:var(--text-muted);font-size:14px;line-height:1.7;max-width:420px;margin:0 auto 24px;}
+  .btn-source{display:inline-flex;align-items:center;gap:9px;background:#25D366;color:#fff;padding:14px 28px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .btn-browse{display:inline-flex;align-items:center;gap:9px;background:var(--navy);color:#fff;padding:14px 28px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;}
 
-  @media (min-width: 600px) { .cars-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 900px) { .cars-grid { grid-template-columns: repeat(4, 1fr); } .results-section { padding: 48px 40px; } }
+  @media(min-width:600px){.cars-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:900px){.cars-grid{grid-template-columns:repeat(4,1fr);}.results-section{padding:48px 40px;}}
+  @media(max-width:520px){.search-btn{padding:0 16px;font-size:13px;}.find-hero{padding:40px 16px 48px;}}
 </style>
 </head>
 <body>
@@ -135,26 +143,27 @@
   </a>
 </nav>
 
-<!-- HERO -->
 <div class="find-hero">
-  <div class="find-hero-tag">Vehicle Finder</div>
-  <div class="find-title bebas">FIND YOUR <span>CAR</span></div>
-  <p class="find-sub">Search our full inventory — available now, incoming, and stock in Japan. If it's not listed, we'll source it for you.</p>
-
-  <div class="search-wrap">
-    <div class="search-input-row">
-      <div class="search-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <div class="find-hero-grid"></div>
+  <div class="find-hero-watermark" style="font-family:'Noto Sans JP',sans-serif;">探す</div>
+  <div class="find-hero-inner">
+    <div class="find-tag">Vehicle Finder</div>
+    <div class="find-title bebas">FIND YOUR <span>CAR</span></div>
+    <p class="find-sub">Search our full inventory — available now, incoming, and stock in Japan.<br>If it's not listed, we'll source it for you.</p>
+    <div class="search-wrap">
+      <div class="search-box">
+        <div class="search-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <input type="text" id="mainSearch" placeholder="e.g. Lexus RX 350, Alphard, GT-R, Audi R8..." autocomplete="off" oninput="handleSearch(this.value)" onkeydown="handleKey(event)">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
+        <button class="search-btn" onclick="commitSearch()">Search</button>
       </div>
-      <input type="text" id="mainSearch" placeholder="e.g. Lexus RX 350, Alphard, GT-R, Audi R8..." autocomplete="off" oninput="handleSearch(this.value)" onkeydown="handleKey(event)">
-      <button class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
-      <button class="search-btn" onclick="commitSearch()">Search</button>
+      <div class="dropdown" id="dropdown"></div>
     </div>
-    <div class="dropdown" id="dropdown"></div>
   </div>
 </div>
 
-<!-- RESULTS -->
 <div class="results-section">
   <div id="filterRow" class="filter-row" style="display:none;">
     <button class="filter-chip active" data-status="all" onclick="setStatusFilter('all',this)">All</button>
@@ -168,10 +177,9 @@
     <span class="results-count" id="resultsCount"></span>
   </div>
   <div id="resultsGrid">
-    <!-- idle state -->
     <div class="idle-state">
       <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <p>Start typing a brand or model above — we'll search across all our available, incoming, and Japan stock instantly.</p>
+      <p>Start typing above — we'll search across all available, incoming, and Japan stock instantly.</p>
     </div>
   </div>
 </div>
@@ -192,38 +200,31 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-// Load all cars from Supabase
 async function init() {
   const { data, error } = await sb.from('cars').select('*').order('created_at', { ascending: false });
   if (!error && data) allCars = data;
 }
 init();
 
-// ── SEARCH INPUT ──
 function handleSearch(val) {
   currentQuery = val.trim();
   document.getElementById('searchClear').classList.toggle('show', !!currentQuery);
-
-  if (!currentQuery) {
-    closeDropdown();
-    showIdle();
-    return;
-  }
+  if (!currentQuery) { closeDropdown(); showIdle(); return; }
   renderDropdown(currentQuery);
 }
 
 function handleKey(e) {
   const dd = document.getElementById('dropdown');
   const items = dd.querySelectorAll('.dd-item');
-  if (e.key === 'ArrowDown') { e.preventDefault(); ddHighlight = Math.min(ddHighlight + 1, items.length - 1); highlightDd(items); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); ddHighlight = Math.max(ddHighlight - 1, 0); highlightDd(items); }
-  else if (e.key === 'Enter') { e.preventDefault(); if (ddHighlight >= 0 && items[ddHighlight]) { items[ddHighlight].click(); } else { commitSearch(); } }
+  if (e.key === 'ArrowDown') { e.preventDefault(); ddHighlight = Math.min(ddHighlight+1, items.length-1); highlightDd(items); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); ddHighlight = Math.max(ddHighlight-1, 0); highlightDd(items); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (ddHighlight>=0 && items[ddHighlight]) { items[ddHighlight].click(); } else { commitSearch(); } }
   else if (e.key === 'Escape') { closeDropdown(); }
 }
 
 function highlightDd(items) {
-  items.forEach((el, i) => el.classList.toggle('hl', i === ddHighlight));
-  if (items[ddHighlight]) items[ddHighlight].scrollIntoView({ block: 'nearest' });
+  items.forEach((el,i) => el.classList.toggle('hl', i===ddHighlight));
+  if (items[ddHighlight]) items[ddHighlight].scrollIntoView({block:'nearest'});
 }
 
 function commitSearch() {
@@ -242,52 +243,50 @@ function clearSearch() {
   document.getElementById('resultsHeader').style.display = 'none';
 }
 
-// ── DROPDOWN ──
 function renderDropdown(q) {
   const query = q.toLowerCase();
-  const matches = allCars.filter(c => {
-    return `${c.brand} ${c.model} ${c.body_type||''} ${c.engine||''}`.toLowerCase().includes(query);
-  }).slice(0, 7);
+  const matches = allCars.filter(c =>
+    (c.brand+' '+c.model+' '+(c.body_type||'')+' '+(c.engine||'')).toLowerCase().includes(query)
+  ).slice(0, 7);
 
   const dd = document.getElementById('dropdown');
   ddHighlight = -1;
 
+  const statusClass = { Available:'st-available', Reserved:'st-reserved', Incoming:'st-incoming', 'Stock in Japan':'st-japan' };
+  const statusLabel = { Available:'Available', Reserved:'Reserved', Incoming:'Incoming', 'Stock in Japan':'Stock in Japan', Sold:'Sold' };
+
   if (!matches.length) {
     dd.innerHTML = `<div class="dd-not-found">
-      <div class="nf-title bebas">No results for "${escapeHtml(q)}"</div>
-      <p>We may be able to source this from Japan.<br>Tell us what you're looking for.</p>
+      <div class="nf-t bebas">No results for "${escapeHtml(q)}"</div>
+      <p>We may be able to source this from Japan. Tell us what you're looking for.</p>
       <a href="https://wa.me/601151177026?text=Hi%20Kansai%20Group%2C%20I%27m%20looking%20for%20a%20${encodeURIComponent(q)}%20%E2%80%94%20do%20you%20have%20it%20or%20can%20you%20source%20one%3F" target="_blank" class="btn-wa">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
         Ask Us to Source It
       </a>
-    </div>
-    <div class="dd-footer">Can't find it? We source directly from Japan's auction houses.</div>`;
+    </div>`;
     dd.classList.add('open');
     return;
   }
 
-  const statusLabel = { Available: 'Available', Reserved: 'Reserved', Sold: 'Sold', Incoming: 'Incoming', 'Stock in Japan': 'Stock in Japan' };
-  const statusClass = { Available: 'st-available', Reserved: 'st-reserved', Sold: 'st-sold', Incoming: 'st-incoming', 'Stock in Japan': 'st-japan' };
-
-  dd.innerHTML = `<div class="dd-section-title">Matching Vehicles</div>` +
-    matches.map((c, i) => {
-      const cover = (c.photos && c.photos[0]?.url) ? c.photos[0].url : null;
-      const price = c.price ? `<div class="car-price bebas" style="font-size:17px"><span style="font-size:11px;color:var(--text-muted)">RM</span> ${Number(c.price).toLocaleString()}</div>` : '';
+  dd.innerHTML = '<div class="dd-section-title">Matching Vehicles</div>' +
+    matches.map(c => {
+      const cover = c.photos && c.photos[0]?.url ? c.photos[0].url : null;
       const st = c.status || 'Available';
-      return `<div class="dd-item" data-id="${c.id}" onclick="goCar('${c.id}')">
-        ${cover ? `<img class="dd-thumb" src="${cover}" loading="lazy">` : `<div class="dd-thumb-placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`}
+      const price = c.price ? `<div class="dd-price bebas"><span class="cur">RM </span>${Number(c.price).toLocaleString()}</div>` : '';
+      return `<div class="dd-item" onclick="goCar('${c.id}')">
+        ${cover ? `<img class="dd-thumb" src="${cover}" loading="lazy">` : `<div class="dd-thumb-ph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`}
         <div class="dd-info">
           <div class="dd-make">${escapeHtml(c.brand)}</div>
           <div class="dd-model">${escapeHtml(c.model)}</div>
-          <div class="dd-specs">${c.year || ''}${c.engine ? ' · ' + c.engine : ''}</div>
+          <div class="dd-specs">${c.year||''}${c.engine?' · '+c.engine:''}</div>
         </div>
-        <div style="text-align:right;flex-shrink:0">
+        <div class="dd-right">
           ${price}
-          <div class="dd-status ${statusClass[st] || 'st-available'}">${statusLabel[st] || st}</div>
+          <div class="dd-status ${statusClass[st]||'st-available'}">${statusLabel[st]||st}</div>
         </div>
       </div>`;
     }).join('') +
-    (matches.length > 0 ? '<div class="dd-footer" style="cursor:pointer;" onclick="commitSearch()">See all results →</div>' : '');
+    '<div class="dd-footer-row" onclick="commitSearch()">See all results →</div>';
 
   dd.classList.add('open');
 }
@@ -298,22 +297,19 @@ function closeDropdown() {
 }
 
 function goCar(id) {
-  window.location.href = `car.html?id=${id}`;
+  window.location.href = 'car.html?id=' + id;
 }
 
-// ── FULL SEARCH RESULTS ──
 function runFullSearch(q) {
   const query = q.toLowerCase();
   searchResults = allCars.filter(c =>
-    `${c.brand} ${c.model} ${c.body_type||''} ${c.engine||''} ${c.status||''}`.toLowerCase().includes(query)
+    (c.brand+' '+c.model+' '+(c.body_type||'')+' '+(c.engine||'')+' '+(c.status||'')).toLowerCase().includes(query)
   );
-
   statusFilter = 'all';
-  document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.status === 'all'));
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b.dataset.status==='all'));
   document.getElementById('filterRow').style.display = 'flex';
   document.getElementById('resultsHeader').style.display = 'flex';
-  document.getElementById('resultsTitle').textContent = `Results for "${q}"`;
-
+  document.getElementById('resultsTitle').textContent = 'Results for "' + q + '"';
   renderResults();
 }
 
@@ -326,42 +322,41 @@ function setStatusFilter(status, btn) {
 
 function renderResults() {
   let list = statusFilter === 'all' ? searchResults : searchResults.filter(c => c.status === statusFilter);
-  document.getElementById('resultsCount').textContent = `${list.length} vehicle${list.length === 1 ? '' : 's'}`;
-
+  document.getElementById('resultsCount').textContent = list.length + ' vehicle' + (list.length===1?'':'s');
   const grid = document.getElementById('resultsGrid');
 
-  if (!list.length && searchResults.length === 0) {
+  if (searchResults.length === 0) {
     grid.innerHTML = `<div class="not-found-state">
       <div class="nf-big bebas">No vehicles found for "${escapeHtml(currentQuery)}"</div>
       <p>We source directly from Japan's Kansai auction houses. Tell us what you're looking for and we'll check availability and pricing.</p>
       <a href="https://wa.me/601151177026?text=Hi%20Kansai%20Group%2C%20I%27m%20looking%20for%20a%20${encodeURIComponent(currentQuery)}%20%E2%80%94%20can%20you%20source%20one%3F" target="_blank" class="btn-source">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
         Ask Us to Source It
-      </a>
-      <br>
+      </a><br>
       <a href="index.html#stock" class="btn-browse">Browse All Stock</a>
     </div>`;
     return;
   }
 
   if (!list.length) {
-    grid.innerHTML = `<div class="idle-state"><p>No vehicles with status "${statusFilter}" match your search. Try a different filter.</p></div>`;
+    grid.innerHTML = '<div class="idle-state"><p>No vehicles with that status match your search. Try a different filter.</p></div>';
     return;
   }
 
-  const statusClass = { Available: 'badge-available', Reserved: 'badge-reserved', Sold: 'badge-sold', Incoming: 'badge-incoming', 'Stock in Japan': 'badge-japan' };
-  const statusLabel = { Available: 'Available', Reserved: 'Reserved', Sold: 'Sold', Incoming: 'Incoming', 'Stock in Japan': 'Stock in Japan' };
+  const statusClass = { Available:'badge-available', Reserved:'badge-reserved', Incoming:'badge-incoming', 'Stock in Japan':'badge-japan' };
+  const statusLabel = { Available:'Available', Reserved:'Reserved', Incoming:'Incoming', 'Stock in Japan':'Stock in Japan', Sold:'Sold' };
 
   grid.innerHTML = list.map(c => {
     const cover = (c.photos && c.photos[0]?.url) || '';
     const st = c.status || 'Available';
-    const badge = `<span class="car-badge ${statusClass[st] || 'badge-available'}">${statusLabel[st] || st}</span>`;
-    const price = c.price ? `<div class="car-price bebas"><span class="cur">RM</span> ${Number(c.price).toLocaleString()}</div>` : `<div class="car-price bebas" style="font-size:14px;color:var(--text-muted)">POA</div>`;
+    const price = c.price
+      ? `<div class="car-price bebas"><span class="cur">RM </span>${Number(c.price).toLocaleString()}</div>`
+      : `<div class="car-price bebas" style="font-size:14px;color:var(--text-muted)">POA</div>`;
     return `<a class="car-card" href="car.html?id=${c.id}">
       <div class="car-img">
         ${cover ? `<img src="${cover}" loading="lazy">` : ''}
-        ${badge}
-        ${c.photos && c.photos.length ? `<span class="car-photos">${c.photos.length} photo${c.photos.length===1?'':'s'}</span>` : ''}
+        <span class="car-badge ${statusClass[st]||'badge-available'}">${statusLabel[st]||st}</span>
+        ${c.photos&&c.photos.length ? `<span class="car-photos">${c.photos.length} photo${c.photos.length===1?'':'s'}</span>` : ''}
       </div>
       <div class="car-info">
         <div class="car-make">${escapeHtml(c.brand)}</div>
@@ -369,12 +364,12 @@ function renderResults() {
         <div class="car-specs">
           ${c.year ? `<span class="spec">${c.year}</span>` : ''}
           ${c.engine ? `<span class="spec">${escapeHtml(c.engine)}</span>` : ''}
-          ${c.mileage && c.status !== 'Incoming' ? `<span class="spec">${Number(c.mileage).toLocaleString()} km</span>` : ''}
-          ${c.status === 'Incoming' && c.eta ? `<span class="spec">ETA ${escapeHtml(c.eta)}</span>` : ''}
+          ${c.mileage&&c.status!=='Incoming'&&c.status!=='Stock in Japan' ? `<span class="spec">${Number(c.mileage).toLocaleString()} km</span>` : ''}
+          ${(c.status==='Incoming'||c.status==='Stock in Japan')&&c.eta ? `<span class="spec">ETA ${escapeHtml(c.eta)}</span>` : ''}
         </div>
         <div class="car-foot">
           ${price}
-          <span class="car-enquire">${st === 'Available' ? 'Enquire →' : st === 'Incoming' ? 'Reserve →' : 'View →'}</span>
+          <span class="car-enquire">${st==='Available'?'Enquire →':st==='Incoming'||st==='Stock in Japan'?'Reserve →':'View →'}</span>
         </div>
       </div>
     </a>`;
@@ -384,17 +379,15 @@ function renderResults() {
 function showIdle() {
   document.getElementById('resultsGrid').innerHTML = `<div class="idle-state">
     <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <p>Start typing a brand or model above — we'll search across all our available, incoming, and Japan stock instantly.</p>
+    <p>Start typing above — we'll search across all available, incoming, and Japan stock instantly.</p>
   </div>`;
   document.getElementById('filterRow').style.display = 'none';
   document.getElementById('resultsHeader').style.display = 'none';
 }
 
-// Close dropdown on outside click
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-wrap')) closeDropdown();
 });
 </script>
-
 </body>
 </html>
