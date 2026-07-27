@@ -58,19 +58,6 @@
   h1.hero-title span { color: var(--red); }
   h1.hero-title .gold { color: var(--gold); }
   .hero-sub { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin: 20px 0 32px; max-width: 500px; }
-  .hero-search { position: relative; margin: 24px 0 28px; max-width: 580px; }
-  .hero-search input { width: 100%; padding: 16px 56px 16px 52px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--text-main); background: #fff; outline: none; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: border-color 0.2s, box-shadow 0.2s; }
-  .hero-search input:focus { border-color: var(--red); box-shadow: 0 4px 20px rgba(230,0,18,0.12); }
-  .hero-search input::placeholder { color: var(--text-muted); }
-  .hero-search .hs-icon { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
-  .hero-search .hs-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px; display: none; }
-  .hero-search .hs-clear:hover { color: var(--red); }
-  .search-results-bar { max-width: 580px; background: rgba(230,0,18,0.06); border: 1px solid rgba(230,0,18,0.15); border-radius: 6px; padding: 10px 16px; font-size: 13px; color: var(--red); font-weight: 600; display: none; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-  .search-results-bar.show { display: flex; }
-  .search-no-results { text-align: center; padding: 48px 20px; grid-column: 1/-1; }
-  .search-no-results .snr-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; margin-bottom: 8px; }
-  .search-no-results p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
-  .search-no-results .btn-wa { display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #fff; padding: 12px 24px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
   .btn-primary { background: var(--red); color: #fff; padding: 15px 32px; border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 14px rgba(230,0,18,0.18); transition: all 0.2s; border: none; cursor: pointer; }
   .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); }
   .btn-outline { background: var(--bg-main); color: var(--text-main); padding: 15px 32px; border: 1px solid var(--border); border-radius: 4px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: inline-block; transition: all 0.2s; cursor: pointer; }
@@ -273,13 +260,9 @@
     <div class="hero-tag">Now Open in Kuala Lumpur</div>
     <h1 class="hero-title bebas">JAPAN'S <span>FINEST</span><br>DELIVERED TO <span class="gold">MALAYSIA</span></h1>
     <p class="hero-sub">Premium Japanese, UK &amp; Australian import vehicles — sourced directly from Osaka's auction houses, ready stock in Kuala Lumpur. Transparent pricing, full auction grade sheets, no middleman.</p>
-    <div class="hero-search">
-      <svg class="hs-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="heroSearch" placeholder="Search by brand or model — e.g. Lexus RX 350, Alphard, GT-R..." autocomplete="off" oninput="doHeroSearch(this.value)">
-      <button class="hs-clear" id="hsClear" onclick="clearHeroSearch()">×</button>
-    </div>
     <div class="hero-actions">
       <a href="#stock" class="btn-primary">Browse Stock</a>
+      <a href="find.html" class="btn-outline" style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find My Car</a>
       <a href="#incoming" class="btn-outline">View Incoming</a>
     </div>
     <div class="hero-stats">
@@ -309,10 +292,6 @@
 </section>
 
 <section id="stock">
-  <div class="search-results-bar" id="searchResultsBar">
-    <span id="searchResultsText"></span>
-    <button onclick="clearHeroSearch()" style="background:none;border:none;color:var(--red);font-weight:700;cursor:pointer;font-size:13px;font-family:'Rajdhani',sans-serif;letter-spacing:1px;text-transform:uppercase;">Clear ×</button>
-  </div>
   <div class="sec-head">
     <div><div class="section-label">Available Now</div><h2 class="bebas">OUR <span class="accent">STOCK</span> IN <span class="gold-txt">MALAYSIA</span></h2></div>
     <span class="sec-link" id="stockCount" style="color:var(--text-muted); cursor:default;"></span>
@@ -601,69 +580,8 @@ async function loadCars() {
 
 loadCars();
 
-// ═══════════════════════════════════════
-// HERO SEARCH
-// ═══════════════════════════════════════
-let searchQuery = '';
 
-function doHeroSearch(val) {
-  searchQuery = val.trim().toLowerCase();
-  const clearBtn = document.getElementById('hsClear');
-  clearBtn.style.display = searchQuery ? 'block' : 'none';
 
-  if (!searchQuery) {
-    clearHeroSearch();
-    return;
-  }
-
-  // Scroll to stock section
-  document.getElementById('stock').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  // Filter ALL cars (available, incoming, any status)
-  const results = allCars.filter(c => {
-    const hay = `${c.brand} ${c.model} ${c.body_type || ''} ${c.engine || ''} ${c.status || ''}`.toLowerCase();
-    return hay.includes(searchQuery);
-  });
-
-  // Show results bar
-  const bar = document.getElementById('searchResultsBar');
-  const txt = document.getElementById('searchResultsText');
-  bar.classList.add('show');
-  txt.textContent = results.length
-    ? `${results.length} result${results.length === 1 ? '' : 's'} for "${val.trim()}"`
-    : `No results for "${val.trim()}"`;
-
-  // Render results into stock grid
-  const grid = document.getElementById('stockGrid');
-  document.getElementById('stockCount').textContent = `${results.length} vehicle${results.length === 1 ? '' : 's'}`;
-
-  if (!results.length) {
-    grid.innerHTML = `<div class="search-no-results">
-      <div class="snr-title bebas">No vehicles found for "${escapeHtml(val.trim())}"</div>
-      <p>We may be able to source this vehicle from Japan for you. Contact us and we'll check availability.</p>
-      <a href="https://wa.me/601151177026?text=Hi%20Kansai%20Group%2C%20I%27m%20looking%20for%20a%20${encodeURIComponent(val.trim())}%20%E2%80%94%20can%20you%20help%20source%20one%3F" class="btn-wa" target="_blank">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
-        Ask Us to Source It
-      </a>
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = results.map(c => carCardHtml(c)).join('');
-
-  // Reset body filter buttons
-  document.querySelectorAll('#bodyFilters .filter-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('#bodyFilters .filter-btn[data-body="all"]').classList.add('active');
-  bodyFilter = 'all';
-}
-
-function clearHeroSearch() {
-  searchQuery = '';
-  document.getElementById('heroSearch').value = '';
-  document.getElementById('hsClear').style.display = 'none';
-  document.getElementById('searchResultsBar').classList.remove('show');
-  renderStock();
-}
 
 // ═══════════════════════════════════════
 // MOBILE MENU
