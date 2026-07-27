@@ -240,6 +240,7 @@
             <button class="seg-btn" data-status="Available" onclick="setStatusFilter('Available', this)">Available</button>
             <button class="seg-btn" data-status="Reserved" onclick="setStatusFilter('Reserved', this)">Reserved</button>
             <button class="seg-btn" data-status="Incoming" onclick="setStatusFilter('Incoming', this)">Incoming</button>
+            <button class="seg-btn" data-status="Stock in Japan" onclick="setStatusFilter('Stock in Japan', this)">Japan</button>
             <button class="seg-btn" data-status="Sold" onclick="setStatusFilter('Sold', this)">Sold</button>
           </div>
         </div>
@@ -337,10 +338,10 @@
                 <div class="card-hint">Controls how the car appears on the site.</div>
                 <div class="field"><label>Status <span class="req">*</span></label>
                   <select id="f_status" onchange="toggleEta(this)">
-                    <option>Available</option><option>Reserved</option><option>Sold</option><option>Incoming</option>
+                    <option>Available</option><option>Reserved</option><option>Sold</option><option>Incoming</option><option>Stock in Japan</option>
                   </select>
                 </div>
-                <div class="field hidden" id="etaField"><label>ETA <span class="opt">(for incoming)</span></label><input type="text" id="f_eta" placeholder="e.g. 3 weeks"></div>
+                <div class="field hidden" id="etaField"><label>ETA <span class="opt">(for incoming / Japan stock)</span></label><input type="text" id="f_eta" placeholder="e.g. 3 weeks"></div>
                 <div class="field"><label>Tag <span class="opt">(badge)</span></label><select id="f_tag"><option>None</option><option>Hot Deal</option><option>New In</option></select></div>
                 <div class="toggle-row">
                   <div><div class="toggle-label">Featured</div><div class="toggle-desc">Show in the featured section</div></div>
@@ -485,7 +486,7 @@ function renderCars() {
   body.innerHTML = list.map(c => {
     const photos = c.photos || [];
     const thumb = photos[0]?.url || '';
-    const statusClass = { Available: 'st-available', Reserved: 'st-reserved', Sold: 'st-sold', Incoming: 'st-incoming' }[c.status] || 'st-available';
+    const statusClass = { Available: 'st-available', Reserved: 'st-reserved', Sold: 'st-sold', Incoming: 'st-incoming', 'Stock in Japan': 'st-incoming' }[c.status] || 'st-available';
     return `
     <div class="ct-row car">
       ${thumb ? `<img class="ct-thumb" src="${thumb}">` : `<div class="ct-thumb"></div>`}
@@ -493,7 +494,7 @@ function renderCars() {
         <div class="ct-name rajdhani">${escapeHtml(c.model)} ${c.featured ? '<svg class="feat-star" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-1px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>' : ''}</div>
         <div class="ct-make">${escapeHtml(c.brand)}</div>
       </div>
-      <div class="ct-cell ct-col-hide">${c.year} · ${c.status==='Incoming' ? (c.eta||'TBA') : (c.mileage||0).toLocaleString()+' km'}</div>
+      <div class="ct-cell ct-col-hide">${c.year} · ${(c.status==='Incoming'||c.status==='Stock in Japan') ? (c.eta||'TBA') : (c.mileage||0).toLocaleString()+' km'}</div>
       <div class="ct-cell ct-col-hide">${escapeHtml(c.body_type||'–')}</div>
       <div class="ct-price bebas">${Number(c.price).toLocaleString()}</div>
       <div><span class="status-pill ${statusClass}">${c.status}</span></div>
@@ -523,7 +524,7 @@ function showView(v) {
 }
 
 function toggleEta(sel) {
-  document.getElementById('etaField').classList.toggle('hidden', sel.value !== 'Incoming');
+  document.getElementById('etaField').classList.toggle('hidden', sel.value !== 'Incoming' && sel.value !== 'Stock in Japan');
 }
 
 // populate year dropdown
@@ -580,7 +581,7 @@ function editCar(id) {
   document.getElementById('f_tag').value = c.tag || 'None';
   document.getElementById('f_desc').value = c.description || '';
   document.getElementById('f_featured').classList.toggle('on', !!c.featured);
-  document.getElementById('etaField').classList.toggle('hidden', c.status !== 'Incoming');
+  document.getElementById('etaField').classList.toggle('hidden', c.status !== 'Incoming' && c.status !== 'Stock in Japan');
   renderPhotoGrid();
   showView('form');
 }
