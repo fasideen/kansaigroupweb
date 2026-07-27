@@ -45,14 +45,14 @@
   .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
   .gallery-badge { position: absolute; top: 16px; left: 16px; background: var(--gold); color: var(--navy); font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 13px; border-radius: 5px; }
   .gallery-count { position: absolute; bottom: 16px; right: 16px; background: rgba(17,24,39,0.8); color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 6px; }
-  .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); user-select: none; -webkit-user-select: none; outline: none; }
   .gallery-nav:hover { background: #fff; }
   .gallery-nav.prev { left: 14px; }
   .gallery-nav.next { right: 14px; }
   .thumb-strip { display: flex; gap: 9px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-  .thumb { flex: 0 0 88px; aspect-ratio: 4/3; border-radius: 9px; overflow: hidden; cursor: pointer; border: 2px solid transparent; }
+  .thumb { flex: 0 0 88px; aspect-ratio: 4/3; border-radius: 9px; overflow: hidden; cursor: pointer; border: 2px solid transparent; user-select: none; -webkit-user-select: none; }
   .thumb.active { border-color: var(--red); }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
 
   .info-panel { position: sticky; top: 84px; align-self: start; }
   .info-make { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
@@ -175,8 +175,8 @@
 
       <div class="info-price-box">
         <div class="info-price-label">Price</div>
-        <div class="info-price bebas"><span id="infoPrice"></span> <span class="cur">RM</span></div>
-        <div class="info-price-note">Excludes import duty &amp; registration. Use our duty calculator for an estimate.</div>
+        <div class="info-price bebas"><span class="cur">RM</span> <span id="infoPrice"></span></div>
+        <div class="info-price-note">Price inclusive of import duty &amp; shipping. Registration fees are calculated separately.</div>
       </div>
 
       <div class="info-actions">
@@ -251,7 +251,7 @@ function renderCarCard(c) {
       <div class="car-make">${escapeHtml(c.brand)}</div>
       <div class="car-model rajdhani">${escapeHtml(c.model.toUpperCase())}</div>
       <div class="car-specs"><span class="spec">${c.year}</span><span class="spec">${escapeHtml(c.engine||'')}</span></div>
-      <div class="car-foot"><div class="car-price bebas">${Number(c.price).toLocaleString()} <span class="cur">RM</span></div><span class="car-enquire">View →</span></div>
+      <div class="car-foot"><div class="car-price bebas"><span class="cur">RM</span> ${Number(c.price).toLocaleString()}</div><span class="car-enquire">View →</span></div>
     </div>
   </a>`;
 }
