@@ -3,7 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loading… — Kansai Group</title>
+<title id="pageTitle">Japanese Import Car for Sale Malaysia — Kansai Group</title>
+<meta id="metaDesc" name="description" content="Premium Japanese recon car available in Kuala Lumpur. Full auction grade sheet, transparent pricing. Contact Kansai Group Malaysia.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Kansai Group Corporation">
+<link id="canonicalLink" rel="canonical" href="https://www.kansaigroup.my/car.html">
+
+<!-- Open Graph -->
+<meta id="ogTitle" property="og:type" content="product">
+<meta id="ogUrl" property="og:url" content="https://www.kansaigroup.my/car.html">
+<meta id="ogTitleProp" property="og:title" content="Japanese Import Car — Kansai Group Malaysia">
+<meta id="ogDesc" property="og:description" content="Premium Japanese recon car available in Kuala Lumpur.">
+<meta id="ogImage" property="og:image" content="https://www.kansaigroup.my/og-image.jpg">
+<meta property="og:site_name" content="Kansai Group Malaysia">
+<meta property="og:locale" content="en_MY">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta id="twTitle" name="twitter:title" content="Japanese Import Car — Kansai Group Malaysia">
+<meta id="twDesc" name="twitter:description" content="Premium Japanese recon car available in Kuala Lumpur.">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -263,7 +281,52 @@ async function loadCar() {
   const { data: car, error } = await sb.from('cars').select('*').eq('id', id).single();
   if (error || !car) { showError(); return; }
 
-  document.title = `${car.brand} ${car.model} — Kansai Group`;
+  document.title = `${car.brand} ${car.model} ${car.year} for Sale Malaysia — Kansai Group`;
+
+  // Dynamic SEO meta updates
+  const carUrl = `https://www.kansaigroup.my/car.html?id=${car.id}`;
+  const carTitle = `${car.brand} ${car.model} ${car.year} for Sale Malaysia — Kansai Group`;
+  const carDesc = `${car.brand} ${car.model} ${car.year}, ${car.engine||''}, ${(car.mileage||0).toLocaleString()} km. Grade ${car.grade||'N/A'}. RM ${Number(car.price).toLocaleString()}. Ready stock Kuala Lumpur. Full auction grade sheet available.`;
+  const carImage = (car.photos && car.photos[0]?.url) || 'https://www.kansaigroup.my/og-image.jpg';
+
+  const setMeta = (id, attr, val) => { const el = document.getElementById(id); if(el) el.setAttribute(attr, val); };
+  setMeta('metaDesc', 'content', carDesc);
+  setMeta('canonicalLink', 'href', carUrl);
+  setMeta('ogUrl', 'content', carUrl);
+  setMeta('ogTitleProp', 'content', carTitle);
+  setMeta('ogDesc', 'content', carDesc);
+  setMeta('ogImage', 'content', carImage);
+  setMeta('twTitle', 'content', carTitle);
+  setMeta('twDesc', 'content', carDesc);
+
+  // Schema.org for individual car listing
+  const carSchema = {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    "name": `${car.brand} ${car.model} ${car.year}`,
+    "brand": { "@type": "Brand", "name": car.brand },
+    "model": car.model,
+    "modelDate": car.year,
+    "mileageFromOdometer": { "@type": "QuantitativeValue", "value": car.mileage || 0, "unitCode": "KMT" },
+    "vehicleEngine": { "@type": "EngineSpecification", "name": car.engine || '' },
+    "fuelType": car.fuel || '',
+    "vehicleTransmission": car.transmission || '',
+    "numberOfDoors": car.seats || '',
+    "offers": {
+      "@type": "Offer",
+      "price": car.price || 0,
+      "priceCurrency": "MYR",
+      "availability": car.status === 'Available' ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+      "url": carUrl,
+      "seller": { "@type": "AutoDealer", "name": "Kansai Group Malaysia", "url": "https://www.kansaigroup.my" }
+    },
+    "image": carImage,
+    "description": carDesc,
+    "url": carUrl
+  };
+  let schemaEl = document.getElementById('carSchema');
+  if (!schemaEl) { schemaEl = document.createElement('script'); schemaEl.id = 'carSchema'; schemaEl.type = 'application/ld+json'; document.head.appendChild(schemaEl); }
+  schemaEl.textContent = JSON.stringify(carSchema);
   photos = (car.photos && car.photos.length) ? car.photos : [{ url: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=900' }];
 
   document.getElementById('bcBrand').textContent = car.brand;

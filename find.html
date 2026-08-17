@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find My Car — Kansai Group</title>
+<title>Find My Car — Search Japanese Import Cars Malaysia | Kansai Group</title>
+<meta name="description" content="Search Kansai Group's full inventory of Japanese import cars in Malaysia. Available now, incoming, and stock in Japan. Can't find it? We'll source it for you.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.kansaigroup.my/find.html">
+<meta property="og:title" content="Find My Car — Japanese Import Cars Malaysia">
+<meta property="og:description" content="Search our full inventory of Japanese import cars. Available, incoming, and Japan stock.">
+<meta property="og:url" content="https://www.kansaigroup.my/find.html">
+<meta property="og:site_name" content="Kansai Group Malaysia">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -31,10 +38,10 @@
   .back-link:hover{color:var(--red);}
 
   /* HERO — matches website light style */
-  .find-hero{background:linear-gradient(135deg,var(--bg-alt) 0%,var(--bg-main) 100%);border-bottom:1px solid var(--border);padding:56px 24px 64px;position:relative;}
-  .find-hero-grid{position:absolute;inset:0;opacity:0.5;background-image:linear-gradient(rgba(0,0,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.03) 1px,transparent 1px);background-size:48px 48px;}
-  .find-hero-watermark{position:absolute;right:0;top:50%;transform:translateY(-50%);font-family:'Noto Sans JP',sans-serif;font-size:200px;font-weight:700;color:rgba(230,0,18,0.03);pointer-events:none;line-height:1;}
-  .find-hero-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;text-align:center;}
+  .find-hero{background:linear-gradient(135deg,var(--bg-alt) 0%,var(--bg-main) 100%);border-bottom:1px solid var(--border);padding:56px 24px 120px;position:relative;overflow:visible;}
+  .find-hero-grid{position:absolute;inset:0;opacity:0.5;background-image:linear-gradient(rgba(0,0,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.03) 1px,transparent 1px);background-size:48px 48px;overflow:hidden;pointer-events:none;}
+  .find-hero-watermark{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-family:'Noto Sans JP',sans-serif;font-size:200px;font-weight:700;color:rgba(230,0,18,0.03);pointer-events:none;line-height:1;overflow:hidden;max-width:100%;}
+  .find-hero-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;text-align:center;overflow:visible;}
   .find-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(230,0,18,0.07);border:1px solid rgba(230,0,18,0.15);padding:6px 15px;border-radius:4px;font-size:10.5px;letter-spacing:2.5px;color:var(--red);text-transform:uppercase;margin-bottom:20px;font-weight:600;}
   .find-tag::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
@@ -43,7 +50,7 @@
   .find-sub{font-size:15px;color:var(--text-muted);line-height:1.6;margin-bottom:36px;}
 
   /* SEARCH BOX */
-  .search-wrap{position:relative;max-width:620px;margin:0 auto;}
+  .search-wrap{position:relative;max-width:620px;margin:0 auto;z-index:500;}
   .search-box{display:flex;background:#fff;border:2px solid var(--border);border-radius:10px;overflow:visible;box-shadow:var(--shadow-md);transition:border-color 0.2s,box-shadow 0.2s;position:relative;z-index:10;}
   .search-box:focus-within{border-color:var(--red);box-shadow:0 8px 32px rgba(230,0,18,0.12);}
   .search-icon{padding:0 16px;display:flex;align-items:center;color:var(--text-muted);flex-shrink:0;}
@@ -56,7 +63,7 @@
   .search-btn:hover{background:var(--red-dark);}
 
   /* DROPDOWN */
-  .dropdown{position:absolute;top:calc(100% + 10px);left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--border);z-index:200;display:none;overflow:hidden;}
+  .dropdown{position:absolute;top:calc(100% + 10px);left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.15);border:1px solid var(--border);z-index:1000;display:none;overflow:hidden;}
   .dropdown.open{display:block;}
   .dd-section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:12px 18px 8px;background:var(--bg-alt);border-bottom:1px solid var(--border);}
   .dd-item{display:flex;align-items:center;gap:14px;padding:13px 18px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);}
