@@ -3,9 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kansai Group — Import Duty Calculator</title>
-<meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Kansai Group Import Duty Calculator — estimate Malaysian import duty for Japanese, UK and Australian vehicles.">
+<title>Malaysia Import Duty Calculator — Japanese & Recon Cars | Kansai Group</title>
+<meta name="description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly. Covers Toyota, Lexus, Nissan, BMW and 2,279 vehicles.">
+<meta name="keywords" content="malaysia import duty calculator, recon car duty malaysia, japanese car import duty, import duty kereta malaysia, duti import kereta, kansai group duty calculator">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.kansaigroup.my/duty-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Malaysia Import Duty Calculator — Japanese & Recon Cars">
+<meta property="og:description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. 2,279 vehicles in database. Calculate instantly.">
+<meta property="og:url" content="https://www.kansaigroup.my/duty-calculator.html">
+<meta property="og:site_name" content="Kansai Group Malaysia">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Malaysia Import Duty Calculator — Kansai Group">
+<meta name="twitter:description" content="Free import duty calculator for Japanese recon cars in Malaysia. 2,279 vehicles in database.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Malaysia Import Duty Calculator",
+  "description": "Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly.",
+  "url": "https://www.kansaigroup.my/duty-calculator.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "MYR"
+  },
+  "provider": {
+    "@type": "AutoDealer",
+    "name": "Kansai Group Malaysia",
+    "url": "https://www.kansaigroup.my"
+  }
+}
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,4 93,27 93,73 50,96 7,73 7,27' fill='%23DC2626'/%3E%3Ctext x='50' y='63' text-anchor='middle' fill='%23fff' font-family='Arial, sans-serif' font-weight='700' font-size='34'%3EKG%3C/text%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -457,99 +488,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 .faq-a.open { max-height: 400px; padding-bottom: 14px; }
 .faq-icon.open { transform: rotate(45deg); }
 
-/* ── PASSWORD GATE ── */
-.gate-overlay {
-  position: fixed; inset: 0;
-  background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1000; padding: 20px;
-}
-.gate-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 44px 40px 40px;
-  max-width: 400px; width: 100%;
-  text-align: center;
-}
-.gate-logo {
-  margin: 0 auto 20px;
-  display: block;
-}
-.gate-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  margin: 0 0 4px;
-}
-.gate-sub {
-  font-size: 12px;
-  color: var(--ink-soft);
-  margin: 0 0 28px;
-  line-height: 1.6;
-}
-.gate-input-wrap {
-  position: relative;
-  margin-bottom: 12px;
-}
-.gate-input-wrap input {
-  width: 100%;
-  padding: 13px 48px 13px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: 'Inter', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  box-sizing: border-box;
-  transition: border-color 0.15s;
-  outline: none;
-  letter-spacing: 0.15em;
-}
-.gate-input-wrap input:focus { border-color: var(--navy); }
-.gate-input-wrap input.error { border-color: var(--red); }
-.gate-lock-icon {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  color: var(--ink-soft); pointer-events: none;
-}
-.gate-btn {
-  width: 100%;
-  background: var(--red) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 10px;
-  padding: 13px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Oswald', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-}
-.gate-btn:active { transform: scale(0.98); }
-.gate-error {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: var(--red);
-  font-size: 12px;
-  font-weight: 500;
-  margin-top: 12px;
-}
-.gate-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 28px 0 20px;
-}
-.gate-footer {
-  font-size: 11px;
-  color: var(--ink-soft);
-  line-height: 1.6;
-}
+
 
 /* ── FOOTER ── */
 .site-footer {
@@ -610,6 +549,16 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 </head>
 <body>
 
+
+<!-- CTA Banner -->
+<div style="background:var(--red);padding:10px 24px;text-align:center;">
+  <span style="color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;">
+    Ready to import? 
+    <a href="https://www.kansaigroup.my" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:8px;">Browse our stock in KL →</a>
+    <a href="https://wa.me/601151177026" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:16px;">WhatsApp Us →</a>
+  </span>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
@@ -634,81 +583,15 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   </div>
 </div>
 
-<!-- PASSWORD GATE -->
-<div id="gate" class="gate-overlay">
-  <div class="gate-box">
-
-    <svg class="gate-logo" width="52" height="52" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" class="kg-hex"/>
-      <text x="50" y="63" text-anchor="middle" class="kg-text" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="34">KG</text>
-    </svg>
-
-    <div class="gate-title">Kansai Group</div>
-    <div class="gate-sub">Import Duty Calculator<br>Please enter your password to continue.</div>
-
-    <div class="gate-input-wrap">
-      <input type="password" id="gatePw" placeholder="Enter password" autocomplete="off">
-      <svg class="gate-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-      </svg>
-    </div>
-
-    <button class="gate-btn" onclick="checkPassword()">Unlock</button>
-
-    <div class="gate-error" id="gateError">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/></svg>
-      Incorrect password — please try again.
-    </div>
-
-    <hr class="gate-divider">
-    <div class="gate-footer">This tool is for authorised Kansai Group staff only.<br>Duty estimates are for reference purposes.</div>
-
-  </div>
-</div>
-
-<div id="app" style="display:none">
+<div id="app">
   <div class="loading-screen">Loading vehicle database…</div>
 </div>
 
-<div class="site-footer" id="siteFooter" style="display:none">
+<div class="site-footer" id="siteFooter">
   Estimates only, for reference purposes. Exchange rates and duty calculations are based on figures you enter and may differ from the official assessment by the Royal Malaysian Customs Department.
   Official rates: <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank" style="color:var(--ink-mid)">customsgc.gov.my</a>.
   © <span id="footYear"></span> Kansai Group.
 </div>
-
-<script>
-const STAFF_PASSWORD = 'kansai2026'; // ← change this to your own password
-
-function checkPassword() {
-  const input = document.getElementById('gatePw');
-  const val = input.value;
-  if (val === STAFF_PASSWORD) {
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('siteFooter').style.display = 'block';
-    try { sessionStorage.setItem('kansaiDutyAuth', '1'); } catch(e) {}
-  } else {
-    input.classList.add('error');
-    document.getElementById('gateError').style.display = 'flex';
-    input.select();
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const gatePw = document.getElementById('gatePw');
-  gatePw.addEventListener('keydown', e => {
-    gatePw.classList.remove('error');
-    document.getElementById('gateError').style.display = 'none';
-    if (e.key === 'Enter') checkPassword();
-  });
-  try {
-    if (sessionStorage.getItem('kansaiDutyAuth') === '1') {
-      document.getElementById('gate').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      document.getElementById('siteFooter').style.display = 'block';
-    }
-  } catch(e) {}
-});
-</script>
 
 <script>
 // ═══════════════════════════════════════════════════
