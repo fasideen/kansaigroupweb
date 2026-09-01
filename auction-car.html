@@ -83,6 +83,11 @@
   .est-row:last-child { border-bottom:none; }
   .est-row .val { font-family:'JetBrains Mono',monospace; font-weight:600; }
   .est-note { font-size:10px; color:var(--muted); margin-top:8px; line-height:1.5; }
+  .est-row.bid-line .val { color:var(--ink); }
+  .est-total { display:flex; justify-content:space-between; align-items:center; padding:14px; margin-top:10px; background:var(--navy); border-radius:10px; }
+  .est-total .tlabel { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:#fff; }
+  .est-total .tval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:var(--gold); letter-spacing:1px; }
+  .est-total .tval .cur { font-size:13px; color:rgba(255,255,255,0.7); }
 
   /* BID BUTTON */
   .bid-btn { width:100%; background:var(--red); color:#fff; border:none; border-radius:10px; padding:16px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:background 0.15s; }
@@ -222,6 +227,13 @@ function currentPrice(){
   return Math.max(top, Number(auction.starting_price)||0);
 }
 
+function extrasTotal(){
+  let t = Number(auction.duty_est||0) + Number(auction.ap_est||0);
+  (auction.extra_lines||[]).forEach(l=>{ t += Number(l.amount||0); });
+  return t;
+}
+function landedTotal(bid){ return Number(bid||0) + extrasTotal(); }
+
 function isClosed(){
   if(auction.status === 'closed') return true;
   if(auction.deadline && new Date(auction.deadline) < new Date()) return true;
@@ -271,14 +283,18 @@ function renderPage(){
           ${closed?'Auction Closed':'Place Your Bid'}
         </button>
 
-        ${(auction.duty_est||auction.ap_est||extraLines.length)?`
         <div class="estimates">
-          <div class="est-title">Estimated Additional Costs</div>
+          <div class="est-title">Estimated Landed Cost Breakdown</div>
+          <div class="est-row bid-line"><span>Current Bid (vehicle body price)</span><span class="val" id="estBidLine">RM ${rm(price)}</span></div>
           ${auction.duty_est?`<div class="est-row"><span>Import Duty (est.)</span><span class="val">RM ${rm(auction.duty_est)}</span></div>`:''}
           ${auction.ap_est?`<div class="est-row"><span>AP Cost (est.)</span><span class="val">RM ${rm(auction.ap_est)}</span></div>`:''}
           ${extraLines.map(l=>`<div class="est-row"><span>${esc(l.label)}</span><span class="val">RM ${rm(l.amount)}</span></div>`).join('')}
-          <div class="est-note">*Estimates only, provided as a guide. Final figures confirmed by Kansai Group. Bid amount is for the vehicle body price only.</div>
-        </div>`:''}
+          <div class="est-total">
+            <span class="tlabel">Est. Total Landed Cost</span>
+            <span class="tval" id="estTotal"><span class="cur">RM</span> ${rm(landedTotal(price))}</span>
+          </div>
+          <div class="est-note">*Estimates only, provided as a guide. Import duty, AP and other costs are approximate and confirmed by Kansai Group. Total updates as the bid changes.</div>
+        </div>
 
         <div class="feed">
           <div class="feed-title"><span>Bid Activity</span><span id="feedLive" style="color:var(--green)">● live</span></div>
@@ -339,6 +355,11 @@ function refreshLiveBits(){
     }
   }
   if(bc) bc.textContent = bids.length;
+  const p = currentPrice();
+  const bl = document.getElementById('estBidLine');
+  const et = document.getElementById('estTotal');
+  if(bl) bl.textContent = 'RM ' + rm(p);
+  if(et) et.innerHTML = '<span class="cur">RM</span> ' + rm(landedTotal(p));
   renderFeed();
 }
 
