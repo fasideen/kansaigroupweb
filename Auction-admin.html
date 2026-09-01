@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auction Manager — Kansai Group (Staff)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root { --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --navy:#111827; --bg:#FFFFFF; --bg-alt:#F4F5F7; --ink:#111827; --muted:#6B7280; --border:#E5E7EB; --green:#16A34A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--bg-alt); color:var(--ink); }
+  .bebas { font-family:'Bebas Neue',sans-serif; letter-spacing:1px; }
+  .rajdhani { font-family:'Rajdhani',sans-serif; }
+  .mono { font-family:'JetBrains Mono',monospace; }
+
+  /* LOGIN */
+  .gate { position:fixed; inset:0; background:var(--bg-alt); display:flex; align-items:center; justify-content:center; padding:20px; z-index:100; }
+  .gate-box { background:#fff; border:1px solid var(--border); border-radius:16px; padding:38px 34px; max-width:380px; width:100%; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.08); }
+  .gate-mark { width:50px; height:50px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:20px; color:#fff; margin:0 auto 16px; }
+  .gate-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
+  .gate-sub { font-size:12px; color:var(--muted); margin:4px 0 22px; }
+  .gate input { width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:9px; font-size:14px; background:var(--bg-alt); outline:none; margin-bottom:10px; }
+  .gate input:focus { border-color:var(--navy); background:#fff; }
+  .gate button { width:100%; background:var(--red); color:#fff; border:none; border-radius:9px; padding:13px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+  .gate-err { color:var(--red); font-size:12px; margin-top:8px; display:none; }
+
+  .app { display:none; max-width:1200px; margin:0 auto; padding:24px 20px 60px; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .brand-mark { width:42px; height:42px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:17px; color:#fff; }
+  .brand-t { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; }
+  .brand-s { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+  .card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:20px; }
+  .card h3 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; }
+  .field { margin-bottom:14px; }
+  .field label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; display:block; margin-bottom:6px; }
+  .field input, .field textarea { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg-alt); outline:none; font-family:'Inter',sans-serif; }
+  .field input:focus, .field textarea:focus { border-color:var(--navy); background:#fff; }
+  .field input.mono { font-family:'JetBrains Mono',monospace; }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .hint { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  .btn { background:var(--red); color:#fff; border:none; border-radius:9px; padding:13px 22px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+  .btn:hover { background:var(--red-dark); }
+  .btn-sm { padding:7px 14px; font-size:12px; border-radius:7px; }
+  .btn-ghost { background:#fff; color:var(--ink); border:1px solid var(--border); }
+  .btn-ghost:hover { border-color:var(--navy); }
+
+  .extra-row { display:flex; gap:8px; margin-bottom:8px; }
+  .extra-row input:first-child { flex:2; } .extra-row input:last-of-type { flex:1; }
+  .extra-row button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; }
+  .extra-row button:hover { color:var(--red); }
+
+  .auction-item { border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px; }
+  .auction-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .auction-name { font-family:'Rajdhani',sans-serif; font-size:17px; font-weight:700; }
+  .auction-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+  .badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px; }
+  .badge.live { background:rgba(22,163,74,0.1); color:var(--green); }
+  .badge.closed { background:var(--bg-alt); color:var(--muted); }
+  .auction-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .link-box { background:var(--bg-alt); border:1px solid var(--border); border-radius:7px; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:11px; flex:1; min-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .bids-table { width:100%; border-collapse:collapse; margin-top:14px; font-size:13px; }
+  .bids-table th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); padding:8px; border-bottom:2px solid var(--navy); }
+  .bids-table td { padding:9px 8px; border-bottom:1px solid var(--border); }
+  .bids-table .amt { font-family:'JetBrains Mono',monospace; font-weight:700; }
+  .bids-table .top-bid { background:rgba(22,163,74,0.05); }
+  .bids-table .top-bid .amt { color:var(--green); }
+  .bids-empty { color:var(--muted); font-size:12px; padding:12px 8px; }
+
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:13px 24px; border-radius:10px; font-size:13px; font-weight:500; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:200; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div class="gate-mark">KG</div>
+    <div class="gate-title bebas">Auction Manager</div>
+    <div class="gate-sub">Staff login required</div>
+    <input type="email" id="email" placeholder="Email" autocomplete="username">
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+    <button onclick="login()">Sign In</button>
+    <div class="gate-err" id="gateErr"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="top">
+    <div class="brand">
+      <div class="brand-mark">KG</div>
+      <div><div class="brand-t">Auction Manager</div><div class="brand-s">Staff Only · Private Bidder Data</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+  </div>
+
+  <!-- CREATE AUCTION -->
+  <div class="card">
+    <h3 id="formTitle">Create New Auction</h3>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label>Car Name</label>
+      <input type="text" id="carName" placeholder="e.g. Toyota Alphard Executive Lounge">
+    </div>
+    <div class="row2">
+      <div class="field"><label>Year</label><input type="text" id="year" placeholder="2023"></div>
+      <div class="field"><label>Specs</label><input type="text" id="specs" placeholder="Grade 5.0 · 8,200km · 2.5L"></div>
+    </div>
+    <div class="field">
+      <label>Photo URLs (one per line)</label>
+      <textarea id="photos" rows="3" placeholder="https://...jpg&#10;https://...jpg"></textarea>
+      <div class="hint">Paste image links. Tip: upload to your car-photos storage and paste the public URLs.</div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Starting Price (RM)</label><input type="number" class="mono" id="startPrice" placeholder="0"></div>
+      <div class="field"><label>Est. Duty (RM)</label><input type="number" class="mono" id="dutyEst" placeholder="0"></div>
+      <div class="field"><label>Est. AP (RM)</label><input type="number" class="mono" id="apEst" placeholder="0"></div>
+    </div>
+    <div class="field">
+      <label>Extra Estimate Lines (optional)</label>
+      <div id="extraLines"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addExtraLine()">+ Add Line</button>
+    </div>
+    <div class="field">
+      <label>Bidding Deadline</label>
+      <input type="datetime-local" id="deadline">
+      <div class="hint">When the countdown hits zero, bidding closes automatically.</div>
+    </div>
+    <div class="field">
+      <label>Description / Notes (optional)</label>
+      <textarea id="description" rows="2" placeholder="Any extra info shown at the bottom of the auction page"></textarea>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn" onclick="saveAuction()" id="saveBtn">Create Auction</button>
+      <button class="btn btn-ghost" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel Edit</button>
+    </div>
+  </div>
+
+  <!-- EXISTING AUCTIONS -->
+  <div class="card">
+    <h3>Auctions &amp; Bids</h3>
+    <div id="auctionList"><div class="bids-empty">Loading…</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let extraLines = [];
+
+function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function rm(n){ return Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+
+// ── AUTH ──
+async function login(){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ const e=document.getElementById('gateErr'); e.textContent=error.message; e.style.display='block'; return; }
+  showApp();
+}
+async function logout(){ await sb.auth.signOut(); location.reload(); }
+async function checkAuth(){ const { data } = await sb.auth.getSession(); if(data.session) showApp(); }
+function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); }
+
+// ── EXTRA LINES ──
+function addExtraLine(label='',amount=''){ extraLines.push({label,amount}); renderExtraLines(); }
+function removeExtraLine(i){ extraLines.splice(i,1); renderExtraLines(); }
+function renderExtraLines(){
+  document.getElementById('extraLines').innerHTML = extraLines.map((l,i)=>`
+    <div class="extra-row">
+      <input type="text" value="${esc(l.label)}" placeholder="Label e.g. Shipping" oninput="extraLines[${i}].label=this.value">
+      <input type="number" class="mono" value="${esc(l.amount)}" placeholder="RM" oninput="extraLines[${i}].amount=this.value">
+      <button onclick="removeExtraLine(${i})">×</button>
+    </div>`).join('');
+}
+
+// ── SAVE / EDIT ──
+async function saveAuction(){
+  const carName = document.getElementById('carName').value.trim();
+  if(!carName){ toast('Enter a car name'); return; }
+  const photos = document.getElementById('photos').value.split('\n').map(u=>u.trim()).filter(Boolean).map(url=>({url}));
+  const cleanExtra = extraLines.filter(l=>l.label && l.amount).map(l=>({label:l.label, amount:parseFloat(l.amount)||0}));
+  const deadlineVal = document.getElementById('deadline').value;
+
+  const payload = {
+    car_name: carName,
+    year: document.getElementById('year').value.trim(),
+    specs: document.getElementById('specs').value.trim(),
+    photos: photos,
+    starting_price: parseFloat(document.getElementById('startPrice').value)||0,
+    duty_est: parseFloat(document.getElementById('dutyEst').value)||0,
+    ap_est: parseFloat(document.getElementById('apEst').value)||0,
+    extra_lines: cleanExtra,
+    deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
+    description: document.getElementById('description').value.trim(),
+    status: 'live'
+  };
+
+  const editId = document.getElementById('editId').value;
+  const btn = document.getElementById('saveBtn'); btn.textContent='Saving…'; btn.disabled=true;
+
+  let error;
+  if(editId){ ({ error } = await sb.from('auctions').update(payload).eq('id', editId)); }
+  else { ({ error } = await sb.from('auctions').insert(payload)); }
+
+  btn.disabled=false;
+  if(error){ toast('Error: '+error.message); btn.textContent = editId?'Save Changes':'Create Auction'; return; }
+  toast(editId?'Auction updated':'Auction created');
+  resetForm();
+  loadAuctions();
+}
+
+function resetForm(){
+  document.getElementById('editId').value='';
+  ['carName','year','specs','photos','startPrice','dutyEst','apEst','deadline','description'].forEach(id=>document.getElementById(id).value='');
+  extraLines=[]; renderExtraLines();
+  document.getElementById('formTitle').textContent='Create New Auction';
+  document.getElementById('saveBtn').textContent='Create Auction';
+  document.getElementById('cancelBtn').style.display='none';
+}
+
+function editAuction(a){
+  document.getElementById('editId').value=a.id;
+  document.getElementById('carName').value=a.car_name||'';
+  document.getElementById('year').value=a.year||'';
+  document.getElementById('specs').value=a.specs||'';
+  document.getElementById('photos').value=(a.photos||[]).map(p=>p.url).join('\n');
+  document.getElementById('startPrice').value=a.starting_price||'';
+  document.getElementById('dutyEst').value=a.duty_est||'';
+  document.getElementById('apEst').value=a.ap_est||'';
+  document.getElementById('description').value=a.description||'';
+  extraLines=(a.extra_lines||[]).map(l=>({label:l.label,amount:l.amount})); renderExtraLines();
+  if(a.deadline){ const d=new Date(a.deadline); const off=d.getTimezoneOffset(); const local=new Date(d.getTime()-off*60000); document.getElementById('deadline').value=local.toISOString().slice(0,16); }
+  document.getElementById('formTitle').textContent='Edit Auction';
+  document.getElementById('saveBtn').textContent='Save Changes';
+  document.getElementById('cancelBtn').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function deleteBid(id){ if(!confirm('Delete this bid? If it is the top bid, the price will drop to the next highest. This cannot be undone.')) return; await sb.from('bids').delete().eq('id',id); toast('Bid deleted'); loadAuctions(); }
+
+async function closeAuction(id){ await sb.from('auctions').update({status:'closed'}).eq('id',id); toast('Auction closed'); loadAuctions(); }
+async function reopenAuction(id){ await sb.from('auctions').update({status:'live'}).eq('id',id); toast('Auction reopened'); loadAuctions(); }
+async function deleteAuction(id){ if(!confirm('Delete this auction and all its bids? This cannot be undone.')) return; await sb.from('auctions').delete().eq('id',id); toast('Auction deleted'); loadAuctions(); }
+
+function copyLink(id){
+  const url = `${location.origin}/auction-car.html?id=${id}`;
+  navigator.clipboard.writeText(url).then(()=>toast('Link copied')).catch(()=>toast(url));
+}
+
+// ── DELETE A BID (remove fake/troll bids; price drops back automatically) ──
+async function deleteBid(bidId){
+  if(!confirm('Delete this bid? The auction price will drop back to the next highest bid. This cannot be undone.')) return;
+  const { error } = await sb.from('bids').delete().eq('id', bidId);
+  if(error){ toast('Error deleting: '+error.message); return; }
+  toast('Bid deleted');
+  loadAuctions();
+}
+
+// ── LOAD + RENDER ──
+async function loadAuctions(){
+  const { data:auctions, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
+  const list = document.getElementById('auctionList');
+  if(error){ list.innerHTML=`<div class="bids-empty">Error loading: ${esc(error.message)}</div>`; return; }
+  if(!auctions.length){ list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
+
+  // Load all bids (staff can read full details)
+  const { data:allBids } = await sb.from('bids').select('*').order('amount',{ascending:false});
+  const bidsByAuction = {};
+  (allBids||[]).forEach(b=>{ (bidsByAuction[b.auction_id]=bidsByAuction[b.auction_id]||[]).push(b); });
+
+  list.innerHTML = auctions.map(a=>{
+    const bids = bidsByAuction[a.id]||[];
+    const closed = a.status==='closed' || (a.deadline && new Date(a.deadline)<new Date());
+    const topPrice = bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : Number(a.starting_price)||0;
+    const deadlineStr = a.deadline ? new Date(a.deadline).toLocaleString('en-MY',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'No deadline';
+
+    return `<div class="auction-item">
+      <div class="auction-head">
+        <div>
+          <div class="auction-name">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
+          <div class="auction-meta">Current: RM ${rm(topPrice)} · ${bids.length} bid${bids.length===1?'':'s'} · Closes ${deadlineStr}</div>
+        </div>
+        <span class="badge ${closed?'closed':'live'}">${closed?'Closed':'Live'}</span>
+      </div>
+      <div class="auction-actions">
+        <div class="link-box">${location.origin}/auction-car.html?id=${a.id}</div>
+        <button class="btn btn-sm" onclick="copyLink('${a.id}')">Copy Link</button>
+        <button class="btn btn-ghost btn-sm" onclick='editAuction(${JSON.stringify(a).replace(/'/g,"&#39;")})'>Edit</button>
+        ${closed?`<button class="btn btn-ghost btn-sm" onclick="reopenAuction('${a.id}')">Reopen</button>`:`<button class="btn btn-ghost btn-sm" onclick="closeAuction('${a.id}')">Close Now</button>`}
+        <button class="btn btn-ghost btn-sm" onclick="deleteAuction('${a.id}')" style="color:var(--red)">Delete</button>
+      </div>
+      ${bids.length?`
+        <table class="bids-table">
+          <thead><tr><th>Rank</th><th>Bidder Name</th><th>Mobile</th><th>Bid Amount</th><th>Time</th><th></th></tr></thead>
+          <tbody>
+            ${bids.map((b,i)=>`<tr class="${i===0?'top-bid':''}">
+              <td>#${i+1}${i===0?' 🏆':''}</td>
+              <td>${esc(b.bidder_name)}</td>
+              <td><a href="https://wa.me/${esc((b.bidder_phone||'').replace(/[^0-9]/g,''))}" target="_blank" style="color:var(--red)">${esc(b.bidder_phone)}</a></td>
+              <td class="amt">RM ${rm(b.amount)}</td>
+              <td style="color:var(--muted);font-size:12px">${new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+              <td><button onclick="deleteBid('${'$'}{b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      `:`<div class="bids-empty">No bids yet.</div>`}
+    </div>`;
+  }).join('');
+}
+
+checkAuth();
+</script>
+</body>
+</html>
