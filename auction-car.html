@@ -133,6 +133,9 @@
   .modal-submit { background:var(--red); color:#fff; }
   .modal-submit:hover { background:var(--red-dark); }
   .modal-consent { font-size:10.5px; color:var(--muted); line-height:1.5; margin-top:14px; }
+  .known-bidder-bar { display:flex; align-items:center; justify-content:space-between; background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.25); border-radius:9px; padding:10px 14px; margin-bottom:14px; font-size:13px; }
+  .known-bidder-bar strong { color:var(--ink); }
+  .known-bidder-bar button { background:none; border:none; color:var(--red); font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; }
   .modal-error { background:rgba(230,0,18,0.06); border:1px solid rgba(230,0,18,0.2); color:var(--red); font-size:12px; padding:10px 12px; border-radius:8px; margin-top:12px; display:none; }
   .modal-success { text-align:center; padding:10px 0; }
   .modal-success .check { width:56px; height:56px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
@@ -163,6 +166,10 @@
     <div class="modal-title bebas">Place Your Bid</div>
     <div class="modal-sub" id="modalSub">Enter your offer and contact details</div>
 
+    <div class="known-bidder-bar" id="knownBidderBar" style="display:none;">
+      <div>Bidding as <strong id="knownBidderName"></strong></div>
+      <button type="button" onclick="editBidderDetails()">Not you?</button>
+    </div>
     <div class="modal-field">
       <label>Your Bid Amount (RM)</label>
       <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
@@ -173,13 +180,15 @@
       </div>
       <div class="modal-hint" id="bidHint"></div>
     </div>
-    <div class="modal-field">
-      <label>Full Name</label>
-      <input type="text" id="bidName" placeholder="Your name">
-    </div>
-    <div class="modal-field">
-      <label>Mobile Number</label>
-      <input type="tel" id="bidPhone" placeholder="+60 1X-XXX XXXX">
+    <div id="contactFields">
+      <div class="modal-field">
+        <label>Full Name</label>
+        <input type="text" id="bidName" placeholder="Your name">
+      </div>
+      <div class="modal-field">
+        <label>Mobile Number</label>
+        <input type="tel" id="bidPhone" placeholder="+60 1X-XXX XXXX">
+      </div>
     </div>
 
     <div class="modal-error" id="modalError"></div>
@@ -436,6 +445,13 @@ function startTimer(){
 }
 
 // ── MODAL ──
+function getSavedBidder(){
+  try { return JSON.parse(localStorage.getItem('kansaiBidder')||'null'); } catch(e){ return null; }
+}
+function saveBidder(name, phone){
+  try { localStorage.setItem('kansaiBidder', JSON.stringify({name, phone})); } catch(e){}
+}
+
 function openModal(){
   if(isClosed()) return;
   const price = currentPrice();
@@ -443,10 +459,37 @@ function openModal(){
   document.getElementById('bidAmount').value = suggested;
   document.getElementById('bidHint').textContent = `Current bid RM ${rm(price)} — tap a button below or type your amount`;
   document.getElementById('modalSub').textContent = `Current bid: RM ${rm(price)}`;
-  document.getElementById('bidName').value = '';
-  document.getElementById('bidPhone').value = '';
+
+  const saved = getSavedBidder();
+  const nameField = document.getElementById('bidName');
+  const phoneField = document.getElementById('bidPhone');
+  const contactWrap = document.getElementById('contactFields');
+  const knownBar = document.getElementById('knownBidderBar');
+
+  if(saved && saved.name && saved.phone){
+    // Returning bidder — pre-fill and collapse contact fields for a fast one-tap bid
+    nameField.value = saved.name;
+    phoneField.value = saved.phone;
+    if(knownBar){
+      knownBar.style.display = 'flex';
+      document.getElementById('knownBidderName').textContent = saved.name;
+    }
+    if(contactWrap) contactWrap.style.display = 'none';
+  } else {
+    if(knownBar) knownBar.style.display = 'none';
+    if(contactWrap) contactWrap.style.display = 'block';
+    nameField.value = '';
+    phoneField.value = '';
+  }
+
   document.getElementById('modalError').style.display='none';
   document.getElementById('bidModal').classList.add('open');
+}
+
+// Let a returning bidder switch to different details
+function editBidderDetails(){
+  document.getElementById('contactFields').style.display='block';
+  document.getElementById('knownBidderBar').style.display='none';
 }
 
 // Bump the amount to current price + increment
@@ -501,6 +544,8 @@ async function submitBid(){
     return;
   }
 
+  saveBidder(name, phone);
+
   const { error } = await sb.from('bids').insert({
     auction_id: auction.id,
     amount: amount,
@@ -527,7 +572,53 @@ async function submitBid(){
   await loadBids();
 }
 
-function closeModalAndRefresh(){ closeModal(); location.reload(); }
+async function closeModalAndRefresh(){
+  closeModal();
+  // Rebuild the modal inner (it was replaced by success screen) then refresh live state
+  await loadBids();
+  renderPage();
+  restoreModalForm();
+}
+
+function restoreModalForm(){
+  const inner = document.getElementById('modalInner');
+  if(!inner) return;
+  inner.innerHTML = `
+    <div class="modal-title bebas">Place Your Bid</div>
+    <div class="modal-sub" id="modalSub">Enter your bid</div>
+    <div class="known-bidder-bar" id="knownBidderBar" style="display:none;">
+      <div>Bidding as <strong id="knownBidderName"></strong></div>
+      <button type="button" onclick="editBidderDetails()">Not you?</button>
+    </div>
+    <div class="modal-field">
+      <label>Your Bid Amount (RM)</label>
+      <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
+      <div class="quick-bumps" id="quickBumps">
+        <button type="button" onclick="bumpTo(2000)">+2,000</button>
+        <button type="button" onclick="bumpTo(5000)">+5,000</button>
+        <button type="button" onclick="bumpTo(10000)">+10,000</button>
+      </div>
+      <div class="modal-hint" id="bidHint"></div>
+    </div>
+    <div id="contactFields">
+      <div class="modal-field">
+        <label>Full Name</label>
+        <input type="text" id="bidName" placeholder="Your name">
+      </div>
+      <div class="modal-field">
+        <label>Mobile Number</label>
+        <input type="tel" id="bidPhone" placeholder="+60 1X-XXX XXXX">
+      </div>
+    </div>
+    <div class="modal-error" id="modalError"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-submit" id="submitBidBtn" onclick="submitBid()">Submit Bid</button>
+    </div>
+    <div class="modal-consent">
+      By submitting, you agree that Kansai Group may contact you about this vehicle. Your details are kept private and never shown publicly.
+    </div>`;
+}
 
 document.getElementById('bidModal').addEventListener('click',e=>{ if(e.target.id==='bidModal') closeModal(); });
 
