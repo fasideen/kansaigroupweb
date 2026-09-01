@@ -75,6 +75,11 @@
   .timer-num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:#fff; line-height:1; }
   .timer-lbl { font-size:8px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.4); margin-top:4px; font-weight:600; }
   .timer-ended { color:var(--red); font-family:'Rajdhani',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-size:14px; padding:10px; }
+  .winner-box { margin-top:14px; padding:16px; background:rgba(200,162,60,0.1); border:1px solid rgba(200,162,60,0.3); border-radius:10px; }
+  .winner-label { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); }
+  .winner-name { font-family:'Bebas Neue',sans-serif; font-size:28px; color:#fff; letter-spacing:1px; margin-top:4px; }
+  .winner-amount { font-family:'JetBrains Mono',monospace; font-size:14px; color:rgba(255,255,255,0.85); font-weight:600; margin-top:2px; }
+  .winner-note { font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px; line-height:1.5; }
 
   /* ESTIMATES */
   .estimates { margin:20px 0; }
@@ -222,7 +227,18 @@ async function loadAuction(){
   renderPage();
   startTimer();
   // Poll for new bids every 5s (near-real-time, low cost)
-  pollInterval = setInterval(async ()=>{ await loadBids(); refreshLiveBits(); }, 5000);
+  pollInterval = setInterval(async ()=>{
+    if(isClosed()){
+      // Auction just closed: stop polling, re-render final state ONCE, no reload loop
+      clearInterval(pollInterval); pollInterval=null;
+      if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+      await loadBids();
+      renderPage();
+      return;
+    }
+    await loadBids();
+    refreshLiveBits();
+  }, 5000);
 }
 
 async function loadBids(){
@@ -242,6 +258,11 @@ function extrasTotal(){
   return t;
 }
 function landedTotal(bid){ return Number(bid||0) + extrasTotal(); }
+function topBidderLabel(){
+  if(!bids.length) return '';
+  const top = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount))[0];
+  return top.bidder_label || 'Bidder';
+}
 
 function isClosed(){
   if(auction.status === 'closed') return true;
@@ -282,10 +303,21 @@ function renderPage(){
         ${auction.specs?`<div class="car-specs">${esc(auction.specs)}</div>`:''}
 
         <div class="price-block">
-          <div class="price-label">${closed?'Final Price':'Current Bid'}</div>
+          <div class="price-label">${closed?'Winning Bid':'Current Bid'}</div>
           <div class="price-value bebas" id="priceValue"><span class="cur">RM</span> ${rm(price)}</div>
           <div class="price-sub"><span class="bid-count" id="bidCount">${bids.length}</span> bid${bids.length===1?'':'s'} · Starting RM ${rm(auction.starting_price)}</div>
-          <div id="timerZone">${closed?'<div class="timer-ended">Bidding has ended</div>':'<div class="timer" id="timer"></div>'}</div>
+          ${closed ? `
+            <div class="winner-box">
+              ${bids.length ? `
+                <div class="winner-label">🏆 Auction Won By</div>
+                <div class="winner-name">${esc(topBidderLabel())}</div>
+                <div class="winner-amount">Winning bid: RM ${rm(price)}</div>
+                <div class="winner-note">If this is you, our team will contact you shortly. Otherwise, thank you for participating.</div>
+              ` : `
+                <div class="timer-ended">Auction ended — no bids received</div>
+              `}
+            </div>
+          ` : '<div id="timerZone"><div class="timer" id="timer"></div></div>'}
         </div>
 
         <button class="bid-btn" id="bidBtn" ${closed?'disabled':''} onclick="openModal()">
@@ -352,7 +384,7 @@ function timeAgo(ts){
 
 // Update just the live bits after polling (no full re-render)
 function refreshLiveBits(){
-  if(isClosed()){ location.reload(); return; }
+  if(isClosed()){ return; }
   const pv = document.getElementById('priceValue');
   const bc = document.getElementById('bidCount');
   if(pv){
@@ -379,13 +411,19 @@ function prevPhoto(){ setPhoto((curPhoto-1+photos.length)%photos.length); }
 function nextPhoto(){ setPhoto((curPhoto+1)%photos.length); }
 
 // ── TIMER ──
+async function onAuctionEnded(){
+  if(pollInterval){ clearInterval(pollInterval); pollInterval=null; }
+  await loadBids();
+  renderPage();
+}
+
 function startTimer(){
   if(isClosed()) return;
   const el = ()=>document.getElementById('timer');
   function tick(){
     const t = el(); if(!t) return;
     const diff = new Date(auction.deadline).getTime() - Date.now();
-    if(diff<=0){ clearInterval(timerInterval); location.reload(); return; }
+    if(diff<=0){ clearInterval(timerInterval); timerInterval=null; onAuctionEnded(); return; }
     const d = Math.floor(diff/86400000);
     const h = Math.floor(diff/3600000)%24;
     const m = Math.floor(diff/60000)%60;
