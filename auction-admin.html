@@ -115,9 +115,14 @@
       <div class="field"><label>Specs</label><input type="text" id="specs" placeholder="Grade 5.0 · 8,200km · 2.5L"></div>
     </div>
     <div class="field">
-      <label>Photo URLs (one per line)</label>
-      <textarea id="photos" rows="3" placeholder="https://...jpg&#10;https://...jpg"></textarea>
-      <div class="hint">Paste image links. Tip: upload to your car-photos storage and paste the public URLs.</div>
+      <label>Photos</label>
+      <div id="dropZone" style="border:2px dashed var(--border); border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:var(--bg-alt); transition:all 0.15s;">
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+        <div style="font-size:13px; color:var(--muted);">📷 Tap to add photos, or drag &amp; drop here</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Photos upload automatically</div>
+      </div>
+      <div id="photoPreview" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+      <div class="hint" id="uploadStatus"></div>
     </div>
     <div class="row3">
       <div class="field"><label>Starting Price (RM)</label><input type="number" class="mono" id="startPrice" placeholder="0"></div>
@@ -174,7 +179,7 @@ async function login(){
 }
 async function logout(){ await sb.auth.signOut(); location.reload(); }
 async function checkAuth(){ const { data } = await sb.auth.getSession(); if(data.session) showApp(); }
-function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); }
+function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); initUploader(); }
 
 // ── EXTRA LINES ──
 function addExtraLine(label='',amount=''){ extraLines.push({label,amount}); renderExtraLines(); }
@@ -188,11 +193,75 @@ function renderExtraLines(){
     </div>`).join('');
 }
 
+// ── PHOTO UPLOAD (drag-drop, auto-compress, upload to Supabase storage) ──
+let uploadedPhotos = []; // array of {url}
+
+function initUploader(){
+  const dz = document.getElementById('dropZone');
+  const input = document.getElementById('photoInput');
+  if(!dz || dz.dataset.bound) return;
+  dz.dataset.bound = '1';
+  dz.addEventListener('click', ()=>input.click());
+  dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.style.borderColor='var(--red)'; });
+  dz.addEventListener('dragleave', ()=>{ dz.style.borderColor='var(--border)'; });
+  dz.addEventListener('drop', e=>{ e.preventDefault(); dz.style.borderColor='var(--border)'; handleFiles(e.dataTransfer.files); });
+  input.addEventListener('change', ()=>handleFiles(input.files));
+}
+
+async function handleFiles(files){
+  const status = document.getElementById('uploadStatus');
+  for(const file of files){
+    if(!file.type.startsWith('image/')) continue;
+    status.textContent = 'Uploading '+file.name+'…';
+    try {
+      const compressed = await compressImage(file);
+      const fileName = 'auction/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+      const { error } = await sb.storage.from('car-photos').upload(fileName, compressed, { contentType:'image/jpeg', upsert:false });
+      if(error){ status.textContent='Upload failed: '+error.message; continue; }
+      const { data } = sb.storage.from('car-photos').getPublicUrl(fileName);
+      uploadedPhotos.push({ url: data.publicUrl });
+      renderPhotoPreview();
+      status.textContent = uploadedPhotos.length+' photo(s) ready';
+    } catch(err){ status.textContent='Error: '+err.message; }
+  }
+}
+
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas');
+        let {width,height} = img;
+        const max = 1400;
+        if(width>height && width>max){ height=height*max/width; width=max; }
+        else if(height>max){ width=width*max/height; height=max; }
+        canvas.width=width; canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        canvas.toBlob(b=>b?resolve(b):reject(new Error('compress failed')),'image/jpeg',0.82);
+      };
+      img.onerror = reject; img.src = e.target.result;
+    };
+    reader.onerror = reject; reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoPreview(){
+  document.getElementById('photoPreview').innerHTML = uploadedPhotos.map((p,i)=>`
+    <div style="position:relative; width:72px; height:56px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+      <img src="${p.url}" style="width:100%; height:100%; object-fit:cover;">
+      <button onclick="removePhoto(${i})" style="position:absolute; top:2px; right:2px; background:rgba(230,0,18,0.9); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:11px; cursor:pointer; line-height:1;">×</button>
+      ${i===0?'<div style="position:absolute; bottom:0; left:0; right:0; background:rgba(17,24,39,0.8); color:#fff; font-size:8px; text-align:center; padding:1px;">COVER</div>':''}
+    </div>`).join('');
+}
+function removePhoto(i){ uploadedPhotos.splice(i,1); renderPhotoPreview(); document.getElementById('uploadStatus').textContent = uploadedPhotos.length+' photo(s) ready'; }
+
 // ── SAVE / EDIT ──
 async function saveAuction(){
   const carName = document.getElementById('carName').value.trim();
   if(!carName){ toast('Enter a car name'); return; }
-  const photos = document.getElementById('photos').value.split('\n').map(u=>u.trim()).filter(Boolean).map(url=>({url}));
+  const photos = uploadedPhotos.slice();
   const cleanExtra = extraLines.filter(l=>l.label && l.amount).map(l=>({label:l.label, amount:parseFloat(l.amount)||0}));
   const deadlineVal = document.getElementById('deadline').value;
 
@@ -228,6 +297,7 @@ function resetForm(){
   document.getElementById('editId').value='';
   ['carName','year','specs','photos','startPrice','dutyEst','apEst','deadline','description'].forEach(id=>document.getElementById(id).value='');
   extraLines=[]; renderExtraLines();
+  uploadedPhotos=[]; renderPhotoPreview(); document.getElementById('uploadStatus').textContent='';
   document.getElementById('formTitle').textContent='Create New Auction';
   document.getElementById('saveBtn').textContent='Create Auction';
   document.getElementById('cancelBtn').style.display='none';
@@ -238,7 +308,7 @@ function editAuction(a){
   document.getElementById('carName').value=a.car_name||'';
   document.getElementById('year').value=a.year||'';
   document.getElementById('specs').value=a.specs||'';
-  document.getElementById('photos').value=(a.photos||[]).map(p=>p.url).join('\n');
+  uploadedPhotos=(a.photos||[]).map(p=>({url:p.url})); renderPhotoPreview();
   document.getElementById('startPrice').value=a.starting_price||'';
   document.getElementById('dutyEst').value=a.duty_est||'';
   document.getElementById('apEst').value=a.ap_est||'';
