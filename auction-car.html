@@ -117,6 +117,10 @@
   .modal-field input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:15px; font-family:'Inter',sans-serif; background:var(--bg-alt); outline:none; }
   .modal-field input:focus { border-color:var(--red); background:#fff; }
   .modal-field input.mono { font-family:'JetBrains Mono',monospace; }
+  .quick-bumps { display:flex; gap:8px; margin-top:8px; }
+  .quick-bumps button { flex:1; padding:9px; border:1.5px solid var(--border); background:#fff; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; color:var(--red); cursor:pointer; transition:all 0.12s; }
+  .quick-bumps button:hover { border-color:var(--red); background:rgba(230,0,18,0.04); }
+  .quick-bumps button:active { transform:scale(0.97); }
   .modal-hint { font-size:11px; color:var(--muted); margin-top:5px; }
   .modal-actions { display:flex; gap:10px; margin-top:20px; }
   .modal-actions button { flex:1; padding:13px; border-radius:9px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; border:1.5px solid transparent; }
@@ -156,7 +160,12 @@
 
     <div class="modal-field">
       <label>Your Bid Amount (RM)</label>
-      <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric">
+      <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
+      <div class="quick-bumps" id="quickBumps">
+        <button type="button" onclick="bumpTo(2000)">+2,000</button>
+        <button type="button" onclick="bumpTo(5000)">+5,000</button>
+        <button type="button" onclick="bumpTo(10000)">+10,000</button>
+      </div>
       <div class="modal-hint" id="bidHint"></div>
     </div>
     <div class="modal-field">
@@ -392,13 +401,32 @@ function startTimer(){
 function openModal(){
   if(isClosed()) return;
   const price = currentPrice();
-  document.getElementById('bidHint').textContent = `Must be higher than current RM ${rm(price)}`;
+  const suggested = price + 2000; // default one-tap increment
+  document.getElementById('bidAmount').value = suggested;
+  document.getElementById('bidHint').textContent = `Current bid RM ${rm(price)} — tap a button below or type your amount`;
   document.getElementById('modalSub').textContent = `Current bid: RM ${rm(price)}`;
-  document.getElementById('bidAmount').value = '';
   document.getElementById('bidName').value = '';
   document.getElementById('bidPhone').value = '';
   document.getElementById('modalError').style.display='none';
   document.getElementById('bidModal').classList.add('open');
+}
+
+// Bump the amount to current price + increment
+function bumpTo(inc){
+  const price = currentPrice();
+  const base = Math.max(parseFloat(document.getElementById('bidAmount').value)||price, price);
+  // If field already above current, add increment to it; else set current+inc
+  const cur = parseFloat(document.getElementById('bidAmount').value)||0;
+  const newVal = (cur > price ? cur : price) + inc;
+  document.getElementById('bidAmount').value = newVal;
+  document.getElementById('bidHint').textContent = `Your bid: RM ${rm(newVal)} (RM ${rm(newVal-price)} above current)`;
+}
+
+function onAmountEdit(){
+  const price = currentPrice();
+  const v = parseFloat(document.getElementById('bidAmount').value)||0;
+  if(v>price) document.getElementById('bidHint').textContent = `RM ${rm(v-price)} above current bid`;
+  else document.getElementById('bidHint').textContent = `Must be higher than current RM ${rm(price)}`;
 }
 function closeModal(){ document.getElementById('bidModal').classList.remove('open'); }
 
