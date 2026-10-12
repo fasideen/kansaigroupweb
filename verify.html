@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Your Japan Auction Sheet — Kansai Group Malaysia</title>
+<meta name="description" content="Buying a Japanese import car? Send us the chassis number and lot number from its auction sheet. Kansai Group checks it with Japan and replies on WhatsApp.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Kansai Group Corporation">
+<link rel="canonical" href="https://www.kansaigroup.my/verify.html">
+
+<!-- Open Graph (static, so WhatsApp / Facebook previews work) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.kansaigroup.my/verify.html">
+<meta property="og:title" content="Verify Your Japan Auction Sheet — Kansai Group Malaysia">
+<meta property="og:description" content="Send us the chassis and lot number from your auction sheet. We check it with Japan and reply on WhatsApp.">
+<meta property="og:image" content="https://www.kansaigroup.my/og-image.jpg">
+<meta property="og:locale" content="en_MY">
+<meta property="og:site_name" content="Kansai Group Malaysia">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verify Your Japan Auction Sheet — Kansai Group Malaysia">
+<meta name="twitter:description" content="Send us the chassis and lot number from your auction sheet. We check it with Japan and reply on WhatsApp.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Japan auction sheet verification",
+  "serviceType": "Auction sheet verification for imported Japanese vehicles",
+  "description": "Send the chassis number and lot number from a Japanese auction sheet. Kansai Group checks it against the Japanese auction record and replies on WhatsApp.",
+  "areaServed": { "@type": "Country", "name": "Malaysia" },
+  "provider": {
+    "@type": "AutoDealer",
+    "name": "Kansai Group Malaysia",
+    "url": "https://www.kansaigroup.my",
+    "telephone": "+601151177026"
+  },
+  "url": "https://www.kansaigroup.my/verify.html"
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --gold-dark:#A8842C;
+    --navy:#111827; --bg-main:#FFFFFF; --bg-alt:#F8F9FA;
+    --text-main:#111827; --text-muted:#6B7280; --border:#E5E7EB; --green:#16A34A;
+    --shadow-sm:0 2px 4px rgba(0,0,0,0.04); --shadow-md:0 10px 30px rgba(0,0,0,0.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Inter',sans-serif;background:var(--bg-alt);color:var(--text-main);min-height:100vh;overflow-x:hidden;}
+  .bebas{font-family:'Bebas Neue',sans-serif;}
+  .rajdhani{font-family:'Rajdhani',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  img{display:block;max-width:100%;}
+  .hidden{display:none !important;}
+  :focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px;}
+  .logo{display:flex;align-items:center;gap:11px;}
+  .logo-mark{width:38px;height:38px;background:var(--red);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:1px;}
+  .logo-text .top{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2.5px;line-height:1;}
+  .logo-text .btm{font-size:8px;letter-spacing:2.5px;color:var(--text-muted);text-transform:uppercase;margin-top:2px;}
+  nav ul{list-style:none;display:flex;gap:28px;align-items:center;margin-left:auto;}
+  nav ul a{color:var(--text-muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;transition:color .2s;}
+  nav ul a:hover,nav ul a[aria-current="page"]{color:var(--red);}
+  .nav-cta{background:var(--red);color:#fff;padding:9px 20px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
+  .nav-cta:hover{background:var(--red-dark);}
+
+  /* HERO */
+  .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--bg-alt) 0%,var(--bg-main) 100%);border-bottom:1px solid var(--border);}
+  .hero-grid{position:absolute;inset:0;opacity:.5;background-image:linear-gradient(rgba(0,0,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+  .hero-watermark{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-family:'Noto Sans JP',sans-serif;font-size:200px;font-weight:700;color:rgba(230,0,18,.03);pointer-events:none;line-height:1;}
+  .hero-inner{position:relative;z-index:2;max-width:1140px;margin:0 auto;padding:52px 24px 48px;}
+  .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,8vw,84px);line-height:.95;letter-spacing:2px;margin-bottom:16px;}
+  .hero-title span{color:var(--red);}
+  .hero-sub{font-size:16px;color:var(--text-muted);line-height:1.65;max-width:600px;}
+  .hero-skip{margin-top:22px;font-size:13.5px;color:var(--text-muted);}
+  .hero-skip a{color:var(--red);font-weight:600;border-bottom:1px solid rgba(230,0,18,.3);}
+  .hero-skip a:hover{border-color:var(--red);}
+
+  /* LAYOUT */
+  .wrap{max-width:1140px;margin:0 auto;padding:36px 24px 0;display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:start;}
+  .card{background:var(--bg-main);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);}
+  .card-pad{padding:26px;}
+  .card h2{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1.5px;line-height:1;margin-bottom:6px;}
+  .card .hint{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:22px;}
+
+  /* FORM */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.4px;margin-bottom:6px;text-transform:uppercase;}
+  .field label .req{color:var(--red);}
+  .field label .opt{color:var(--text-muted);font-weight:500;text-transform:none;letter-spacing:0;}
+  .field input,.field select,.field textarea{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:9px;font-size:15px;font-family:'Inter',sans-serif;background:var(--bg-alt);color:var(--text-main);outline:none;transition:border-color .15s,background .15s;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy);background:#fff;}
+  .field textarea{resize:vertical;min-height:84px;}
+  .field input.mono{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;}
+  .field input[aria-invalid="true"]{border-color:var(--red);background:#fff;}
+  .err{display:none;color:var(--red);font-size:12.5px;margin-top:6px;line-height:1.4;}
+  .err.show{display:block;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .help{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5;}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+  .btn-submit{width:100%;background:#25D366;color:#fff;border:none;border-radius:10px;padding:16px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;}
+  .btn-submit:hover{background:#1FB855;}
+  .btn-submit:disabled{opacity:.65;cursor:wait;}
+  .fine{font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:14px;}
+  .form-error{display:none;background:rgba(230,0,18,.07);border:1px solid rgba(230,0,18,.2);color:var(--red);font-size:13px;padding:11px 14px;border-radius:8px;margin-bottom:16px;}
+  .form-error.show{display:block;}
+
+  /* RESULT PANEL */
+  .done{text-align:left;}
+  .done-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(22,163,74,.1);color:var(--green);font-size:12px;font-weight:700;padding:6px 13px;border-radius:20px;margin-bottom:16px;}
+  .done h2{margin-bottom:10px;}
+  .done p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;}
+  .ref-box{background:var(--bg-alt);border:1px dashed var(--border);border-radius:10px;padding:14px 16px;margin:6px 0 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .ref-box .k{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+  .ref-box .v{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;}
+  .btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;border-radius:10px;padding:15px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;}
+  .btn-wa:hover{background:#1FB855;}
+  .btn-ghost{display:block;width:100%;text-align:center;background:#fff;border:1px solid var(--border);color:var(--text-muted);border-radius:10px;padding:13px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+  .btn-ghost:hover{border-color:var(--navy);color:var(--text-main);}
+
+  /* SIDE: SHEET MOCK + STEPS */
+  .sheet{position:relative;background:#FFFEF9;border:1px solid #E7E2D3;border-radius:10px;padding:16px 16px 18px;box-shadow:var(--shadow-sm);}
+  .sheet-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .sheet-box{border:1px solid #D9D3C1;border-radius:6px;padding:8px 10px;font-size:11px;color:#8A8470;background:#fff;}
+  .sheet-box b{display:block;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;color:#8A8470;margin-bottom:2px;}
+  .sheet-box .ph{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;color:#C9C3B0;}
+  .sheet-box.hl{border:2px solid var(--red);background:#fff;color:var(--red);box-shadow:0 0 0 4px rgba(230,0,18,.08);}
+  .sheet-box.hl b{color:var(--red);}
+  .sheet-box.hl .ph{color:var(--red);}
+  .sheet-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .sheet-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.6;}
+  .legend{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .legend div{display:flex;gap:10px;align-items:baseline;font-size:13.5px;line-height:1.55;}
+  .legend .dot{flex:0 0 9px;height:9px;border-radius:50%;background:var(--red);transform:translateY(0);}
+  .legend strong{font-weight:600;}
+  .legend .jp{font-family:'Noto Sans JP',sans-serif;color:var(--text-muted);font-size:12px;}
+
+  .steps{list-style:none;counter-reset:s;margin-top:4px;}
+  .steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--border);}
+  .steps li:first-child{border-top:none;padding-top:4px;}
+  .steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--navy);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:19px;display:flex;align-items:center;justify-content:center;}
+  .steps h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.3px;margin-bottom:3px;}
+  .steps p{font-size:13.5px;color:var(--text-muted);line-height:1.6;}
+  .tips{margin-top:6px;padding:14px 16px;background:var(--bg-alt);border-radius:10px;font-size:13px;color:var(--text-muted);line-height:1.65;}
+  .tips strong{color:var(--text-main);}
+  .extra-note{font-size:13px;color:var(--text-main);margin-top:14px;padding:12px 14px;border-left:3px solid var(--gold);background:rgba(200,162,60,.07);border-radius:0 8px 8px 0;}
+  .stack{display:flex;flex-direction:column;gap:20px;}
+
+  /* FOOTER */
+  footer{background:var(--navy);color:#F9FAFB;margin-top:56px;padding:36px 24px 26px;text-align:center;}
+  .footer-links{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+  .footer-links a{font-size:12.5px;color:#9CA3AF;}
+  .footer-links a:hover{color:#fff;}
+  .footer-jp{font-family:'Noto Sans JP',sans-serif;font-size:13px;color:rgba(200,162,60,.85);margin-bottom:8px;}
+  .footer-text{font-size:12px;color:#9CA3AF;line-height:1.7;}
+  .wa-float{position:fixed;bottom:20px;right:20px;width:54px;height:54px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 38px rgba(0,0,0,.14);z-index:90;}
+
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr;}
+    .hero-watermark{font-size:140px;}
+  }
+  @media (max-width:720px){
+    nav{padding:0 16px;}
+    nav ul{display:none;}
+    .nav-cta{margin-left:auto;}
+    .hero-inner{padding:36px 18px 34px;}
+    .wrap{padding:24px 16px 0;}
+    .card-pad{padding:20px 18px;}
+  }
+  @media (max-width:480px){
+    .row2{grid-template-columns:1fr;gap:0;}
+    .logo-text .btm{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo" aria-label="Kansai Group home">
+    <div class="logo-mark">KG</div>
+    <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
+  </a>
+  <ul>
+    <li><a href="index.html#stock">Stock</a></li>
+    <li><a href="find.html">Find My Car</a></li>
+    <li><a href="duty-calculator.html">Duty Calc</a></li>
+    <li><a href="verify.html" aria-current="page">Verify Sheet</a></li>
+  </ul>
+  <a href="https://wa.me/601151177026" class="nav-cta">WhatsApp</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-watermark jp" aria-hidden="true">検査</div>
+  <div class="hero-inner">
+    <h1 class="hero-title bebas">VERIFY YOUR <span>AUCTION SHEET</span></h1>
+    <p class="hero-sub">Thinking of buying a car imported from Japan? Give us the chassis number and lot number from its auction sheet. We check them with Japan and tell you what we find, on WhatsApp.</p>
+    <p class="hero-skip">Already have the sheet photo? <a href="#" id="skipLink" target="_blank" rel="noopener">Send it straight to us on WhatsApp</a></p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- LEFT: FORM / RESULT -->
+  <section class="card card-pad" aria-labelledby="formHeading">
+    <div id="formView">
+      <h2 id="formHeading">Your auction sheet details</h2>
+      <p class="hint">Fill in what you can see on the sheet. In the next step, WhatsApp opens with these details ready to send, and you attach the sheet photo or PDF.</p>
+
+      <div class="form-error" id="formError" role="alert"></div>
+
+      <form id="verifyForm" novalidate autocomplete="on">
+        <div class="field">
+          <label for="chassis">Chassis number <span class="req">*</span></label>
+          <input type="text" id="chassis" class="mono" inputmode="text" autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="30" placeholder="e.g. GGH30-0012345" aria-describedby="chassisHelp chassisErr" required>
+          <div class="help" id="chassisHelp">Printed as 車台番号 on the sheet. Letters, numbers and a hyphen.</div>
+          <div class="err" id="chassisErr"></div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="lot">Lot number <span class="req">*</span></label>
+            <input type="text" id="lot" class="mono" inputmode="text" autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="20" placeholder="e.g. 41235" aria-describedby="lotErr" required>
+            <div class="err" id="lotErr"></div>
+          </div>
+          <div class="field">
+            <label for="house">Auction house <span class="opt">(if known)</span></label>
+            <select id="house">
+              <option value="">Not sure</option>
+              <option>USS</option>
+              <option>TAA</option>
+              <option>JU</option>
+              <option>HAA Kobe</option>
+              <option>CAA Chubu</option>
+              <option>ARAI</option>
+              <option>Aucnet</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="adate">Auction date <span class="opt">(if on the sheet)</span></label>
+          <input type="date" id="adate">
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="name">Your name <span class="req">*</span></label>
+            <input type="text" id="name" autocomplete="name" maxlength="100" placeholder="Full name" aria-describedby="nameErr" required>
+            <div class="err" id="nameErr"></div>
+          </div>
+          <div class="field">
+            <label for="phone">WhatsApp number <span class="req">*</span></label>
+            <input type="tel" id="phone" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="+60 12 345 6789" aria-describedby="phoneErr" required>
+            <div class="err" id="phoneErr"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="notes">Anything we should know <span class="opt">(optional)</span></label>
+          <textarea id="notes" maxlength="500" placeholder="e.g. The seller says Grade 4.5, I want to confirm before paying."></textarea>
+        </div>
+
+        <!-- spam trap: real visitors never see or fill this -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input type="text" id="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
+          <span id="submitLabel">Continue to WhatsApp</span>
+        </button>
+        <p class="fine">We use these details only to check your sheet and reply to you.</p>
+        <p class="extra-note hidden" id="extraNote"></p>
+      </form>
+    </div>
+
+    <!-- shown after submit -->
+    <div id="doneView" class="done hidden" aria-live="polite">
+      <div class="done-badge">Details ready</div>
+      <h2>Now send us the sheet on WhatsApp</h2>
+      <p>If WhatsApp did not open, use the green button below. Attach a clear photo or PDF of the whole sheet to the message, then send it. We cannot check your car until the sheet arrives.</p>
+      <div class="ref-box">
+        <div><div class="k">Your reference</div><div class="v" id="refOut"></div></div>
+        <div class="k">Quote this if you contact us again</div>
+      </div>
+      <a class="btn-wa" id="waAgain" href="#" target="_blank" rel="noopener">Open WhatsApp</a>
+      <button type="button" class="btn-ghost" id="againBtn">Check another sheet</button>
+    </div>
+  </section>
+
+  <!-- RIGHT: GUIDE -->
+  <div class="stack">
+    <section class="card card-pad" aria-labelledby="whereHeading">
+      <h2 id="whereHeading">Where to find the numbers</h2>
+      <p class="hint">Layouts differ between auction houses, but both numbers are labelled on every sheet.</p>
+
+      <div class="sheet" role="img" aria-label="Sketch of an auction sheet with the lot number and chassis number boxes highlighted">
+        <div class="sheet-head">
+          <div class="sheet-box hl" style="flex:1"><b>出品番号 · LOT NO.</b><span class="ph">00000</span></div>
+          <div class="sheet-box" style="flex:1"><b>オークション · AUCTION</b><span class="ph">NAME / DATE</span></div>
+        </div>
+        <div class="sheet-body">
+          <div class="sheet-box hl" style="grid-column:1/-1"><b>車台番号 · CHASSIS NO.</b><span class="ph">XXXXX-0000000</span></div>
+          <div class="sheet-box"><b>評価 · GRADE</b><span class="ph">0.0</span></div>
+          <div class="sheet-box"><b>走行 · MILEAGE</b><span class="ph">00,000 km</span></div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div><span class="dot" aria-hidden="true"></span><span><strong>Lot number</strong> <span class="jp">出品番号</span>: usually near the top, beside the auction name and date.</span></div>
+        <div><span class="dot" aria-hidden="true"></span><span><strong>Chassis number</strong> <span class="jp">車台番号</span>: in the vehicle details block. It is the model code, a hyphen, then the serial number.</span></div>
+      </div>
+    </section>
+
+    <section class="card card-pad" aria-labelledby="howHeading">
+      <h2 id="howHeading">How it works</h2>
+      <ol class="steps">
+        <li><div><h3>Enter the numbers</h3><p>Add the chassis number, lot number and your WhatsApp number.</p></div></li>
+        <li><div><h3>Send the sheet</h3><p>WhatsApp opens with your details filled in. Attach a photo or PDF of the full sheet and send.</p></div></li>
+        <li><div><h3>We check with Japan</h3><p>We compare your sheet with the original auction record and reply on WhatsApp with what we find.</p></div></li>
+      </ol>
+      <div class="tips"><strong>For a good photo:</strong> send the whole sheet, not a crop. Keep all four edges in view and the text sharp enough to read. If the sheet has several pages, send every page.</div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="index.html#stock">Stock</a>
+    <a href="find.html">Find My Car</a>
+    <a href="duty-calculator.html">Duty Calculator</a>
+  </div>
+  <div class="footer-jp jp">関西グループコーポレーション</div>
+  <div class="footer-text">SSM Reg: 202601018333 · © 2026 Kansai Group Malaysia Sdn. Bhd.<br>3 Towers, Jalan Ampang, 50450 Kuala Lumpur</div>
+</footer>
+
+<a href="https://wa.me/601151177026" class="wa-float" aria-label="Chat with Kansai Group on WhatsApp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
+</a>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────
+const WA_NUMBER = '601151177026';
+const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
+// Optional line shown under the form (e.g. turnaround or fee). Leave '' to hide it.
+const EXTRA_NOTE = '';
+const SAVE_TIMEOUT_MS = 4000;
+
+let sb = null;
+try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { sb = null; }
+
+const $ = id => document.getElementById(id);
+
+// ── HELPERS ────────────────────────────────────────────
+function waLink(text) {
+  return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text);
+}
+
+function makeRef() {
+  // no 0/O/1/I so it is easy to read out over the phone
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const buf = new Uint32Array(6);
+  (window.crypto || window.msCrypto).getRandomValues(buf);
+  return 'KG-' + Array.from(buf, n => chars[n % chars.length]).join('');
+}
+
+function normChassis(v) { return v.toUpperCase().replace(/[\s_]+/g, '').replace(/[–—]/g, '-'); }
+function normLot(v)     { return v.toUpperCase().replace(/\s+/g, ''); }
+
+function normPhone(v) {
+  let p = v.replace(/[^\d+]/g, '');
+  if (p.startsWith('+')) return '+' + p.slice(1).replace(/\D/g, '');
+  p = p.replace(/\D/g, '');
+  if (p.startsWith('00')) return '+' + p.slice(2);
+  if (p.startsWith('0')) return '+60' + p.slice(1);   // Malaysian local format
+  return '+' + p;                                      // assume country code already included
+}
+
+function setErr(inputId, errId, msg) {
+  const input = $(inputId), err = $(errId);
+  err.textContent = msg || '';
+  err.classList.toggle('show', !!msg);
+  input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+}
+
+function clearErrors() {
+  setErr('chassis', 'chassisErr', '');
+  setErr('lot', 'lotErr', '');
+  setErr('name', 'nameErr', '');
+  setErr('phone', 'phoneErr', '');
+  $('formError').classList.remove('show');
+}
+
+// ── VALIDATION ─────────────────────────────────────────
+function validate() {
+  clearErrors();
+  const data = {
+    chassis: normChassis($('chassis').value),
+    lot: normLot($('lot').value),
+    name: $('name').value.trim().replace(/\s+/g, ' '),
+    phone: normPhone($('phone').value),
+    house: $('house').value,
+    adate: $('adate').value,
+    notes: $('notes').value.trim()
+  };
+  let firstBad = null;
+  const bad = (id, errId, msg) => { setErr(id, errId, msg); if (!firstBad) firstBad = id; };
+
+  if (!data.chassis) bad('chassis', 'chassisErr', 'Enter the chassis number from the sheet.');
+  else if (!/^[A-Z0-9-]{5,25}$/.test(data.chassis)) bad('chassis', 'chassisErr', 'Use 5 to 25 letters, numbers or hyphens only. Example: GGH30-0012345.');
+
+  if (!data.lot) bad('lot', 'lotErr', 'Enter the lot number.');
+  else if (!/^[A-Z0-9-]{1,15}$/.test(data.lot)) bad('lot', 'lotErr', 'Use up to 15 letters, numbers or hyphens.');
+
+  if (!data.name) bad('name', 'nameErr', 'Enter your name.');
+
+  const digits = data.phone.replace(/\D/g, '');
+  if (!$('phone').value.trim()) bad('phone', 'phoneErr', 'Enter your WhatsApp number.');
+  else if (digits.length < 8 || digits.length > 15) bad('phone', 'phoneErr', 'That number looks incomplete. Include the country code if it is not a Malaysian number.');
+
+  if (firstBad) { $(firstBad).focus(); return null; }
+  return data;
+}
+
+// ── SAVE (never blocks WhatsApp) ───────────────────────
+async function saveRequest(row) {
+  if (!sb) return false;
+  try {
+    const result = await Promise.race([
+      sb.from('verification_requests').insert(row),
+      new Promise(resolve => setTimeout(() => resolve({ error: { message: 'timeout' } }), SAVE_TIMEOUT_MS))
+    ]);
+    return !result.error;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ── SUBMIT ─────────────────────────────────────────────
+let busy = false;
+
+$('verifyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (busy) return;
+
+  // spam trap: pretend it worked, send nothing
+  if ($('website').value) { showDone('KG-000000', waLink('Hi Kansai Group')); return; }
+
+  const d = validate();
+  if (!d) return;
+
+  busy = true;
+  $('submitBtn').disabled = true;
+  $('submitLabel').textContent = 'Preparing…';
+
+  // Open the tab right now, while the tap still counts, so phone browsers do not block it.
+  const popup = window.open('about:blank', '_blank');
+
+  const ref = makeRef();
+  const lines = [
+    'Hi Kansai Group, I would like to verify an auction sheet.',
+    '',
+    'Reference: ' + ref,
+    'Chassis no: ' + d.chassis,
+    'Lot no: ' + d.lot
+  ];
+  if (d.house) lines.push('Auction house: ' + d.house);
+  if (d.adate) lines.push('Auction date: ' + d.adate);
+  lines.push('Name: ' + d.name);
+  if (d.notes) lines.push('Note: ' + d.notes);
+  lines.push('', 'I am attaching the auction sheet (photo or PDF) in this chat.');
+  const url = waLink(lines.join('\n'));
+
+  await saveRequest({
+    ref: ref,
+    name: d.name.slice(0, 100),
+    phone: d.phone,
+    chassis_no: d.chassis,
+    lot_no: d.lot,
+    auction_house: d.house || null,
+    auction_date: d.adate || null,
+    notes: d.notes ? d.notes.slice(0, 500) : null
+  });
+
+  if (popup && !popup.closed) {
+    try { popup.opener = null; popup.location.href = url; } catch (err) { /* fall back to the button */ }
+  }
+  showDone(ref, url);
+});
+
+function showDone(ref, url) {
+  $('refOut').textContent = ref;
+  $('waAgain').href = url;
+  $('formView').classList.add('hidden');
+  $('doneView').classList.remove('hidden');
+  $('doneView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  busy = false;
+  $('submitBtn').disabled = false;
+  $('submitLabel').textContent = 'Continue to WhatsApp';
+}
+
+$('againBtn').addEventListener('click', () => {
+  $('verifyForm').reset();
+  clearErrors();
+  $('doneView').classList.add('hidden');
+  $('formView').classList.remove('hidden');
+  $('chassis').focus();
+});
+
+// ── LIVE CLEAN-UP WHILE TYPING ─────────────────────────
+['chassis', 'lot'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    const el = $(id);
+    const pos = el.selectionStart;
+    const cleaned = el.value.toUpperCase();
+    if (cleaned !== el.value) { el.value = cleaned; el.setSelectionRange(pos, pos); }
+  });
+});
+
+['chassis', 'lot', 'name', 'phone'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    if ($(id).getAttribute('aria-invalid') === 'true') setErr(id, id + 'Err', '');
+  });
+});
+
+// ── SKIP LINK + OPTIONAL NOTE ──────────────────────────
+$('skipLink').href = waLink('Hi Kansai Group, I would like to verify an auction sheet. I am attaching it in this chat.');
+if (EXTRA_NOTE) { $('extraNote').textContent = EXTRA_NOTE; $('extraNote').classList.remove('hidden'); }
+</script>
+</body>
+</html>
