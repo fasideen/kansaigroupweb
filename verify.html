@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en-MY">
 <head>
@@ -93,7 +94,7 @@
       "@id": "https://www.kansaigroup.my/verify.html#service",
       "name": "Japan auction sheet verification in Malaysia",
       "serviceType": "Auction sheet verification for imported Japanese cars",
-      "description": "Send the chassis number, lot number and auction date from a Japan auction sheet from the last 5 years. Kansai Group reviews available auction details and replies on WhatsApp.",
+      "description": "Send the chassis number and lot number from a Japanese auction sheet; include the auction date if known. Verification availability depends on the auction date and records. Kansai Group reviews available auction details and replies on WhatsApp.",
       "provider": {
         "@id": "https://www.kansaigroup.my/#business"
       },
@@ -112,7 +113,7 @@
           "name": "How do I verify a Japan auction sheet in Malaysia?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Fill in the form on this page with the chassis number, lot number and auction date from the sheet. WhatsApp then opens with your details filled in. Attach a photo or PDF of the sheet and send it. We review the details and reply on WhatsApp with what can be established."
+            "text": "Fill in the form on this page with the chassis number and lot number from the sheet. Add the auction date if you know it. WhatsApp then opens with your details filled in. Attach a photo or PDF of the sheet and send it. We review the details and reply on WhatsApp with what can be established."
           }
         },
         {
@@ -120,7 +121,7 @@
           "name": "What do I need to verify an auction sheet?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You need the chassis number, the lot number and the auction date from the sheet, plus a clear photo or PDF of the whole sheet. If you know which auction house it came from, add that too."
+            "text": "You need the chassis number, lot number and a clear photo or PDF of the whole sheet. The auction date is optional if you do not know it. If you know which auction house it came from, add that too."
           }
         },
         {
@@ -128,7 +129,7 @@
           "name": "How old can the auction sheet be?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "We can only verify auction sheets from the last 5 years, counted from the auction date printed on the sheet. We cannot verify older sheets."
+            "text": "Our verification coverage is limited to auction sheets from the last 5 years. If you do not know the auction date, send the full sheet and we can assess whether it falls within that period."
           }
         },
         {
@@ -182,14 +183,14 @@
   :focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 
   /* NAV */
-  nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px;}
+  nav.site-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px;}
   .logo{display:flex;align-items:center;gap:11px;}
   .logo-mark{width:38px;height:38px;background:var(--red);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;letter-spacing:1px;}
   .logo-text .top{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2.5px;line-height:1;}
   .logo-text .btm{font-size:8px;letter-spacing:2.5px;color:var(--text-muted);text-transform:uppercase;margin-top:2px;}
-  nav ul{list-style:none;display:flex;gap:28px;align-items:center;margin-left:auto;}
-  nav ul a{color:var(--text-muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;transition:color .2s;}
-  nav ul a:hover,nav ul a[aria-current="page"]{color:var(--red);}
+  nav.site-nav ul{list-style:none;display:flex;gap:28px;align-items:center;margin-left:auto;}
+  nav.site-nav ul a{color:var(--text-muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;transition:color .2s;}
+  nav.site-nav ul a:hover,nav.site-nav ul a[aria-current="page"]{color:var(--red);}
   .nav-cta{background:var(--red);color:#fff;padding:9px 20px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;}
   .nav-cta:hover{background:var(--red-dark);}
 
@@ -201,9 +202,22 @@
   .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,8vw,84px);line-height:.95;letter-spacing:2px;margin-bottom:16px;}
   .hero-title span{color:var(--red);}
   .hero-sub{font-size:16px;color:var(--text-muted);line-height:1.65;max-width:600px;}
-  .hero-skip{margin-top:22px;font-size:13.5px;color:var(--text-muted);}
+  .hero-skip{margin-top:18px;font-size:13.5px;color:var(--text-muted);}
   .hero-skip a{color:var(--red);font-weight:600;border-bottom:1px solid rgba(230,0,18,.3);}
   .hero-skip a:hover{border-color:var(--red);}
+
+  /* CONVERSION & CONTENT */
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:24px;}
+  .hero-action{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border-radius:8px;background:var(--red);color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;}
+  .hero-action:hover{background:var(--red-dark);}
+  .hero-action-secondary{background:#fff;color:var(--navy);border:1px solid #d1d5db;}
+  .hero-action-secondary:hover{background:#f3f4f6;}
+  .trust-strip{max-width:1140px;margin:0 auto;padding:20px 24px;display:flex;gap:16px 32px;flex-wrap:wrap;border-bottom:1px solid var(--border);font-size:13px;color:#374151;}
+  .trust-strip span::before{content:'✓';color:var(--green);font-weight:800;margin-right:8px;}
+  .form-kicker{display:inline-block;color:var(--red);font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:8px;}
+  .section-lead{max-width:760px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
+  #verification-form{scroll-margin-top:85px;}
+  @media(max-width:720px){.trust-strip{padding:16px;gap:10px 18px}.hero-actions{align-items:stretch}.hero-action{width:100%}}
 
   /* LAYOUT */
   .wrap{max-width:1140px;margin:0 auto;padding:36px 24px 0;display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:start;}
@@ -247,6 +261,14 @@
   .btn-ghost{display:block;width:100%;text-align:center;background:#fff;border:1px solid var(--border);color:var(--text-muted);border-radius:10px;padding:13px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
   .btn-ghost:hover{border-color:var(--navy);color:var(--text-main);}
 
+  /* Annotated auction sheet guide */
+  .auction-example{margin:0 0 18px;}
+  .auction-example a{display:block;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;transition:box-shadow .2s,transform .2s;}
+  .auction-example a:hover{box-shadow:var(--shadow-md);}
+  .auction-example img{display:block;width:100%;height:auto;}
+  .zoom-hint{display:block;padding:11px 14px;background:var(--navy);color:#fff;text-align:center;font-size:12px;font-weight:600;letter-spacing:.15px;}
+  .auction-example figcaption{margin-top:10px;color:var(--text-muted);font-size:12px;line-height:1.6;}
+
   /* SIDE: SHEET MOCK + STEPS */
   .sheet{position:relative;background:#FFFEF9;border:1px solid #E7E2D3;border-radius:10px;padding:16px 16px 18px;box-shadow:var(--shadow-sm);}
   .sheet-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;}
@@ -289,8 +311,8 @@
     .hero-watermark{font-size:140px;}
   }
   @media (max-width:720px){
-    nav{padding:0 16px;}
-    nav ul{display:none;}
+    nav.site-nav{padding:0 16px;}
+    nav.site-nav ul{display:none;}
     .nav-cta{margin-left:auto;}
     .hero-inner{padding:36px 18px 34px;}
     .wrap{padding:24px 16px 0;}
@@ -302,7 +324,7 @@
   }
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
 
-  .crumbs{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--text-muted);margin-bottom:18px;}
+  .crumbs{position:static;display:inline-flex;justify-content:flex-start;gap:9px;align-items:center;width:auto;height:auto;padding:0;margin:0 0 22px;background:none;border:0;box-shadow:none;backdrop-filter:none;font-size:12.5px;color:var(--text-muted);flex-wrap:wrap;}
   .crumbs a:hover{color:var(--red);}
   .hero-rule{display:inline-block;margin-top:16px;padding:7px 14px;border-left:3px solid var(--gold);background:rgba(200,162,60,.09);font-size:13.5px;font-weight:600;border-radius:0 8px 8px 0;}
 
@@ -329,11 +351,36 @@
   .where .links a:hover{border-color:var(--red);color:var(--red);}
   @media (max-width:900px){.info-grid{grid-template-columns:1fr;}}
   @media (max-width:720px){.info{padding:0 16px;margin-top:34px;}}
+
+/* 2026 concise Kansai visual update */
+.visual-section,.why-section,.kansai-cta,.faq{margin-top:44px}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:22px;margin-bottom:20px}
+.section-heading h2{margin:0!important;font-size:clamp(28px,3.3vw,40px)!important;line-height:1.06!important}
+.section-heading>p{max-width:360px;font-size:14px;line-height:1.6;color:#5c6574}
+.eyebrow{display:block;color:var(--red);font-weight:800;font-size:11px;letter-spacing:2px;margin-bottom:8px}
+.condition-grid,.advantage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.condition-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.condition-card img{width:100%;aspect-ratio:1.52;object-fit:cover}
+.condition-copy{padding:18px 19px 21px}
+.condition-label{font-size:10px;color:var(--red);letter-spacing:1.5px;font-weight:800}
+.condition-copy h3,.advantage h3{font-size:17px;margin:7px 0 8px;color:#101827}
+.condition-copy p,.advantage p{font-size:13px;line-height:1.6;color:#5c6574;margin:0}
+.photo-disclaimer{font-size:11px;color:#6b7280;margin-top:11px;line-height:1.6}
+.advantage{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px}
+.advantage-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:8px;background:#fff1f2;color:var(--red);font-size:15px;font-weight:900}
+.kansai-cta{background:var(--red);border-radius:14px;padding:30px!important;display:flex;justify-content:space-between;align-items:center;gap:24px;color:white}
+.kansai-cta .eyebrow{color:#ffd6d9}.kansai-cta h2{color:#fff!important;font-size:clamp(28px,3vw,36px)!important;margin:0 0 9px!important}
+.kansai-cta p{max-width:620px;color:#fff;opacity:.94;font-size:14px;line-height:1.6}
+.cta-buttons{display:flex;gap:9px;flex-wrap:wrap;flex-shrink:0}
+.cta-buttons a{padding:13px 17px;border-radius:7px;font-size:13px;font-weight:800;white-space:nowrap}
+.cta-white{background:#fff;color:var(--red)}.cta-outline{border:1px solid #fff;color:#fff}
+.faq{max-width:1140px}.faq details{margin-bottom:9px}.faq summary{font-size:14px}
+@media(max-width:760px){.section-heading{display:block}.section-heading>p{margin-top:10px}.condition-grid{grid-template-columns:1fr;gap:12px}.condition-card{display:grid;grid-template-columns:42% 1fr}.condition-card img{height:100%;aspect-ratio:auto}.condition-copy{padding:13px}.condition-copy h3{font-size:15px}.condition-copy p{font-size:12px}.advantage-grid{grid-template-columns:1fr;gap:10px}.kansai-cta{display:block;padding:24px!important}.cta-buttons{margin-top:20px}}
 </style>
 </head>
 <body>
 
-<nav>
+<nav class="site-nav" aria-label="Main navigation">
   <a href="index.html" class="logo" aria-label="Kansai Group home">
     <div class="logo-mark">KG</div>
     <div class="logo-text"><div class="top">KANSAI GROUP</div><div class="btm">Osaka · Kuala Lumpur</div></div>
@@ -351,19 +398,22 @@
   <div class="hero-grid"></div>
   <div class="hero-watermark jp" aria-hidden="true">検査</div>
   <div class="hero-inner">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span>Verify auction sheet</span></nav>
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Auction Sheet Verification</span></nav>
     <h1 class="hero-title bebas">JAPANESE <span>AUCTION SHEET VERIFICATION</span> IN MALAYSIA</h1>
     <p class="hero-sub">Buying a Japanese recon car? Request a review of the auction sheet before you commit. Share the chassis number, auction details and a clear copy of the sheet; Kansai Group will reply on WhatsApp with the findings available from its check.</p>
-    <p class="hero-rule">Currently accepting sheets dated within the last 5 years.</p>
+    <div class="hero-actions"><a class="hero-action" href="#verification-form">Request a sheet check →</a><a class="hero-action hero-action-secondary" href="#howHeading">How it works</a></div>
+    <p class="hero-rule">Auction date unknown? You can still send your sheet. Verification coverage is limited to the last 5 years.</p>
     <p class="hero-skip">Already have the sheet photo? <a href="#" id="skipLink" target="_blank" rel="noopener">Send it straight to us on WhatsApp</a></p>
   </div>
 </header>
+<div class="trust-strip" aria-label="Service highlights"><span>For Japanese recon car buyers in Malaysia</span><span>Share your sheet through WhatsApp</span><span>Review based on available auction information</span></div>
 
 <main class="wrap">
 
   <!-- LEFT: FORM / RESULT — existing submission logic retained -->
-  <section class="card card-pad" aria-labelledby="formHeading">
+  <section class="card card-pad" id="verification-form" aria-labelledby="formHeading">
     <div id="formView">
+      <span class="form-kicker">Verification request</span>
       <h2 id="formHeading">Request an auction sheet check</h2>
       <p class="hint">Enter the details shown on your sheet. We will prepare a WhatsApp message; attach the full sheet photo or PDF and press Send to complete your request.</p>
 
@@ -400,9 +450,9 @@
         </div>
 
         <div class="field">
-          <label for="adate">Auction date <span class="req">*</span></label>
-          <input type="date" id="adate" aria-describedby="adateHelp adateErr" required>
-          <div class="help" id="adateHelp">Printed near the top of the sheet. Currently accepting auction dates within the last 5 years.</div>
+          <label for="adate">Auction date <span class="opt">(optional)</span></label>
+          <input type="date" id="adate" aria-describedby="adateHelp adateErr">
+          <div class="help" id="adateHelp">Not sure of the date? Leave this blank and send the full sheet on WhatsApp. We will assess whether it falls within our 5-year coverage.</div>
           <div class="err" id="adateErr"></div>
         </div>
 
@@ -435,7 +485,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4 8.94 8.94 0 0 0 3.13 12.92a8.85 8.85 0 0 0 1.19 4.45L3 21l3.74-1.3a8.9 8.9 0 0 0 5.31 1.7h.01a8.94 8.94 0 0 0 8.94-8.93 8.87 8.87 0 0 0-2.4-6.15zm-5.55 13.7a7.4 7.4 0 0 1-3.78-1.03l-.27-.16-2.79.97.93-2.73-.18-.28a7.4 7.4 0 0 1-1.14-3.96 7.46 7.46 0 0 1 12.74-5.27 7.4 7.4 0 0 1 2.19 5.28 7.46 7.46 0 0 1-7.46 7.41z"/></svg>
           <span id="submitLabel">Continue to WhatsApp</span>
         </button>
-        <p class="fine">We use these details only to check your sheet and reply to you.</p>
+        <p class="fine">After tapping Continue, WhatsApp opens with a prepared message. You must attach the auction sheet and press Send. A document review is not a physical vehicle inspection.</p>
         <p class="extra-note hidden" id="extraNote"></p>
       </form>
     </div>
@@ -458,19 +508,15 @@
   <div class="stack">
     <section class="card card-pad" aria-labelledby="whereHeading">
       <h2 id="whereHeading">Where to find the numbers</h2>
-      <p class="hint">Layouts differ between auction houses, but both numbers are labelled on every sheet.</p>
+      <p class="hint">Use the annotated example below to locate the lot and chassis numbers. Tap the image to enlarge it. Auction houses may use different layouts.</p>
 
-      <div class="sheet" role="img" aria-label="Sketch of an auction sheet with the lot number and chassis number boxes highlighted">
-        <div class="sheet-head">
-          <div class="sheet-box hl" style="flex:1"><b>出品番号 · LOT NO.</b><span class="ph">00000</span></div>
-          <div class="sheet-box" style="flex:1"><b>オークション · AUCTION</b><span class="ph">NAME / DATE</span></div>
-        </div>
-        <div class="sheet-body">
-          <div class="sheet-box hl" style="grid-column:1/-1"><b>車台番号 · CHASSIS NO.</b><span class="ph">XXXXX-0000000</span></div>
-          <div class="sheet-box"><b>評価 · GRADE</b><span class="ph">0.0</span></div>
-          <div class="sheet-box"><b>走行 · MILEAGE</b><span class="ph">00,000 km</span></div>
-        </div>
-      </div>
+      <figure class="auction-example">
+        <a href="auction-sheet-guide.png" target="_blank" rel="noopener" aria-label="Open larger annotated Japanese auction sheet example">
+          <img src="auction-sheet-guide.png" alt="Annotated Japanese auction sheet showing the auction lot number, chassis number, grade, mileage, and vehicle condition diagram" loading="lazy" decoding="async" width="1279" height="1169">
+          <span class="zoom-hint">↗ Tap or click to enlarge the auction sheet</span>
+        </a>
+        <figcaption>Illustrative guide based on a Japanese auction sheet. Layouts vary. The auction date is not clearly shown on this example; you can leave that field blank.</figcaption>
+      </figure>
 
       <div class="legend">
         <div><span class="dot" aria-hidden="true"></span><span><strong>Lot number</strong> <span class="jp">出品番号</span>: usually near the top, beside the auction name and date.</span></div>
@@ -479,9 +525,9 @@
     </section>
 
     <section class="card card-pad" aria-labelledby="howHeading">
-      <h2 id="howHeading">How it works</h2>
+      <h2 id="howHeading">How auction sheet verification works</h2>
       <ol class="steps">
-        <li><div><h3>Enter the numbers</h3><p>Add the chassis number, lot number, auction date and your WhatsApp number.</p></div></li>
+        <li><div><h3>Enter the numbers</h3><p>Add the chassis number, lot number and your WhatsApp number. The auction date is optional.</p></div></li>
         <li><div><h3>Send the sheet</h3><p>WhatsApp opens with your details filled in. Attach a photo or PDF of the full sheet and send.</p></div></li>
         <li><div><h3>We check with Japan</h3><p>We review the submitted details against records available to us and explain the findings on WhatsApp. If a record cannot be confirmed, we will say so.</p></div></li>
       </ol>
@@ -490,54 +536,38 @@
   </div>
 </main>
 
-<section class="info" aria-labelledby="whatHeading">
-  <div class="info-grid">
-    <div class="info-block">
-      <h2 id="whatHeading">What is a Japanese auction sheet?</h2>
-      <p>A Japanese auction sheet is the condition report an auction house inspector prepares for each car before it is sold. It usually shows the overall grade (for example 4.5, or R and RA for a repaired car), an interior grade, the mileage at the time of inspection, a diagram marking dents, scratches and repairs, and the inspector's notes.</p>
-      <p>For recon and imported cars in Malaysia, the sheet is the main record of the car's condition when it left Japan.</p>
-    </div>
-    <div class="info-block">
-      <h2>Why verify an auction sheet before you buy?</h2>
-      <p>A paper or photo copy of a sheet does not prove it belongs to the car in front of you. Sheets can be copied, edited or attached to a different car.</p>
-      <p>Comparing the chassis and auction details with available records can help identify inconsistencies. A document check does not replace an independent inspection of the actual car.</p>
-    </div>
+<section class="info visual-section" aria-labelledby="conditionHeading">
+  <div class="section-heading"><div><span class="eyebrow">LOOK BEYOND THE PHOTO</span><h2 id="conditionHeading">WHY AUCTION HISTORY MATTERS</h2></div><p>Two cars can look equally clean today — but have very different histories. Check the sheet before you commit.</p></div>
+  <div class="condition-grid">
+    <article class="condition-card"><img src="auction-damage-example.webp" loading="lazy" alt="Illustrative photograph of a car with visible front-end collision damage" width="680" height="450"><div class="condition-copy"><span class="condition-label">01 / DAMAGE</span><h3>Accident damage</h3><p>Previous damage can be difficult to spot from a sales listing.</p></div></article>
+    <article class="condition-card"><img src="auction-repair-example.webp" loading="lazy" alt="Illustrative photograph of a vehicle undergoing body repairs" width="680" height="450"><div class="condition-copy"><span class="condition-label">02 / REPAIR</span><h3>Repair history</h3><p>Inspection notes and grades can flag earlier repairs.</p></div></article>
+    <article class="condition-card"><img src="auction-clean-example.webp" loading="lazy" alt="Illustrative photograph of a clean-looking used Japanese sedan" width="680" height="450"><div class="condition-copy"><span class="condition-label">03 / APPEARANCE</span><h3>Clean on the outside</h3><p>A polished exterior alone cannot confirm a vehicle's past.</p></div></article>
+  </div>
+  <p class="photo-disclaimer">Illustrative images only; these are not documented before-and-after photos of the same vehicle. Auction grades describe condition at auction, not a guarantee of present condition.</p>
+</section>
+<section class="info why-section" aria-labelledby="whyKansaiHeading">
+  <div class="section-heading"><div><span class="eyebrow">JAPAN TO MALAYSIA</span><h2 id="whyKansaiHeading">WHY KANSAI GROUP?</h2></div></div>
+  <div class="advantage-grid">
+    <div class="advantage"><span class="advantage-icon">JP</span><h3>Direct Japan sourcing</h3><p>Established Japanese auction sourcing experience and a direct connection to the market.</p></div>
+    <div class="advantage"><span class="advantage-icon">35+</span><h3>35 years in business</h3><p>Backed by Kansai Group Corporation's automotive trading history in Osaka.</p></div>
+    <div class="advantage"><span class="advantage-icon">KL</span><h3>Local team in KL</h3><p>Visit our representative office at 3 Towers, Jalan Ampang, Kuala Lumpur.</p></div>
   </div>
 </section>
-
-<section class="info" aria-labelledby="whichHeading">
-  <h2 id="whichHeading">Which auction sheets can we verify?</h2>
-  <ul class="plain">
-    <li>Sheets from Japanese car auctions held in the <strong>last 5 years</strong>, counted from the auction date on the sheet. We cannot verify older sheets.</li>
-    <li>Buyers in Malaysia. This service is for customers in Malaysia only.</li>
-    <li>Sheets where you can read the chassis number, lot number and auction date.</li>
-  </ul>
-  <p>We reply on WhatsApp with what we find. You do not need to visit our office.</p>
-</section>
-
-<section class="info" aria-labelledby="scopeHeading">
-  <div class="info-grid">
-    <div class="info-block"><h2 id="scopeHeading">What the check can tell you</h2><p>We review the chassis number, lot details and auction sheet information, and report any discrepancies or information we cannot confirm from available records.</p><p>Results depend on the availability and readability of the original auction information.</p></div>
-    <div class="info-block"><h2>What it does not guarantee</h2><p>An auction sheet describes the vehicle at the time of auction in Japan. It cannot establish the car’s current mechanical condition, whether it was damaged later, or whether the seller has disclosed everything.</p><p>Always inspect the actual vehicle before buying.</p></div>
-  </div>
-</section>
-<section class="info" aria-labelledby="nextHeading">
-  <div class="info-block" style="background:#101c2e;color:white;border-color:#25344b">
-    <h2 id="nextHeading" style="color:white">Still choosing a Japanese recon car?</h2>
-    <p style="color:#d1d5db">You can request a sheet check even if the car is being sold by another dealer. If you are still comparing vehicles, Kansai Group can also help you explore Japanese imports and available stock.</p>
-    <div class="links" style="display:flex;gap:10px;flex-wrap:wrap"><a href="index.html#stock" style="display:inline-block;padding:12px 18px;background:#fff;color:#101c2e;border-radius:8px;font-weight:700">Explore available cars</a> <a href="find.html" style="display:inline-block;padding:12px 18px;border:1px solid #a6b1c2;color:white;border-radius:8px;font-weight:700">Request car sourcing</a></div>
-  </div>
+<section class="info kansai-cta" aria-labelledby="nextHeading">
+  <div><span class="eyebrow">FIND YOUR NEXT CAR</span><h2 id="nextHeading">STILL CHOOSING A JAPANESE RECON CAR?</h2><p>Verify a sheet even when buying from another dealer — or let Kansai help you source a vehicle directly from Japan.</p></div>
+  <div class="cta-buttons"><a href="index.html#stock" class="cta-white">Explore stock</a><a href="find.html" class="cta-outline">Source a car</a></div>
 </section>
 <section class="info faq" aria-labelledby="faqHeading">
-  <h2 id="faqHeading">Auction sheet verification: common questions</h2>
-      <details><summary>How do I verify a Japan auction sheet in Malaysia?</summary><p>Fill in the form on this page with the chassis number, lot number and auction date from the sheet. WhatsApp then opens with your details filled in. Attach a photo or PDF of the sheet and send it. We review the details and reply on WhatsApp with what can be established.</p></details>
-      <details><summary>What do I need to verify an auction sheet?</summary><p>You need the chassis number, the lot number and the auction date from the sheet, plus a clear photo or PDF of the whole sheet. If you know which auction house it came from, add that too.</p></details>
-      <details><summary>How old can the auction sheet be?</summary><p>We can only verify auction sheets from the last 5 years, counted from the auction date printed on the sheet. We cannot verify older sheets.</p></details>
-      <details><summary>Where do I find the chassis number and lot number on an auction sheet?</summary><p>The lot number (出品番号) is usually near the top of the sheet, beside the auction name and date. The chassis number (車台番号) is in the vehicle details block. It is the model code, a hyphen, then the serial number.</p></details>
-      <details><summary>Can I verify an auction sheet before I pay for the car?</summary><p>Yes. The check only needs the sheet, so you can do it before you pay or while you are still deciding.</p></details>
-      <details><summary>Do I need to be in Kuala Lumpur to use this?</summary><p>No. The check is done online through WhatsApp, so you can use it from anywhere in Malaysia. Our representative office is at 3 Towers, Jalan Ampang, Kuala Lumpur.</p></details>
-      </section>
-
+  <div class="section-heading"><div><span class="eyebrow">HELP &amp; ANSWERS</span><h2 id="faqHeading">FREQUENTLY ASKED QUESTIONS</h2></div></div>
+  <details><summary>What is a Japanese auction sheet?</summary><p>It is an inspection report made at a Japanese vehicle auction, typically showing the grade, recorded mileage, vehicle condition diagram and inspector notes. It describes the vehicle at that time, not necessarily today.</p></details>
+  <details><summary>Why should I verify the auction sheet before buying?</summary><p>A photo of an auction sheet alone does not prove it belongs to the car being sold. Checking chassis and auction details against available records can reveal inconsistencies. Always arrange an independent physical inspection too.</p></details>
+  <details><summary>Which auction sheets can Kansai review?</summary><p>Our service is for buyers in Malaysia and covers Japanese auction sheets from the last 5 years. We need a readable chassis number and lot number. The auction date is optional when submitting the request.</p></details>
+  <details><summary>What does the verification check — and what can't it guarantee?</summary><p>We review available chassis, lot and auction information and report what we can or cannot confirm. A check cannot guarantee the car's current mechanical condition or detect damage that occurred after the auction. Missing records do not automatically mean a sheet is fake.</p></details>
+  <details><summary>How do I submit my auction sheet?</summary><p>Enter the chassis number, lot number and WhatsApp contact in the form above. Add the auction date if known. Continue to WhatsApp and attach a clear photo or PDF of the entire sheet.</p></details>
+  <details><summary>Where are the chassis and lot numbers?</summary><p>They are usually near the top or in the vehicle details block. Use the annotated example above to identify them; layouts vary by auction house.</p></details>
+  <details><summary>Can I check a car sold by another dealer?</summary><p>Yes. You can request a check before paying for a vehicle, even if it is being sold by another dealer.</p></details>
+  <details><summary>Do I have to visit the KL office?</summary><p>No. Requests are handled through WhatsApp for customers across Malaysia. Our KL office is at 3 Towers, Jalan Ampang.</p></details>
+</section>
 <section class="info where" aria-labelledby="whereUsHeading">
   <h2 id="whereUsHeading">Serving buyers across Malaysia</h2>
   <p>We help buyers in Kuala Lumpur, Selangor, Penang, Johor, Perak, Sabah, Sarawak and the rest of Malaysia. The check is done online through WhatsApp, and our representative office is in Kuala Lumpur.</p>
@@ -576,7 +606,7 @@ const WA_NUMBER = '601151177026';
 const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
 // Optional line shown under the form (e.g. turnaround or fee). Leave '' to hide it.
-const EXTRA_NOTE = 'Pricing and response time will be confirmed before any chargeable work. No payment is collected on this page.';
+const EXTRA_NOTE = 'Any applicable fee and expected response time will be confirmed before proceeding. No payment is collected on this page.';
 const SAVE_TIMEOUT_MS = 4000;
 
 let sb = null;
@@ -662,9 +692,8 @@ function validate() {
   if (!data.lot) bad('lot', 'lotErr', 'Enter the lot number.');
   else if (!/^[A-Z0-9-]{1,15}$/.test(data.lot)) bad('lot', 'lotErr', 'Use up to 15 letters, numbers or hyphens.');
 
-  if (!data.adate) bad('adate', 'adateErr', 'Enter the auction date printed on the sheet.');
-  else if (data.adate > todayStr()) bad('adate', 'adateErr', 'The auction date cannot be in the future.');
-  else if (data.adate < cutoffStr()) bad('adate', 'adateErr', 'We can only verify auction sheets from the last 5 years. This sheet is dated ' + data.adate + '. If that date is wrong, message us on WhatsApp.');
+  if (data.adate && data.adate > todayStr()) bad('adate', 'adateErr', 'The auction date cannot be in the future.');
+  else if (data.adate && data.adate < cutoffStr()) bad('adate', 'adateErr', 'We can only verify auction sheets from the last 5 years. This sheet is dated ' + data.adate + '. If that date is wrong, message us on WhatsApp.');
 
   if (!data.name) bad('name', 'nameErr', 'Enter your name.');
 
@@ -722,7 +751,7 @@ $('verifyForm').addEventListener('submit', async e => {
     'Lot no: ' + d.lot
   ];
   if (d.house) lines.push('Auction house: ' + d.house);
-  lines.push('Auction date: ' + d.adate);
+  lines.push('Auction date: ' + (d.adate || 'Not known — please check the attached sheet'));
   lines.push('Name: ' + d.name);
   if (d.notes) lines.push('Note: ' + d.notes);
   lines.push('', 'I am attaching the auction sheet (photo or PDF) in this chat.');
@@ -736,7 +765,7 @@ $('verifyForm').addEventListener('submit', async e => {
     chassis_no: d.chassis,
     lot_no: d.lot,
     auction_house: d.house || null,
-    auction_date: d.adate,
+    auction_date: d.adate || null,
     notes: d.notes ? d.notes.slice(0, 500) : null
   });
   } catch (err) { console.warn(err); }
@@ -784,7 +813,7 @@ $('againBtn').addEventListener('click', () => {
 });
 
 // ── SKIP LINK + OPTIONAL NOTE ──────────────────────────
-$('skipLink').href = waLink('Hi Kansai Group, I would like to verify an auction sheet (from the last 5 years). I am attaching it in this chat.');
+$('skipLink').href = waLink('Hi Kansai Group, I would like to check an auction sheet. I may not know the auction date; I am attaching the sheet for your review.');
 $('adate').max = todayStr();
 $('adate').min = cutoffStr();
 if (EXTRA_NOTE) { $('extraNote').textContent = EXTRA_NOTE; $('extraNote').classList.remove('hidden'); }
