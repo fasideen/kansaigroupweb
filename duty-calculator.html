@@ -6,18 +6,18 @@
 <link rel="apple-touch-icon" href="/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Malaysia Import Duty Calculator — Japanese & Recon Cars | Kansai Group</title>
-<meta name="description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly. Covers Toyota, Lexus, Nissan, BMW and 2,279 vehicles.">
+<meta name="description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. Calculate import duty, insurance and shipping costs instantly. Covers Toyota, Lexus, Nissan, BMW and 2,275 vehicles.">
 <meta name="keywords" content="malaysia import duty calculator, recon car duty malaysia, japanese car import duty, import duty kereta malaysia, duti import kereta, kansai group duty calculator">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.kansaigroup.my/duty-calculator.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Malaysia Import Duty Calculator — Japanese & Recon Cars">
-<meta property="og:description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. 2,279 vehicles in database. Calculate instantly.">
+<meta property="og:description" content="Free Malaysian import duty calculator for Japanese, UK and Australian recon cars. 2,275 vehicles in database. Calculate instantly.">
 <meta property="og:url" content="https://www.kansaigroup.my/duty-calculator.html">
 <meta property="og:site_name" content="Kansai Group Malaysia">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Malaysia Import Duty Calculator — Kansai Group">
-<meta name="twitter:description" content="Free import duty calculator for Japanese recon cars in Malaysia. 2,279 vehicles in database.">
+<meta name="twitter:description" content="Free import duty calculator for Japanese recon cars in Malaysia. 2,275 vehicles in database.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -512,10 +512,30 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
   font-size: 13px;
 }
 
+/* ── STEP 2: TOTAL LANDED COST ── */
+.btn-step2 { width: 100%; margin-top: 14px; padding: 12px; border-radius: 9px; border: 1.5px solid var(--red); background: var(--surface); color: var(--red); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.btn-step2:hover { background: var(--red-light); }
+.step2 { margin-top: 18px; padding-top: 18px; border-top: 2px dashed var(--border); display: flex; flex-direction: column; gap: 14px; }
+.step2-head { display: flex; align-items: center; gap: 8px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; font-size: 16px; font-weight: 600; }
+.step2-badge { width: 22px; height: 22px; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; font-size: 12px; font-family: 'Inter', sans-serif; }
+.s2-line { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.s2-line span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; white-space: nowrap; }
+.s2-hint { font-size: 11px; color: var(--ink-soft); margin-top: 4px; min-height: 14px; }
+.ap-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ap-btn { border: 1.5px solid var(--border); background: var(--surface); color: var(--ink); border-radius: 9px; padding: 10px 6px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ap-btn small { display: block; font-weight: 400; font-size: 10px; opacity: 0.7; margin-top: 2px; }
+.ap-btn.on { background: var(--red); border-color: var(--red); color: #fff; }
+.s2-detail { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.s2-link { background: none; border: none; color: var(--ink-mid); text-decoration: underline; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; padding: 0; margin-top: 8px; text-align: left; }
+.s2-total { background: var(--ink); color: #fff; border-radius: 12px; padding: 16px; text-align: center; }
+.s2-total-l { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; font-family: 'Oswald', sans-serif; }
+.s2-total-v { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; margin-top: 4px; }
+.s2-warn { font-size: 12px; margin-top: 6px; opacity: 0.85; }
+
 /* ── PRINT ── */
 .print-header { display: none; }
 @media print {
-  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .gauge-seg:not(.active), .gauge-label, .compare-bar, #compareCard, .faq-card, .lang-toggle, .td-check { display: none !important; }
+  .header, .search-row, .search-row-4, .table-wrap, .pagination, .rate-row, .rate-link, .action-row, .btn-step2, .s2-link, .ap-btn:not(.on), .gauge-seg:not(.active), .gauge-label, .compare-bar, #compareCard, .faq-card, .lang-toggle, .td-check { display: none !important; }
   .layout { max-width: 100%; }
   body { background: white; }
   .card { box-shadow: none; border: 1px solid #ddd; }
@@ -568,7 +588,7 @@ tbody tr.active-row td { border-bottom-color: #FBD5D5; }
 
 <!-- CTA Banner -->
 <div style="background:var(--red);padding:10px 24px;text-align:center;">
-  <span style="color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;">
+  <span style="color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;">
     Ready to import? 
     <a href="https://www.kansaigroup.my" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:8px;">Browse our stock in KL →</a>
     <a href="https://wa.me/601151177026" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:16px;">WhatsApp Us →</a>
@@ -629,6 +649,13 @@ const acState = {
 // Compare feature state
 let compareList = []; // array of car "no"
 
+// Step 2 (total landed cost) state
+const S2 = { open: false, price: '', other: '', detail: false, pekema: '', roadtax: '', transport: '', ap: 10000 };
+try {
+  const a = JSON.parse(localStorage.getItem('kansaiAP'));
+  if (a && (a.amount === 10000 || a.amount === 20000)) S2.ap = a.amount;
+} catch (e) { /* ignore */ }
+
 // ═══════════════════════════════════════════════════
 // LANGUAGE / TRANSLATIONS
 // ═══════════════════════════════════════════════════
@@ -676,12 +703,21 @@ const i18n = {
     printPdf: 'Print / PDF', copyResultBtn: 'Copy Result', copied: 'Copied ✓', clear: 'Clear',
     shareLink: 'Share Link', linkCopied: 'Link Copied ✓', whatsapp: 'WhatsApp',
     ev: 'Electric / EV', dutySuffix: 'duty',
+    s2Open: 'Calculate total landed cost →', s2Title: 'Total Landed Cost', s2Duty: 'Import duty',
+    s2Price: 'Car purchase price', s2PricePh: 'What you pay for the car',
+    s2PriceRM: (a, cur) => `≈ ${a} at your ${cur} rate`,
+    s2AP: 'AP (Approved Permit)', s2APStd: 'Standard', s2APQuota: 'Quota finished', s2APShort: 'AP',
+    s2Other: 'Other costs', s2OtherPh: 'PEKEMA, transport, etc. (optional)',
+    s2Breakdown: 'Break down other costs', s2OneBox: 'Use one box instead',
+    s2Pekema: 'PEKEMA fee (RM)', s2Roadtax: 'JPJ registration & road tax (RM), if known', s2Transport: 'Transport (RM)',
+    s2Total: 'Total landed cost', s2Partial: 'Costs so far (without car price)',
+    s2PartialWarn: 'Enter the car price to see the full total', s2NotEntered: 'not entered',
+    s2Back: '← Back to duty only',
     faqTitle: 'Frequently Asked Questions',
     faqItems: [
       ['Is this an official calculation?', 'No. This tool gives an estimate based on the formula used by Malaysian Customs. The final duty amount is determined by the Royal Malaysian Customs Department (JKDM) upon inspection.'],
       ['Where do the FOB values come from?', 'FOB (Free On Board) values are based on the official price guide issued by Customs for Japanese, UK, and Australian used vehicles.'],
       ['What exchange rate should I use?', 'Use the official rate published by Customs (linked above), updated every 2 weeks. This calculator remembers your last entered rates for convenience.'],
-      ["What's not included in this estimate?", 'This covers import duty only. Excise duty (for applicable vehicles), sales tax, registration fees (JPJ), and road tax are calculated separately and not included here.'],
       ['Can I override the FOB value?', "Yes — after selecting a vehicle, use the 'Override FOB' field if you have a different invoice value to calculate against."],
       ["I can't find my vehicle model — what should I do?", "Try searching with just the brand name, or a shorter keyword from the model. If it's still not listed, contact our team directly for a manual estimate."],
     ],
@@ -692,7 +728,7 @@ const i18n = {
     compareBarText: (n) => `${n} vehicle${n>1?'s':''} selected for comparison`,
     compareView: 'View Comparison', compareClear: 'Clear', compareRemove: 'Remove',
     compareLabels: { brand: 'Vehicle', cc: 'Engine', cur: 'Currency', fob: 'FOB', dutyPct: 'Duty Rate', dutyAmt: 'Estimated Duty', totalCost: 'Vehicle Value + Import Duty' },
-    dutyNote: 'Based on the Customs guide FOB value, not your actual invoice price. Other taxes (excise duty, SST, JPJ registration, road tax) are calculated separately.',
+    dutyNote: 'Based on the Customs guide FOB value, not your actual invoice price.',
     printTitle: 'Kansai Group — Import Duty Estimate',
     printSub: (date) => `Generated ${date} · For reference only, subject to official customs assessment`,
   },
@@ -737,12 +773,21 @@ const i18n = {
     printPdf: 'Cetak / PDF', copyResultBtn: 'Salin Keputusan', copied: 'Disalin ✓', clear: 'Kosongkan',
     shareLink: 'Kongsi Pautan', linkCopied: 'Pautan Disalin ✓', whatsapp: 'WhatsApp',
     ev: 'Elektrik / EV', dutySuffix: 'duti',
+    s2Open: 'Kira jumlah kos mendarat →', s2Title: 'Jumlah Kos Mendarat', s2Duty: 'Duti import',
+    s2Price: 'Harga pembelian kereta', s2PricePh: 'Harga yang anda bayar untuk kereta',
+    s2PriceRM: (a, cur) => `≈ ${a} pada kadar ${cur} anda`,
+    s2AP: 'AP (Permit Diluluskan)', s2APStd: 'Standard', s2APQuota: 'Kuota habis', s2APShort: 'AP',
+    s2Other: 'Kos lain', s2OtherPh: 'PEKEMA, pengangkutan, dll. (pilihan)',
+    s2Breakdown: 'Pecahkan kos lain', s2OneBox: 'Guna satu kotak',
+    s2Pekema: 'Yuran PEKEMA (RM)', s2Roadtax: 'Pendaftaran JPJ & cukai jalan (RM), jika diketahui', s2Transport: 'Pengangkutan (RM)',
+    s2Total: 'Jumlah kos mendarat', s2Partial: 'Kos setakat ini (tanpa harga kereta)',
+    s2PartialWarn: 'Masukkan harga kereta untuk jumlah penuh', s2NotEntered: 'belum dimasukkan',
+    s2Back: '← Kembali ke duti sahaja',
     faqTitle: 'Soalan Lazim',
     faqItems: [
       ['Adakah ini pengiraan rasmi?', 'Tidak. Alat ini memberikan anggaran berdasarkan formula yang digunakan oleh Kastam Malaysia. Jumlah duti muktamad ditentukan oleh Jabatan Kastam Diraja Malaysia (JKDM) semasa pemeriksaan.'],
       ['Dari mana nilai FOB diperoleh?', 'Nilai FOB (Free On Board) adalah berdasarkan garis panduan harga rasmi yang dikeluarkan oleh Kastam untuk kenderaan terpakai dari Jepun, UK, dan Australia.'],
       ['Kadar tukaran apa yang perlu saya guna?', 'Gunakan kadar rasmi yang diterbitkan oleh Kastam (pautan di atas), dikemas kini setiap 2 minggu. Kalkulator ini akan ingat kadar terakhir anda untuk kemudahan.'],
-      ['Apa yang tidak termasuk dalam anggaran ini?', 'Ini hanya meliputi duti import. Duti eksais (untuk kenderaan berkenaan), cukai jualan, yuran pendaftaran (JPJ), dan cukai jalan dikira berasingan dan tidak termasuk di sini.'],
       ['Bolehkah saya menggantikan nilai FOB?', "Boleh — selepas memilih kenderaan, gunakan ruangan 'Ganti FOB' jika anda mempunyai nilai invois berbeza untuk dikira."],
       ['Saya tidak jumpa model kenderaan saya — apa yang perlu saya buat?', 'Cuba cari dengan nama jenama sahaja, atau kata kunci lebih pendek daripada model. Jika masih tidak disenaraikan, hubungi pasukan kami terus untuk anggaran manual.'],
     ],
@@ -753,7 +798,7 @@ const i18n = {
     compareBarText: (n) => `${n} kenderaan dipilih untuk perbandingan`,
     compareView: 'Lihat Perbandingan', compareClear: 'Kosongkan', compareRemove: 'Buang',
     compareLabels: { brand: 'Kenderaan', cc: 'Enjin', cur: 'Mata Wang', fob: 'FOB', dutyPct: 'Kadar Duti', dutyAmt: 'Anggaran Duti', totalCost: 'Nilai Kenderaan + Duti Import' },
-    dutyNote: 'Berdasarkan nilai FOB panduan Kastam, bukan harga invois sebenar anda. Cukai lain (duti eksais, SST, pendaftaran JPJ, cukai jalan) dikira berasingan.',
+    dutyNote: 'Berdasarkan nilai FOB panduan Kastam, bukan harga invois sebenar anda.',
     printTitle: 'Kansai Group — Anggaran Duti Import',
     printSub: (date) => `Dijana ${date} · Untuk rujukan sahaja, tertakluk kepada penilaian rasmi kastam`,
   },
@@ -768,6 +813,11 @@ function setLang(lang) {
   LANG = lang;
   try { localStorage.setItem('kansaiLang', lang); } catch(e) {}
   rebuild();
+}
+
+function updateFooter() {
+  document.getElementById('siteFooter').innerHTML =
+    `${t('footerDisclaimer')} ${t('officialRatesLink')} <a href="http://customsgc.gov.my/cgi-bin/exchange.cgi" target="_blank" style="color:var(--ink-mid)">customsgc.gov.my</a>. © ${new Date().getFullYear()} Kansai Group.`;
 }
 
 function updateLangButtons() {
@@ -790,7 +840,7 @@ fetch('cars.json')
   })
   .catch(err => {
     document.getElementById('app').innerHTML =
-      '<div class="loading-screen">Could not load cars.json — make sure it is uploaded in the same folder as index.html.</div>';
+      '<div class="loading-screen">Could not load cars.json — make sure it is uploaded in the same folder as this page.</div>';
     console.error(err);
   });
 
@@ -814,7 +864,7 @@ function buildPage() {
       </div>
     </div>
 
-    <!-- LEFT: Vehicle Table -->
+    <!-- Vehicle Table -->
     <div>
       <div class="card">
         <div class="card-header">
@@ -1000,6 +1050,7 @@ function buildPage() {
   loadRates();
   showEmptyPrompt();
   updateLangButtons();
+  updateFooter();
   refreshCompareBar();
 }
 
@@ -1394,7 +1445,9 @@ function toggleFaq(i) {
 // SELECT & CALCULATE
 // ═══════════════════════════════════════
 function clickRow(bil) {
+  const prev = sel;
   sel = DB.find(c => c[0] === bil) || null;
+  if (!prev || !sel || prev[0] !== sel[0]) resetCarInputs();
   renderTable();
   if (sel) {
     renderCalc();
@@ -1404,33 +1457,35 @@ function clickRow(bil) {
   }
 }
 
-function renderCalc() {
-  if (!sel) return;
-
+function calcValues() {
   const [bil, brand, model, cc, cur] = sel;
   const fob = getFOB(sel);
   const rate = getRate(cur);
   const duty = getDuty(cc);
   const ship = parseFloat(document.getElementById('rShip').value) || 0;
-
   const ovEl = document.getElementById('ovFOB');
   const ov = ovEl ? parseFloat(ovEl.value) : NaN;
   const useFOB = (!isNaN(ov) && ov > 0) ? ov : fob;
-
   const A = useFOB * rate;
   const B = A * 0.015;
   const C = B + ship;
   const D = A + C;
   const E = D * duty.pct;
+  return { bil, brand, model, cc, cur, fob, rate, duty, ship, ov, useFOB, A, B, C, D, E };
+}
+
+// Full render: header, FOB/override box and the (re-renderable) results area.
+function renderCalc() {
+  if (!sel) return;
+  const v = calcValues();
+  const { brand, model, cc, cur, fob, duty, ov } = v;
 
   ['dr0','dr1','dr2','dr3','dr4'].forEach(id => {
     document.getElementById(id).classList.remove('active');
   });
   document.getElementById(duty.row).classList.add('active');
 
-  const ageLabels = t('ageLabels');
-  const ageIdx = parseInt(document.getElementById('sAge').value);
-  const ageLbl = ageLabels[ageIdx];
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
 
   document.getElementById('calcBody').innerHTML = `
     <div class="sel-info">
@@ -1453,6 +1508,23 @@ function renderCalc() {
         value="${(!isNaN(ov) && ov > 0) ? ov : ''}">
     </div>
 
+    <div id="calcDyn"></div>
+  `;
+
+  // Typing in the override box only refreshes the results area below it,
+  // so the box itself keeps focus (fixes the one-digit-at-a-time bug).
+  document.getElementById('ovFOB').addEventListener('input', renderDyn);
+  renderDyn();
+}
+
+// Results area: A-E steps, result, share buttons and Step 2.
+function renderDyn() {
+  if (!sel) return;
+  const v = calcValues();
+  const { bil, brand, cc, cur, rate, duty, ship, useFOB, A, B, C, D, E } = v;
+  const ageLbl = t('ageLabels')[parseInt(document.getElementById('sAge').value)];
+
+  document.getElementById('calcDyn').innerHTML = `
     <div class="calc-steps">
       <div class="step">
         <div class="step-left">
@@ -1505,14 +1577,155 @@ function renderCalc() {
 
     <div class="action-row">
       <button class="btn btn-primary" onclick="window.print()">${t('printPdf')}</button>
-      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil})">${t('copyResultBtn')}</button>
-      <button class="btn btn-ghost" id="shareBtn" onclick="copyShareLink(${bil})">${t('shareLink')}</button>
-      <button class="btn btn-ghost" onclick="sendWhatsApp(${bil})">${t('whatsapp')}</button>
+      <button class="btn btn-ghost" id="copyBtn" onclick="copyResult(${bil}, false)">${t('copyResultBtn')}</button>
+      <button class="btn btn-ghost" id="shareBtn" onclick="copyShareLink(${bil}, false)">${t('shareLink')}</button>
+      <button class="btn btn-ghost" onclick="sendWhatsApp(${bil}, false)">${t('whatsapp')}</button>
       <button class="btn btn-ghost" onclick="clearSel()">${t('clear')}</button>
     </div>
+
+    ${step2Html(cur)}
   `;
 
-  document.getElementById('ovFOB').addEventListener('input', renderCalc);
+  if (S2.open) {
+    const bind = (id, key) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => { S2[key] = el.value; updateStep2(); });
+    };
+    bind('s2Price', 'price');
+    bind('s2Other', 'other');
+    bind('s2Pekema', 'pekema');
+    bind('s2Roadtax', 'roadtax');
+    bind('s2Transport', 'transport');
+    updateStep2();
+  }
+}
+
+// ═══════════════════════════════════════
+// STEP 2 — TOTAL LANDED COST (optional)
+// ═══════════════════════════════════════
+function s2Other() {
+  const n = v => parseFloat(v) || 0;
+  return S2.detail ? n(S2.pekema) + n(S2.roadtax) + n(S2.transport) : n(S2.other);
+}
+
+function s2Totals(v) {
+  const price = parseFloat(S2.price) || 0;
+  const priceRM = price * v.rate;
+  const other = s2Other();
+  return { price, priceRM, other, ap: S2.ap, hasPrice: price > 0, total: priceRM + v.E + S2.ap + other };
+}
+
+function s2TextBlock(v) {
+  const T = s2Totals(v);
+  return `\n\n${t('s2Price')}: ${T.hasPrice ? rm(T.priceRM) : t('s2NotEntered')}` +
+         `\n${t('s2APShort')}: ${rm(T.ap)}` +
+         `\n${t('s2Other')}: ${rm(T.other)}` +
+         `\n${(T.hasPrice ? t('s2Total') : t('s2Partial')).toUpperCase()}: ${rm(T.total)}`;
+}
+
+function step2Html(cur) {
+  if (!S2.open) {
+    return `<button class="btn-step2" onclick="openStep2()">${t('s2Open')}</button>`;
+  }
+  const v = calcValues();
+  const d = S2.detail;
+  const val = k => escapeHtml(S2[k]);
+  return `
+  <div class="step2" id="step2">
+    <div class="step2-head"><span class="step2-badge">2</span>${t('s2Title')}</div>
+
+    <div><div class="s2-line"><span>${t('s2Duty')}</span><span>${rm(v.E)}</span></div></div>
+
+    <div>
+      <label class="field-label">${t('s2Price')} (${cur})</label>
+      <input type="number" class="mono" id="s2Price" min="0" inputmode="decimal" placeholder="${t('s2PricePh')}" value="${val('price')}">
+      <div class="s2-hint" id="s2PriceRM"></div>
+    </div>
+
+    <div>
+      <label class="field-label">${t('s2AP')}</label>
+      <div class="ap-seg">
+        <button class="ap-btn" data-ap="10000" onclick="setAP(10000)">RM 10,000<small>${t('s2APStd')}</small></button>
+        <button class="ap-btn" data-ap="20000" onclick="setAP(20000)">RM 20,000<small>${t('s2APQuota')}</small></button>
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">${t('s2Other')} (RM)</label>
+      <input type="number" class="mono" id="s2Other" min="0" inputmode="decimal" placeholder="${t('s2OtherPh')}" value="${val('other')}" ${d ? 'style="display:none"' : ''}>
+      <div class="s2-detail" style="display:${d ? 'flex' : 'none'}">
+        <input type="number" class="mono" id="s2Pekema" min="0" inputmode="decimal" placeholder="${t('s2Pekema')}" value="${val('pekema')}">
+        <input type="number" class="mono" id="s2Roadtax" min="0" inputmode="decimal" placeholder="${t('s2Roadtax')}" value="${val('roadtax')}">
+        <input type="number" class="mono" id="s2Transport" min="0" inputmode="decimal" placeholder="${t('s2Transport')}" value="${val('transport')}">
+      </div>
+      <button class="s2-link" onclick="toggleDetail()">${d ? t('s2OneBox') : t('s2Breakdown')}</button>
+    </div>
+
+    <div class="s2-total">
+      <div class="s2-total-l" id="s2TotLbl"></div>
+      <div class="s2-total-v" id="s2Total"></div>
+      <div class="s2-warn" id="s2Warn"></div>
+    </div>
+
+    <div>
+      <div class="s2-line"><span>${t('s2Price')}</span><span id="s2bPrice"></span></div>
+      <div class="s2-line"><span>${t('s2Duty')}</span><span id="s2bDuty"></span></div>
+      <div class="s2-line"><span>${t('s2APShort')}</span><span id="s2bAP"></span></div>
+      <div class="s2-line"><span>${t('s2Other')}</span><span id="s2bOther"></span></div>
+    </div>
+
+    <div class="action-row s2-actions">
+      <button class="btn btn-primary" onclick="window.print()">${t('printPdf')}</button>
+      <button class="btn btn-ghost" id="copyBtn2" onclick="copyResult(${v.bil}, true)">${t('copyResultBtn')}</button>
+      <button class="btn btn-ghost" id="shareBtn2" onclick="copyShareLink(${v.bil}, true)">${t('shareLink')}</button>
+      <button class="btn btn-ghost" onclick="sendWhatsApp(${v.bil}, true)">${t('whatsapp')}</button>
+    </div>
+    <button class="s2-link s2-back" onclick="closeStep2()">${t('s2Back')}</button>
+  </div>`;
+}
+
+// Updates only the numbers, never rebuilds inputs, so typing keeps focus.
+function updateStep2() {
+  if (!sel || !S2.open) return;
+  const v = calcValues();
+  const T = s2Totals(v);
+  const g = id => document.getElementById(id);
+  g('s2PriceRM').textContent = T.hasPrice ? t('s2PriceRM')(rm(T.priceRM), v.cur) : '';
+  g('s2TotLbl').textContent = T.hasPrice ? t('s2Total') : t('s2Partial');
+  g('s2Total').textContent = rm(T.total);
+  g('s2Warn').textContent = T.hasPrice ? '' : t('s2PartialWarn');
+  g('s2bPrice').textContent = T.hasPrice ? rm(T.priceRM) : t('s2NotEntered');
+  g('s2bDuty').textContent = rm(v.E);
+  g('s2bAP').textContent = rm(T.ap);
+  g('s2bOther').textContent = rm(T.other);
+  document.querySelectorAll('.ap-btn').forEach(b => b.classList.toggle('on', +b.dataset.ap === S2.ap));
+}
+
+function openStep2() {
+  S2.open = true;
+  renderDyn();
+  const el = document.getElementById('step2');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeStep2() {
+  S2.open = false;
+  renderDyn();
+  document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function setAP(n) {
+  S2.ap = n;
+  try { localStorage.setItem('kansaiAP', JSON.stringify({ amount: n })); } catch (e) {}
+  updateStep2();
+}
+function toggleDetail() {
+  S2.detail = !S2.detail;
+  renderDyn();
+}
+// New car selected (or cleared): car-specific inputs start fresh. AP choice is kept.
+function resetCarInputs() {
+  S2.price = ''; S2.other = ''; S2.pekema = ''; S2.roadtax = ''; S2.transport = ''; S2.detail = false;
+  const ov = document.getElementById('ovFOB');
+  if (ov) ov.value = '';
 }
 
 // ═══════════════════════════════════════
@@ -1541,7 +1754,7 @@ function computeCalc(car) {
 // ═══════════════════════════════════════
 // COPY RESULT TO CLIPBOARD
 // ═══════════════════════════════════════
-function copyResult(bil) {
+function copyResult(bil, full) {
   const car = DB.find(c => c[0] === bil);
   if (!car) return;
   const v = computeCalc(car);
@@ -1559,12 +1772,12 @@ ${t('stepC')} (C): ${rm(v.C)}
 ${t('stepD')} (D): ${rm(v.D)}
 ${t('dutySuffix')}: ${v.duty.lbl}
 
-${t('resultLabel').toUpperCase()}: ${rm(v.E)}
+${t('resultLabel').toUpperCase()}: ${rm(v.E)}${full ? s2TextBlock(v) : ''}
 *${t('dutyNote')}
 
 ${t('printSub')('').split('·')[1]?.trim() || ''}`;
 
-  const btn = document.getElementById('copyBtn');
+  const btn = document.getElementById(full ? 'copyBtn2' : 'copyBtn');
   const showCopied = () => {
     const original = btn.textContent;
     btn.textContent = t('copied');
@@ -1581,7 +1794,7 @@ ${t('printSub')('').split('·')[1]?.trim() || ''}`;
 // ═══════════════════════════════════════
 // SHARE LINK
 // ═══════════════════════════════════════
-function copyShareLink(bil) {
+function copyShareLink(bil, full) {
   const params = new URLSearchParams();
   params.set('car', bil);
   params.set('age', document.getElementById('sAge').value);
@@ -1590,9 +1803,18 @@ function copyShareLink(bil) {
   params.set('aud', document.getElementById('rAUD').value);
   params.set('ship', document.getElementById('rShip').value);
   params.set('lang', LANG);
+  const ovv = parseFloat((document.getElementById('ovFOB') || {}).value);
+  if (ovv > 0) params.set('fob', ovv);
+  if (full) {
+    params.set('s2', '1');
+    params.set('ap', S2.ap);
+    if (parseFloat(S2.price) > 0) params.set('price', S2.price);
+    const o = s2Other();
+    if (o > 0) params.set('oth', o);
+  }
   const url = `${location.origin}${location.pathname}?${params.toString()}`;
 
-  const btn = document.getElementById('shareBtn');
+  const btn = document.getElementById(full ? 'shareBtn2' : 'shareBtn');
   const showCopied = () => {
     const original = btn.textContent;
     btn.textContent = t('linkCopied');
@@ -1609,7 +1831,7 @@ function copyShareLink(bil) {
 // ═══════════════════════════════════════
 // WHATSAPP ENQUIRY
 // ═══════════════════════════════════════
-function sendWhatsApp(bil) {
+function sendWhatsApp(bil, full) {
   const car = DB.find(c => c[0] === bil);
   if (!car) return;
   const v = computeCalc(car);
@@ -1620,7 +1842,7 @@ function sendWhatsApp(bil) {
 `${t('printTitle')}
 ${v.brand} ${v.model}
 ${evLbl} · ${v.cur} · ${ageLbl}
-${t('resultLabel')}: ${rm(v.E)}
+${t('resultLabel')}: ${rm(v.E)}${full ? s2TextBlock(v) : ''}
 *${t('dutyNote')}`;
 
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
@@ -1639,6 +1861,8 @@ function fallbackCopy(text, cb) {
 
 function clearSel() {
   sel = null;
+  S2.open = false;
+  resetCarInputs();
   ['dr0','dr1','dr2','dr3','dr4'].forEach(id => document.getElementById(id).classList.remove('active'));
   document.getElementById('calcBody').innerHTML = `
     <div class="empty">
@@ -1702,11 +1926,22 @@ function applySharedLink() {
   syncBadge();
   saveRates();
 
+  if (params.get('s2') === '1') {
+    S2.open = true;
+    if (['10000', '20000'].includes(params.get('ap'))) S2.ap = +params.get('ap');
+    if (params.has('price')) S2.price = params.get('price');
+    if (params.has('oth')) { S2.other = params.get('oth'); S2.detail = false; }
+  }
+
   document.getElementById('sBrand').value = car[1];
   doFilter();
   sel = car;
   renderTable();
   renderCalc();
+  if (parseFloat(params.get('fob')) > 0) {
+    document.getElementById('ovFOB').value = params.get('fob');
+    renderDyn();
+  }
   setTimeout(() => {
     document.getElementById('calcBody').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
