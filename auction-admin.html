@@ -164,6 +164,7 @@ const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let extraLines = [];
+let auctionsById = {}; // cache so Edit does not need to embed JSON in HTML
 
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function rm(n){ return Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:0,maximumFractionDigits:0}); }
@@ -275,16 +276,21 @@ async function saveAuction(){
     ap_est: parseFloat(document.getElementById('apEst').value)||0,
     extra_lines: cleanExtra,
     deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
-    description: document.getElementById('description').value.trim(),
-    status: 'live'
+    description: document.getElementById('description').value.trim()
   };
 
   const editId = document.getElementById('editId').value;
   const btn = document.getElementById('saveBtn'); btn.textContent='Saving…'; btn.disabled=true;
 
   let error;
-  if(editId){ ({ error } = await sb.from('auctions').update(payload).eq('id', editId)); }
-  else { ({ error } = await sb.from('auctions').insert(payload)); }
+  if(editId){
+    // FIX: editing no longer touches status, so a closed auction stays closed.
+    // Use the Close Now / Reopen buttons to change status.
+    ({ error } = await sb.from('auctions').update(payload).eq('id', editId));
+  } else {
+    payload.status = 'live';
+    ({ error } = await sb.from('auctions').insert(payload));
+  }
 
   btn.disabled=false;
   if(error){ toast('Error: '+error.message); btn.textContent = editId?'Save Changes':'Create Auction'; return; }
@@ -295,7 +301,10 @@ async function saveAuction(){
 
 function resetForm(){
   document.getElementById('editId').value='';
-  ['carName','year','specs','photos','startPrice','dutyEst','apEst','deadline','description'].forEach(id=>document.getElementById(id).value='');
+  // FIX: removed the non-existent 'photos' id that made this function crash
+  ['carName','year','specs','startPrice','dutyEst','apEst','deadline','description'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
   extraLines=[]; renderExtraLines();
   uploadedPhotos=[]; renderPhotoPreview(); document.getElementById('uploadStatus').textContent='';
   document.getElementById('formTitle').textContent='Create New Auction';
@@ -303,7 +312,9 @@ function resetForm(){
   document.getElementById('cancelBtn').style.display='none';
 }
 
-function editAuction(a){
+function editAuction(id){
+  const a = auctionsById[id];
+  if(!a){ toast('Auction not found, refresh the page'); return; }
   document.getElementById('editId').value=a.id;
   document.getElementById('carName').value=a.car_name||'';
   document.getElementById('year').value=a.year||'';
@@ -315,13 +326,12 @@ function editAuction(a){
   document.getElementById('description').value=a.description||'';
   extraLines=(a.extra_lines||[]).map(l=>({label:l.label,amount:l.amount})); renderExtraLines();
   if(a.deadline){ const d=new Date(a.deadline); const off=d.getTimezoneOffset(); const local=new Date(d.getTime()-off*60000); document.getElementById('deadline').value=local.toISOString().slice(0,16); }
+  else { document.getElementById('deadline').value=''; }
   document.getElementById('formTitle').textContent='Edit Auction';
   document.getElementById('saveBtn').textContent='Save Changes';
   document.getElementById('cancelBtn').style.display='inline-block';
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
-async function deleteBid(id){ if(!confirm('Delete this bid? If it is the top bid, the price will drop to the next highest. This cannot be undone.')) return; await sb.from('bids').delete().eq('id',id); toast('Bid deleted'); loadAuctions(); }
 
 async function closeAuction(id){ await sb.from('auctions').update({status:'closed'}).eq('id',id); toast('Auction closed'); loadAuctions(); }
 async function reopenAuction(id){ await sb.from('auctions').update({status:'live'}).eq('id',id); toast('Auction reopened'); loadAuctions(); }
@@ -333,10 +343,12 @@ function copyLink(id){
 }
 
 // ── DELETE A BID (remove fake/troll bids; price drops back automatically) ──
+// FIX: single definition (the old file had two) and it now confirms a row was really deleted.
 async function deleteBid(bidId){
   if(!confirm('Delete this bid? The auction price will drop back to the next highest bid. This cannot be undone.')) return;
-  const { error } = await sb.from('bids').delete().eq('id', bidId);
+  const { data, error } = await sb.from('bids').delete().eq('id', bidId).select();
   if(error){ toast('Error deleting: '+error.message); return; }
+  if(!data || !data.length){ toast('Bid was not deleted. Check staff permissions.'); return; }
   toast('Bid deleted');
   loadAuctions();
 }
@@ -347,6 +359,9 @@ async function loadAuctions(){
   const list = document.getElementById('auctionList');
   if(error){ list.innerHTML=`<div class="bids-empty">Error loading: ${esc(error.message)}</div>`; return; }
   if(!auctions.length){ list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
+
+  auctionsById = {};
+  auctions.forEach(a=>{ auctionsById[a.id]=a; });
 
   // Load all bids (staff can read full details)
   const { data:allBids } = await sb.from('bids').select('*').order('amount',{ascending:false});
@@ -370,7 +385,7 @@ async function loadAuctions(){
       <div class="auction-actions">
         <div class="link-box">${location.origin}/auction-car.html?id=${a.id}</div>
         <button class="btn btn-sm" onclick="copyLink('${a.id}')">Copy Link</button>
-        <button class="btn btn-ghost btn-sm" onclick='editAuction(${JSON.stringify(a).replace(/'/g,"&#39;")})'>Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="editAuction('${a.id}')">Edit</button>
         ${closed?`<button class="btn btn-ghost btn-sm" onclick="reopenAuction('${a.id}')">Reopen</button>`:`<button class="btn btn-ghost btn-sm" onclick="closeAuction('${a.id}')">Close Now</button>`}
         <button class="btn btn-ghost btn-sm" onclick="deleteAuction('${a.id}')" style="color:var(--red)">Delete</button>
       </div>
@@ -381,10 +396,10 @@ async function loadAuctions(){
             ${bids.map((b,i)=>`<tr class="${i===0?'top-bid':''}">
               <td>#${i+1}${i===0?' 🏆':''}</td>
               <td>${esc(b.bidder_name)}</td>
-              <td><a href="https://wa.me/${esc((b.bidder_phone||'').replace(/[^0-9]/g,''))}" target="_blank" style="color:var(--red)">${esc(b.bidder_phone)}</a></td>
+              <td><a href="https://wa.me/${esc((b.bidder_phone||'').replace(/[^0-9]/g,''))}" target="_blank" rel="noopener" style="color:var(--red)">${esc(b.bidder_phone)}</a></td>
               <td class="amt">RM ${rm(b.amount)}</td>
               <td style="color:var(--muted);font-size:12px">${new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
-              <td><button onclick="deleteBid('${'$'}{b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
+              <td><button onclick="deleteBid('${b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
             </tr>`).join('')}
           </tbody>
         </table>
