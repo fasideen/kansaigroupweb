@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Car Auctions — Kansai Group Malaysia</title>
+<meta name="description" content="Bid on Japanese import cars live. See every open auction from Kansai Group Malaysia with current bids and countdown timers.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.kansaigroup.my/auctions.html">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root { --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --navy:#111827; --bg-alt:#F4F5F7; --ink:#111827; --muted:#6B7280; --border:#E5E7EB; --green:#16A34A; --shadow:0 8px 30px rgba(0,0,0,0.08); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { font-family:'Inter',sans-serif; background:var(--bg-alt); color:var(--ink); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { text-decoration:none; color:inherit; }
+  img { display:block; max-width:100%; }
+  nav { background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:40; }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-mark { width:36px; height:36px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:15px; color:#fff; }
+  .logo-t { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; }
+  .nav-back { font-size:13px; color:var(--muted); }
+  .nav-back:hover { color:var(--red); }
+  .wrap { max-width:1100px; margin:0 auto; padding:28px 20px 60px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(230,0,18,0.08); border:1px solid rgba(230,0,18,0.2); color:var(--red); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:6px 14px; border-radius:6px; margin-bottom:14px; font-family:'Rajdhani',sans-serif; }
+  .dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,6vw,56px); letter-spacing:1.5px; line-height:1; }
+  h1 span { color:var(--red); }
+  .sub { font-size:14px; color:var(--muted); line-height:1.6; margin:10px 0 26px; max-width:560px; }
+  h2 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin:40px 0 14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr)); gap:18px; }
+  .card { display:block; background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); transition:transform .2s, box-shadow .2s; min-width:0; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 18px 38px rgba(0,0,0,0.12); }
+  .img { position:relative; width:100%; aspect-ratio:16/11; background:#ECEDF0; overflow:hidden; }
+  .img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .tag { position:absolute; top:10px; left:10px; display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:5px; font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; }
+  .tag-live { background:var(--red); } .tag-live i { width:6px; height:6px; border-radius:50%; background:#fff; animation:pulse 1.2s infinite; }
+  .tag-end { background:var(--muted); }
+  .pc { position:absolute; bottom:10px; right:10px; background:rgba(17,24,39,0.78); color:#fff; font-size:10px; font-weight:600; padding:3px 9px; border-radius:5px; font-family:'JetBrains Mono',monospace; }
+  .body { padding:16px 16px 14px; }
+  .nm { font-family:'Rajdhani',sans-serif; font-size:21px; font-weight:700; line-height:1.15; overflow-wrap:anywhere; }
+  .sp { font-size:12px; color:var(--muted); margin-top:4px; overflow-wrap:anywhere; }
+  .row { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+  .lb { font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:'Rajdhani',sans-serif; }
+  .pr { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1px; line-height:1.1; }
+  .pr small { font-size:13px; color:var(--muted); }
+  .rt { text-align:right; }
+  .cd { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; margin-top:3px; white-space:nowrap; }
+  .cd.soon { color:var(--red); }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; color:var(--muted); }
+  .go { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); }
+  .ended { opacity:.82; } .ended .pr { color:var(--muted); } .ended .go { color:var(--muted); }
+  .msg { text-align:center; padding:56px 20px; background:#fff; border:1px solid var(--border); border-radius:14px; color:var(--muted); font-size:14px; line-height:1.7; }
+  .msg a.btn { display:inline-block; margin-top:16px; background:var(--red); color:#fff; padding:13px 26px; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+  .note { font-size:11px; color:var(--muted); text-align:center; margin-top:36px; line-height:1.6; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo"><div class="logo-mark">KG</div><div class="logo-t">KANSAI GROUP</div></a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="wrap">
+  <div class="badge"><span class="dot"></span>Live Auctions</div>
+  <h1>BID ON <span>JAPAN'S</span> FINEST</h1>
+  <p class="sub">Pick a vehicle, watch the bidding in real time and place your bid in seconds. Highest bid when the timer ends wins the right to buy.</p>
+
+  <div id="liveGrid" class="grid"></div>
+  <div id="liveMsg"></div>
+
+  <div id="endedWrap" style="display:none;">
+    <h2>Recently Ended</h2>
+    <div id="endedGrid" class="grid"></div>
+  </div>
+
+  <p class="note">Bids are offers to purchase and are non-binding until confirmed by Kansai Group Malaysia. We reserve the right to accept or decline any bid.</p>
+</div>
+
+<script>
+const sb = supabase.createClient('https://ieqflqzcurwfyxobprro.supabase.co', 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_');
+const WA = '601151177026';
+let auctions = [], topBid = {}, bidCount = {};
+
+function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function rm(n){ return Number(n||0).toLocaleString('en-MY',{maximumFractionDigits:0}); }
+function isClosed(a){ return a.status==='closed' || (a.deadline && new Date(a.deadline) <= new Date()); }
+function priceOf(a){ return Math.max(Number(topBid[a.id]||0), Number(a.starting_price)||0); }
+
+function countdown(dl){
+  if(!dl) return {t:'Open', soon:false};
+  const diff = new Date(dl).getTime() - Date.now();
+  if(diff<=0) return {t:'Ended', soon:false};
+  const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
+  if(d>0) return {t:`${d}d ${h}h`, soon:false};
+  if(h>0) return {t:`${h}h ${m}m`, soon:diff<36e5*3};
+  return {t:`${m}m ${String(s).padStart(2,'0')}s`, soon:true};
+}
+
+function card(a){
+  const closed = isClosed(a);
+  const photos = (a.photos||[]).map(p=>p&&p.url).filter(Boolean);
+  const cover = photos[0] || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600';
+  const n = bidCount[a.id]||0;
+  const cd = countdown(a.deadline);
+  return `<a class="card${closed?' ended':''}" href="auction-car.html?id=${esc(a.id)}">
+    <div class="img"><img src="${esc(cover)}" alt="${esc(a.car_name)}" loading="lazy">
+      <span class="tag ${closed?'tag-end':'tag-live'}">${closed?'Closed':'<i></i>Live'}</span>
+      ${photos.length>1?`<span class="pc">${photos.length} photos</span>`:''}
+    </div>
+    <div class="body">
+      <div class="nm">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
+      ${a.specs?`<div class="sp">${esc(a.specs)}</div>`:''}
+      <div class="row">
+        <div><div class="lb">${closed?(n?'Winning bid':'Final price'):'Current bid'}</div><div class="pr"><small>RM</small> ${rm(priceOf(a))}</div></div>
+        <div class="rt"><div class="lb">${closed?'Status':'Ends in'}</div><div class="cd${cd.soon&&!closed?' soon':''}" ${closed?'':`data-dl="${esc(a.deadline||'')}"`}>${closed?'Ended':cd.t}</div></div>
+      </div>
+      <div class="foot"><span>${n} bid${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Bid'} →</span></div>
+    </div>
+  </a>`;
+}
+
+function render(){
+  const live = auctions.filter(a=>!isClosed(a)).sort((a,b)=>(a.deadline?new Date(a.deadline):Infinity)-(b.deadline?new Date(b.deadline):Infinity));
+  const ended = auctions.filter(isClosed).sort((a,b)=>new Date(b.deadline||b.created_at)-new Date(a.deadline||a.created_at)).slice(0,6);
+  document.getElementById('liveGrid').innerHTML = live.map(card).join('');
+  document.getElementById('liveMsg').innerHTML = live.length ? '' : `<div class="msg"><strong style="color:var(--ink);font-size:16px;">No auctions are live right now</strong><br>New vehicles are listed regularly. Message us and we'll let you know when the next one opens.<br><a class="btn" href="https://wa.me/${WA}?text=${encodeURIComponent("I'd like to be notified when the next live auction opens.")}">Notify me on WhatsApp</a></div>`;
+  document.getElementById('endedGrid').innerHTML = ended.map(card).join('');
+  document.getElementById('endedWrap').style.display = ended.length ? '' : 'none';
+}
+
+async function load(){
+  const { data, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
+  if(error){ document.getElementById('liveMsg').innerHTML = '<div class="msg">Could not load auctions right now. Please refresh the page.</div>'; console.error(error); return; }
+  auctions = data || [];
+  topBid = {}; bidCount = {};
+  if(auctions.length){
+    const { data:bids } = await sb.from('public_bids').select('auction_id,amount').in('auction_id', auctions.map(a=>a.id));
+    (bids||[]).forEach(b=>{ bidCount[b.auction_id]=(bidCount[b.auction_id]||0)+1; topBid[b.auction_id]=Math.max(topBid[b.auction_id]||0, Number(b.amount)); });
+  }
+  render();
+}
+
+// tick countdowns every second; refresh data every 30s
+setInterval(()=>{
+  document.querySelectorAll('.cd[data-dl]').forEach(el=>{
+    const c = countdown(el.dataset.dl);
+    el.textContent = c.t; el.classList.toggle('soon', c.soon);
+  });
+}, 1000);
+setInterval(load, 30000);
+load();
+</script>
+</body>
+</html>
