@@ -4,865 +4,181 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#111827">
-<title>Live Auction — Kansai Group</title>
+<title>Live Car Auctions — Kansai Group Malaysia</title>
+<meta name="description" content="Bid on Japanese import cars live. See every open auction from Kansai Group Malaysia with current bids and countdown timers.">
 <meta name="robots" content="index, follow">
-<meta name="description" content="Bid live on Japanese import cars from Kansai Group Malaysia. See the current bid, countdown, photos and full specs, then place your bid from your phone.">
+<link rel="canonical" href="https://www.kansaigroup.my/auctions.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Kansai Group Malaysia">
 <meta property="og:locale" content="en_MY">
-<meta property="og:title" content="Live Car Auction — Kansai Group Malaysia">
-<meta property="og:description" content="Bid live on Japanese import cars from Kansai Group Malaysia.">
+<meta property="og:title" content="Live Car Auctions — Kansai Group Malaysia">
+<meta property="og:description" content="Bid on Japanese import cars live. See every open auction with current bids and countdown timers.">
+<meta property="og:url" content="https://www.kansaigroup.my/auctions.html">
 <meta property="og:image" content="https://www.kansaigroup.my/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C;
-    --navy:#111827; --bg:#FFFFFF; --bg-alt:#F4F5F7;
-    --ink:#111827; --muted:#6B7280; --border:#E5E7EB; --green:#16A34A;
-    --shadow:0 8px 30px rgba(0,0,0,0.08);
-  }
+  :root { --red:#E60012; --red-dark:#B3000E; --gold:#C8A23C; --navy:#111827; --bg-alt:#F4F5F7; --ink:#111827; --muted:#6B7280; --border:#E5E7EB; --green:#16A34A; --shadow:0 8px 30px rgba(0,0,0,0.08); }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { -webkit-text-size-adjust:100%; }
   body { font-family:'Inter',sans-serif; background:var(--bg-alt); color:var(--ink); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
-  .bebas { font-family:'Bebas Neue',sans-serif; letter-spacing:1px; }
   a { text-decoration:none; color:inherit; }
   img { display:block; max-width:100%; }
-
   nav { background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; position:sticky; top:0; z-index:40; }
   .logo { display:flex; align-items:center; gap:10px; }
   .logo-mark { width:36px; height:36px; background:var(--red); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:15px; color:#fff; }
   .logo-t { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; }
   .nav-back { font-size:13px; color:var(--muted); }
   .nav-back:hover { color:var(--red); }
-
-  .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
-
-  .live-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(230,0,18,0.08); border:1px solid rgba(230,0,18,0.2); color:var(--red); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:6px 14px; border-radius:6px; margin-bottom:16px; font-family:'Rajdhani',sans-serif; }
-  .live-dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:pulse 1.2s infinite; }
+  .wrap { max-width:1100px; margin:0 auto; padding:28px 20px 60px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(230,0,18,0.08); border:1px solid rgba(230,0,18,0.2); color:var(--red); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:6px 14px; border-radius:6px; margin-bottom:14px; font-family:'Rajdhani',sans-serif; }
+  .dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:pulse 1.2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-  .live-badge.closed { background:var(--bg-alt); border-color:var(--border); color:var(--muted); }
-  .live-badge.closed .live-dot { background:var(--muted); animation:none; }
-
-  /* LAYOUT: minmax(0,…) and min-width:0 stop wide content (photo thumbnails) from stretching the columns */
-  .grid { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:28px; align-items:start; }
-  .grid > * { min-width:0; }
-
-  /* GALLERY: the photo is absolutely placed inside a fixed-ratio box, so its size can never follow the file size */
-  .gallery { background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); max-width:100%; }
-  .gallery-main { position:relative; width:100%; aspect-ratio:16/11; max-height:520px; background:#ECEDF0; overflow:hidden; }
-  .gallery-main img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-drag:none; }
-  .gnav { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; border:none; font-size:22px; line-height:1; z-index:2; }
-  .gnav.prev { left:12px; } .gnav.next { right:12px; }
-  .gnav:hover { background:#fff; }
-  .gcount { position:absolute; bottom:12px; right:12px; background:rgba(17,24,39,0.8); color:#fff; font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; font-family:'JetBrains Mono',monospace; z-index:2; }
-  .thumbs { display:flex; gap:8px; padding:12px; overflow-x:auto; max-width:100%; }
-  .thumb { flex:0 0 74px; width:74px; height:56px; border-radius:8px; overflow:hidden; cursor:pointer; border:2px solid transparent; user-select:none; }
-  .thumb.active { border-color:var(--red); }
-  .thumb img { width:100%; height:100%; object-fit:cover; pointer-events:none; }
-
-  .panel { background:#fff; border:1px solid var(--border); border-radius:14px; padding:22px; box-shadow:var(--shadow); }
-  .car-name { font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:700; line-height:1.1; overflow-wrap:anywhere; }
-  .car-specs { font-size:13px; color:var(--muted); margin-top:6px; overflow-wrap:anywhere; }
-
-  .price-block { background:var(--navy); border-radius:12px; padding:20px; margin:20px 0; text-align:center; overflow:hidden; }
-  .price-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.5); font-family:'Rajdhani',sans-serif; }
-  .price-value { font-family:'Bebas Neue',sans-serif; font-size:46px; color:#fff; line-height:1; margin-top:6px; letter-spacing:1px; }
-  .price-value .cur { font-size:20px; color:var(--gold); }
-  .price-value.bumped { animation:priceFlash 0.6s ease; }
-  @keyframes priceFlash { 0%{color:var(--gold);} 100%{color:#fff;} }
-  .price-sub { font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px; }
-  .bid-count { color:var(--gold); font-weight:600; }
-
-  .timer { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
-  .timer-seg { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 10px; min-width:52px; text-align:center; }
-  .timer-num { font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:#fff; line-height:1; }
-  .timer-lbl { font-size:8px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.4); margin-top:4px; font-weight:600; }
-  .timer-ended { color:var(--red); font-family:'Rajdhani',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-size:14px; padding:10px; }
-  .winner-box { margin-top:14px; padding:16px; background:rgba(200,162,60,0.1); border:1px solid rgba(200,162,60,0.3); border-radius:10px; }
-  .winner-label { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); }
-  .winner-name { font-family:'Bebas Neue',sans-serif; font-size:28px; color:#fff; letter-spacing:1px; margin-top:4px; }
-  .winner-amount { font-family:'JetBrains Mono',monospace; font-size:14px; color:rgba(255,255,255,0.85); font-weight:600; margin-top:2px; }
-  .winner-note { font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px; line-height:1.5; }
-
-  .estimates { margin:20px 0; }
-  .est-title { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; font-family:'Rajdhani',sans-serif; }
-  .est-row { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; }
-  .est-row .val { font-family:'JetBrains Mono',monospace; font-weight:600; white-space:nowrap; }
-  .est-note { font-size:10px; color:var(--muted); margin-top:8px; line-height:1.5; }
-  .est-total { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px; margin-top:10px; background:var(--navy); border-radius:10px; }
-  .est-total .tlabel { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:#fff; }
-  .est-total .tval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:var(--gold); letter-spacing:1px; white-space:nowrap; }
-  .est-total .tval .cur { font-size:13px; color:rgba(255,255,255,0.7); }
-
-  .bid-btn { width:100%; background:var(--red); color:#fff; border:none; border-radius:10px; padding:16px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:background 0.15s; }
-  .bid-btn:hover { background:var(--red-dark); }
-  .bid-btn:disabled { background:var(--muted); cursor:not-allowed; }
-
-  .feed { margin-top:20px; }
-  .feed-title { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; font-family:'Rajdhani',sans-serif; display:flex; justify-content:space-between; }
-  .feed-item { display:flex; align-items:center; justify-content:space-between; padding:11px 14px; background:var(--bg-alt); border-radius:9px; margin-bottom:8px; }
-  .feed-bidder { display:flex; align-items:center; gap:10px; }
-  .feed-avatar { width:30px; height:30px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; font-family:'Rajdhani',sans-serif; }
-  .feed-name { font-size:13px; font-weight:600; }
-  .feed-time { font-size:11px; color:var(--muted); }
-  .feed-amount { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; }
-  .feed-amount.top { color:var(--green); }
-  .feed-empty { text-align:center; padding:24px; color:var(--muted); font-size:13px; }
-
-  .modal-overlay { position:fixed; inset:0; background:rgba(17,24,39,0.6); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; z-index:100; padding:20px; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:#fff; border-radius:16px; max-width:420px; width:100%; max-height:92vh; overflow-y:auto; padding:28px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
-  .modal-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; }
-  .modal-sub { font-size:13px; color:var(--muted); margin:4px 0 20px; }
-  .modal-field { margin-bottom:14px; }
-  .modal-field label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink); display:block; margin-bottom:6px; }
-  .modal-field input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:9px; font-size:16px; font-family:'Inter',sans-serif; background:var(--bg-alt); outline:none; }
-  .modal-field input:focus { border-color:var(--red); background:#fff; }
-  .modal-field input.mono { font-family:'JetBrains Mono',monospace; }
-  .quick-bumps { display:flex; gap:8px; margin-top:8px; }
-  .quick-bumps button { flex:1; padding:9px; border:1.5px solid var(--border); background:#fff; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; color:var(--red); cursor:pointer; }
-  .quick-bumps button:hover { border-color:var(--red); background:rgba(230,0,18,0.04); }
-  .modal-hint { font-size:11px; color:var(--muted); margin-top:5px; }
-  .modal-actions { display:flex; gap:10px; margin-top:20px; }
-  .modal-actions button { flex:1; padding:13px; border-radius:9px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; border:1.5px solid transparent; }
-  .modal-cancel { background:#fff; color:var(--muted); border-color:var(--border); }
-  .modal-submit { background:var(--red); color:#fff; }
-  .modal-submit:hover { background:var(--red-dark); }
-  .modal-submit:disabled { background:var(--muted); cursor:wait; }
-  .modal-consent { font-size:10.5px; color:var(--muted); line-height:1.5; margin-top:14px; }
-  .known-bidder-bar { display:flex; align-items:center; justify-content:space-between; background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.25); border-radius:9px; padding:10px 14px; margin-bottom:14px; font-size:13px; }
-  .known-bidder-bar button { background:none; border:none; color:var(--red); font-size:12px; font-weight:600; cursor:pointer; text-decoration:underline; }
-  .modal-error { background:rgba(230,0,18,0.06); border:1px solid rgba(230,0,18,0.2); color:var(--red); font-size:12px; padding:10px 12px; border-radius:8px; margin-top:12px; display:none; }
-  .modal-success { text-align:center; padding:10px 0; }
-  .modal-success .check { width:56px; height:56px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
-
-  .loading { text-align:center; padding:80px 20px; color:var(--muted); font-size:15px; }
-  .disclaimer { font-size:11px; color:var(--muted); text-align:center; margin-top:32px; line-height:1.6; max-width:600px; margin-left:auto; margin-right:auto; }
-
-  @media (max-width:860px) {
-    .grid { grid-template-columns:minmax(0,1fr); gap:20px; }
-    .wrap { padding:16px 14px 48px; }
-    .panel { padding:18px; }
-    .price-value { font-size:40px; }
-  }
-
-  /* ===== v3: details card, mobile order, sticky bar, slider, viewer ===== */
-  .crumbs { font-size:12px; color:var(--muted); margin-bottom:14px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
-  .crumbs a { padding:6px 0; } .crumbs a:hover { color:var(--red); } .crumbs .cur { color:var(--ink); overflow-wrap:anywhere; }
+  h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,6vw,56px); letter-spacing:1.5px; line-height:1; }
+  h1 span { color:var(--red); }
+  .sub { font-size:14px; color:var(--muted); line-height:1.6; margin:10px 0 26px; max-width:560px; }
+  h2 { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin:40px 0 14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr)); gap:18px; }
+  .card { display:block; background:#fff; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); transition:transform .2s, box-shadow .2s; min-width:0; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 18px 38px rgba(0,0,0,0.12); }
+  .img { position:relative; width:100%; aspect-ratio:16/11; background:#ECEDF0; overflow:hidden; }
+  .img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .tag { position:absolute; top:10px; left:10px; display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:5px; font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; }
+  .tag-live { background:var(--red); } .tag-live i { width:6px; height:6px; border-radius:50%; background:#fff; animation:pulse 1.2s infinite; }
+  .tag-end { background:var(--muted); }
+  .pc { position:absolute; bottom:10px; right:10px; background:rgba(17,24,39,0.78); color:#fff; font-size:10px; font-weight:600; padding:3px 9px; border-radius:5px; font-family:'JetBrains Mono',monospace; }
+  .body { padding:16px 16px 14px; }
+  .nm { font-family:'Rajdhani',sans-serif; font-size:21px; font-weight:700; line-height:1.15; overflow-wrap:anywhere; }
+  .sp { font-size:12px; color:var(--muted); margin-top:4px; overflow-wrap:anywhere; }
+  .row { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+  .lb { font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:'Rajdhani',sans-serif; }
+  .pr { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1px; line-height:1.1; }
+  .pr small { font-size:13px; color:var(--muted); }
+  .rt { text-align:right; }
+  .cd { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; margin-top:3px; white-space:nowrap; }
+  .cd.soon { color:var(--red); }
+  .foot { display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; color:var(--muted); }
+  .go { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); }
+  .ended { opacity:.82; } .ended .pr { color:var(--muted); } .ended .go { color:var(--muted); }
+  .msg { text-align:center; padding:56px 20px; background:#fff; border:1px solid var(--border); border-radius:14px; color:var(--muted); font-size:14px; line-height:1.7; }
+  .msg a.btn { display:inline-block; margin-top:16px; background:var(--red); color:#fff; padding:13px 26px; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+  .note { font-size:11px; color:var(--muted); text-align:center; margin-top:36px; line-height:1.6; }
   .nav-back { padding:12px 0; }
-  .col-left .c-d, .col-right .c-b { margin-top:18px; }
-  .c-b .estimates { margin-top:0; }
-  .gallery-main { cursor:zoom-in; touch-action:pan-y; }
-  .zoom-hint { position:absolute; bottom:12px; left:12px; background:rgba(17,24,39,0.8); color:#fff; font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; z-index:2; pointer-events:none; }
-  .gnav { width:44px; height:44px; }
-  .thumbs { position:relative; scrollbar-width:none; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; }
-  .thumbs::-webkit-scrollbar { display:none; }
-  .thumb { scroll-snap-align:center; }
-  .details { background:#fff; border:1px solid var(--border); border-radius:14px; padding:22px; box-shadow:var(--shadow); }
-  .sec-h { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
-  .d-intro { margin-bottom:18px; }
-  .d-line { font-size:14px; line-height:1.6; margin-bottom:6px; overflow-wrap:anywhere; }
-  .d-list { list-style:none; columns:2; column-gap:28px; }
-  .d-list li { break-inside:avoid; position:relative; padding:10px 0 10px 22px; border-bottom:1px solid var(--border); font-size:13.5px; line-height:1.5; overflow-wrap:anywhere; }
-  .d-list li::before { content:''; position:absolute; left:2px; top:17px; width:8px; height:8px; border-radius:50%; background:var(--red); }
-  .d-list li.extra { display:none; } .d-list.open li.extra { display:list-item; }
-  .d-more { margin-top:14px; width:100%; min-height:46px; background:var(--bg-alt); border:1px solid var(--border); border-radius:9px; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; color:var(--ink); }
-  .status-banner { border-radius:10px; padding:12px 14px; font-size:13px; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .status-banner.win { background:rgba(22,163,74,0.1); border:1px solid rgba(22,163,74,0.3); color:#166534; }
-  .status-banner.out { background:rgba(230,0,18,0.07); border:1px solid rgba(230,0,18,0.25); color:var(--red-dark); }
-  .status-banner button { background:var(--red); color:#fff; border:none; border-radius:7px; min-height:40px; padding:0 14px; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; white-space:nowrap; }
-  .ends-at { font-size:11px; color:rgba(255,255,255,0.55); margin-top:10px; }
-  .bid-btn { min-height:52px; }
-  .quick-bumps button { min-height:44px; } .modal-actions button { min-height:48px; }
-  .actions2 { display:flex; gap:10px; margin-top:12px; }
-  .actions2 a, .actions2 button { flex:1; display:flex; align-items:center; justify-content:center; min-height:46px; border:1.5px solid var(--border); border-radius:10px; background:#fff; color:var(--ink); font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; text-align:center; }
-  .actions2 a.wa { background:#25D366; border-color:#25D366; color:#fff; }
-  .sticky-bar { display:none; }
-  .more { margin-top:36px; }
-  .more-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom:14px; }
-  .more-head h2 { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1px; line-height:1; }
-  .more-r { display:flex; align-items:center; gap:10px; }
-  .more-r a { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--red); white-space:nowrap; padding:10px 0; }
-  .sl-btn { display:none; width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:#fff; font-size:20px; cursor:pointer; align-items:center; justify-content:center; }
-  .slider { display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:4px 2px 12px; scrollbar-width:none; }
-  .slider::-webkit-scrollbar { display:none; }
-  .mc { flex:0 0 min(78%,260px); scroll-snap-align:start; background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
-  .mi { position:relative; aspect-ratio:16/11; background:#ECEDF0; overflow:hidden; }
-  .mi img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .mt { position:absolute; top:8px; left:8px; background:var(--red); color:#fff; font-family:'Rajdhani',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; border-radius:5px; }
-  .mb { padding:12px 13px 13px; }
-  .mn { font-family:'Rajdhani',sans-serif; font-size:17px; font-weight:700; line-height:1.15; overflow-wrap:anywhere; }
-  .mr { display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px; gap:8px; }
-  .ml { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:'Rajdhani',sans-serif; }
-  .mp { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; } .mp small { font-size:11px; color:var(--muted); }
-  .mcd { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; white-space:nowrap; }
-  .mg { display:block; margin-top:10px; text-align:center; background:var(--red); color:#fff; border-radius:8px; padding:12px; font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-  .lb { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.94); display:none; align-items:center; justify-content:center; touch-action:pan-y; }
-  .lb.open { display:flex; }
-  .lb img { max-width:100%; max-height:100%; object-fit:contain; user-select:none; -webkit-user-drag:none; }
-  .lb button { position:absolute; background:rgba(255,255,255,0.16); color:#fff; border:none; border-radius:50%; width:48px; height:48px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .lb .lx { top:calc(12px + env(safe-area-inset-top,0px)); right:12px; } .lb .lp { left:12px; top:50%; transform:translateY(-50%); } .lb .ln { right:12px; top:50%; transform:translateY(-50%); }
-  .lb .lc { position:absolute; bottom:calc(16px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); color:#fff; font-family:'JetBrains Mono',monospace; font-size:12px; background:rgba(0,0,0,0.55); padding:4px 12px; border-radius:12px; }
-  @media (min-width:861px) { .sl-btn { display:inline-flex; } .mc { flex-basis:260px; } }
-  @media (max-width:860px) {
-    .col-left, .col-right { display:contents; }
-    .c-g { order:1; } .c-t { order:2; } .c-d { order:3; } .c-b { order:4; }
-    .grid .c-g, .grid .c-t, .grid .c-d, .grid .c-b { min-width:0; margin-top:0; }
-    .details { padding:18px; } .d-list { columns:1; }
-    .more-head h2 { font-size:26px; }
-    .sticky-bar { position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex; align-items:center; gap:12px; padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px)); background:rgba(17,24,39,0.97); color:#fff; box-shadow:0 -6px 24px rgba(0,0,0,0.25); transition:transform .25s; }
-    .sticky-bar.hide { transform:translateY(115%); }
-    .sb-l { flex:1; min-width:0; }
-    .sb-lbl { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.55); font-family:'Rajdhani',sans-serif; font-weight:700; }
-    .sb-pr { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; line-height:1.05; } .sb-pr small { font-size:12px; color:var(--gold); }
-    .sb-tm { font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(255,255,255,0.7); }
-    .sticky-bar button { background:var(--red); color:#fff; border:none; border-radius:10px; min-height:48px; padding:0 26px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
-    body.has-sticky { padding-bottom:calc(86px + env(safe-area-inset-bottom,0px)); }
-    .modal-overlay { align-items:flex-end; padding:0; }
-    .modal { max-width:none; border-radius:18px 18px 0 0; max-height:92vh; max-height:92dvh; padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px)); animation:sheet .25s ease; }
-    @keyframes sheet { from { transform:translateY(40px); opacity:0; } to { transform:none; opacity:1; } }
-  }
+  @media (max-width:600px) { .wrap { padding:20px 14px 48px; } .pr { font-size:28px; } .go { padding:6px 0; } }
 </style>
 </head>
 <body>
-
 <nav>
-  <a href="index.html" class="logo">
-    <div class="logo-mark">KG</div>
-    <div class="logo-t">KANSAI GROUP</div>
-  </a>
-  <a href="auctions.html" class="nav-back">← All auctions</a>
+  <a href="index.html" class="logo"><div class="logo-mark">KG</div><div class="logo-t">KANSAI GROUP</div></a>
+  <a href="index.html" class="nav-back">← Back to site</a>
 </nav>
 
-<noscript><div style="padding:60px 20px;text-align:center;color:#6B7280;font-size:15px;line-height:1.7;">This auction page needs JavaScript to show live bids.<br><a href="auctions.html" style="color:#E60012;font-weight:600;">See all live auctions</a> or <a href="https://wa.me/601151177026" style="color:#E60012;font-weight:600;">WhatsApp Kansai Group</a>.</div></noscript>
-<div class="wrap" id="wrap">
-  <div class="loading" id="loading">Loading auction…</div>
-</div>
+<noscript><div style="padding:60px 20px;text-align:center;color:#6B7280;font-size:15px;line-height:1.7;">This page needs JavaScript to show live auctions.<br><a href="https://wa.me/601151177026" style="color:#E60012;font-weight:600;">WhatsApp Kansai Group</a> for the current list.</div></noscript>
+<div class="wrap">
+  <div class="badge"><span class="dot"></span>Live Auctions</div>
+  <h1>BID ON <span>JAPAN'S</span> FINEST</h1>
+  <p class="sub">Pick a vehicle, watch the bidding in real time and place your bid in seconds. Highest bid when the timer ends wins the right to buy.</p>
 
-<div class="modal-overlay" id="bidModal">
-  <div class="modal" id="modalInner"></div>
+  <div id="liveGrid" class="grid"></div>
+  <div id="liveMsg"></div>
+
+  <div id="endedWrap" style="display:none;">
+    <h2>Recently Ended</h2>
+    <div id="endedGrid" class="grid"></div>
+  </div>
+
+  <p class="note">Bids are offers to purchase and are non-binding until confirmed by Kansai Group Malaysia. We reserve the right to accept or decline any bid.</p>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Must match min_increment in the database function validate_bid()
-const MIN_INCREMENT = 500;
-
-let auction = null;
-let bids = [];
-let photos = [];
-let curPhoto = 0;
-let timerInterval = null;
-let pollInterval = null;
+const sb = supabase.createClient('https://ieqflqzcurwfyxobprro.supabase.co', 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_');
+const WA = '601151177026';
+let auctions = [], topBid = {}, bidCount = {};
 
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function rm(n){ return Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:0,maximumFractionDigits:0}); }
-function getAuctionId(){ return new URLSearchParams(location.search).get('id'); }
-function setLoading(msg){ const l=document.getElementById('loading'); if(l) l.textContent=msg; }
+function rm(n){ return Number(n||0).toLocaleString('en-MY',{maximumFractionDigits:0}); }
+function isClosed(a){ return a.status==='closed' || (a.deadline && new Date(a.deadline) <= new Date()); }
+function priceOf(a){ return Math.max(Number(topBid[a.id]||0), Number(a.starting_price)||0); }
 
-async function loadAuction(){
-  const id = getAuctionId();
-  if(!id){ setLoading('No auction specified.'); return; }
-
-  const { data, error } = await sb.from('auctions').select('*').eq('id', id).single();
-  if(error || !data){ setLoading('Auction not found.'); return; }
-  auction = data;
-  photos = (auction.photos||[]).map(p=>p && p.url).filter(Boolean);
-  if(!photos.length) photos = ['https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800'];
-
-  await loadBids();
-  renderPage();
-  startTimer();
-  loadOthers(); setInterval(loadOthers, 30000);
-  pollInterval = setInterval(async ()=>{
-    if(isClosed()){
-      clearInterval(pollInterval); pollInterval=null;
-      if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
-      await loadBids();
-      renderPage();
-      return;
-    }
-    await loadBids();
-    refreshLiveBits();
-  }, 5000);
+function countdown(dl){
+  if(!dl) return {t:'Open', soon:false};
+  const diff = new Date(dl).getTime() - Date.now();
+  if(diff<=0) return {t:'Ended', soon:false};
+  const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
+  if(d>0) return {t:`${d}d ${h}h`, soon:false};
+  if(h>0) return {t:`${h}h ${m}m`, soon:diff<36e5*3};
+  return {t:`${m}m ${String(s).padStart(2,'0')}s`, soon:true};
 }
 
-async function loadBids(){
-  // Reads the PUBLIC-SAFE view: no names or phones here
-  const { data } = await sb.from('public_bids').select('*').eq('auction_id', auction.id).order('amount',{ascending:false});
-  bids = data || [];
-}
-
-function currentPrice(){
-  const top = bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : 0;
-  return Math.max(top, Number(auction.starting_price)||0);
-}
-function extrasTotal(){
-  let t = Number(auction.duty_est||0) + Number(auction.ap_est||0);
-  (auction.extra_lines||[]).forEach(l=>{ t += Number(l.amount||0); });
-  return t;
-}
-function landedTotal(bid){ return Number(bid||0) + extrasTotal(); }
-function topBidderLabel(){
-  if(!bids.length) return '';
-  const top = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount))[0];
-  return top.bidder_label || 'Bidder';
-}
-function isClosed(){
-  if(auction.status === 'closed') return true;
-  if(auction.deadline && new Date(auction.deadline) < new Date()) return true;
-  return false;
-}
-
-function pageUrl(){ return location.origin + location.pathname + '?id=' + encodeURIComponent(auction.id); }
-function endsAtText(closed){
-  if(!auction.deadline) return '';
-  const d = new Date(auction.deadline).toLocaleString('en-MY',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
-  return (closed?'Ended ':'Ends ') + d;
-}
-
-// Split the description into an intro and a bullet list (text is split on the "•" character)
-function parseDetails(raw){
-  const text = String(raw||'').replace(/\r/g,'').trim();
-  if(!text) return null;
-  let intro = text, items = [], title = 'Highlights';
-  if(text.indexOf('•') > -1){
-    const parts = text.split('•').map(x=>x.trim()).filter(Boolean);
-    intro = text.charAt(0)==='•' ? '' : parts.shift();
-    items = parts;
-    const m = intro.match(/\b([A-Z][A-Z &\/]{3,}?(?:HIGHLIGHTS|FEATURES|SPECIFICATIONS?|EQUIPMENT))\s*:?\s*$/);
-    if(m){ title = m[1].toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()); intro = intro.slice(0,m.index).trim(); }
-  }
-  return { intro, items, title };
-}
-function introHtml(t){
-  return t.replace(/\s+(Exterior|Interior|Mileage|Colour|Color|Engine|Transmission|Drive|Chassis)\s*:/g,'\n$1:')
-    .split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
-      const m = l.match(/^([A-Za-z ]{3,14}):\s*(.*)$/);
-      return m ? `<div class="d-line"><strong>${esc(m[1])}:</strong> ${esc(m[2])}</div>` : `<div class="d-line">${esc(l)}</div>`;
-    }).join('');
-}
-function toggleSpecs(){
-  const l=document.getElementById('dList'), b=document.getElementById('dMore'); if(!l||!b) return;
-  const open = l.classList.toggle('open');
-  b.textContent = open ? 'Show fewer specs' : `Show all ${l.children.length} specs`;
-}
-
-function renderPage(){
-  const closed = isClosed();
-  const price = currentPrice();
-  const extraLines = auction.extra_lines || [];
-  const nm = [auction.car_name, auction.year].filter(Boolean).join(' ');
-  const D = parseDetails(auction.description);
-  curPhoto = 0;
-
-  const detailsHtml = D ? `<section class="details" id="details" aria-label="Vehicle details">
-      <h2 class="sec-h">Vehicle Details</h2>
-      ${D.intro?`<div class="d-intro">${introHtml(D.intro)}</div>`:''}
-      ${D.items.length?`<h3 class="sec-h">${esc(D.title)}</h3>
-        <ul class="d-list" id="dList">${D.items.map((t,i)=>`<li${i>=8?' class="extra"':''}>${esc(t)}</li>`).join('')}</ul>
-        ${D.items.length>8?`<button type="button" class="d-more" id="dMore" onclick="toggleSpecs()">Show all ${D.items.length} specs</button>`:''}`:''}
-    </section>` : '';
-
-  document.getElementById('wrap').innerHTML = `
-    <div class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span>›</span><a href="auctions.html">Live Auctions</a><span>›</span><span class="cur">${esc(nm)}</span></div>
-    <div class="${closed?'live-badge closed':'live-badge'}">
-      <span class="live-dot"></span>${closed?'Auction Closed':'Live Auction'}
+function card(a){
+  const closed = isClosed(a);
+  const photos = (a.photos||[]).map(p=>p&&p.url).filter(Boolean);
+  const cover = photos[0] || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600';
+  const n = bidCount[a.id]||0;
+  const cd = countdown(a.deadline);
+  return `<a class="card${closed?' ended':''}" href="auction-car.html?id=${esc(a.id)}">
+    <div class="img"><img src="${esc(cover)}" alt="${esc(a.car_name)}" loading="lazy">
+      <span class="tag ${closed?'tag-end':'tag-live'}">${closed?'Closed':'<i></i>Live'}</span>
+      ${photos.length>1?`<span class="pc">${photos.length} photos</span>`:''}
     </div>
-    <div class="grid">
-      <div class="col-left">
-        <div class="c-g">
-          <div class="gallery">
-            <div class="gallery-main">
-              <img id="mainImg" src="${esc(photos[0])}" alt="${esc(nm)} photo 1 of ${photos.length}" onclick="openLightbox()">
-              <span class="zoom-hint">⤢ Tap to enlarge</span>
-              ${photos.length>1?`
-                <button class="gnav prev" onclick="prevPhoto()" aria-label="Previous photo">‹</button>
-                <button class="gnav next" onclick="nextPhoto()" aria-label="Next photo">›</button>
-                <div class="gcount"><span id="gcur">1</span> / ${photos.length}</div>
-              `:''}
-            </div>
-            ${photos.length>1?`<div class="thumbs" id="thumbs">${photos.map((p,i)=>`
-              <div class="thumb ${i===0?'active':''}" onclick="setPhoto(${i})"><img src="${esc(p)}" alt="${esc(nm)} thumbnail ${i+1}" loading="lazy"></div>
-            `).join('')}</div>`:''}
-          </div>
-        </div>
-        <div class="c-d">${detailsHtml}</div>
+    <div class="body">
+      <div class="nm">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
+      ${a.specs?`<div class="sp">${esc(a.specs)}</div>`:''}
+      <div class="row">
+        <div><div class="lb">${closed?(n?'Winning bid':'Final price'):'Current bid'}</div><div class="pr"><small>RM</small> ${rm(priceOf(a))}</div></div>
+        <div class="rt"><div class="lb">${closed?'Status':'Ends in'}</div><div class="cd${cd.soon&&!closed?' soon':''}" ${closed?'':`data-dl="${esc(a.deadline||'')}"`}>${closed?'Ended':cd.t}</div></div>
       </div>
-
-      <div class="col-right">
-        <div class="c-t panel">
-          <h1 class="car-name">${esc(auction.car_name)}${auction.year?' · '+esc(auction.year):''}</h1>
-          ${auction.specs?`<div class="car-specs">${esc(auction.specs)}</div>`:''}
-          <div id="bidStatus" style="margin-top:14px"></div>
-          <div class="price-block">
-            <div class="price-label">${closed?'Winning Bid':'Current Bid'}</div>
-            <div class="price-value bebas" id="priceValue"><span class="cur">RM</span> ${rm(price)}</div>
-            <div class="price-sub"><span class="bid-count" id="bidCount">${bids.length}</span> bid${bids.length===1?'':'s'} · Starting RM ${rm(auction.starting_price)}</div>
-            ${closed ? `
-              <div class="winner-box">
-                ${bids.length ? `
-                  <div class="winner-label">🏆 Auction Won By</div>
-                  <div class="winner-name">${esc(topBidderLabel())}</div>
-                  <div class="winner-amount">Winning bid: RM ${rm(price)}</div>
-                  <div class="winner-note">If this is you, our team will contact you shortly. Otherwise, thank you for participating.</div>
-                ` : `
-                  <div class="timer-ended">Auction ended — no bids received</div>
-                `}
-              </div>
-            ` : '<div id="timerZone"><div class="timer" id="timer"></div></div>'}
-            ${endsAtText(closed)?`<div class="ends-at">${esc(endsAtText(closed))}</div>`:''}
-          </div>
-          <button class="bid-btn" id="bidBtn" ${closed?'disabled':''} onclick="openModal()">${closed?'Auction Closed':'Place Your Bid'}</button>
-          <div class="actions2">
-            <button type="button" onclick="shareAuction()">Share</button>
-            <a class="wa" target="_blank" rel="noopener" href="https://wa.me/601151177026?text=${encodeURIComponent('Hi Kansai Group, I have a question about the '+nm+' ('+pageUrl()+')')}">Ask about this car</a>
-          </div>
-        </div>
-
-        <div class="c-b panel">
-          <div class="estimates">
-            <div class="est-title">Estimated Landed Cost Breakdown</div>
-            <div class="est-row"><span>Current Bid (vehicle body price)</span><span class="val" id="estBidLine">RM ${rm(price)}</span></div>
-            ${auction.duty_est?`<div class="est-row"><span>Import Duty (est.)</span><span class="val">RM ${rm(auction.duty_est)}</span></div>`:''}
-            ${auction.ap_est?`<div class="est-row"><span>AP Cost (est.)</span><span class="val">RM ${rm(auction.ap_est)}</span></div>`:''}
-            ${extraLines.map(l=>`<div class="est-row"><span>${esc(l.label)}</span><span class="val">RM ${rm(l.amount)}</span></div>`).join('')}
-            <div class="est-total">
-              <span class="tlabel">Est. Total Landed Cost</span>
-              <span class="tval" id="estTotal"><span class="cur">RM</span> ${rm(landedTotal(price))}</span>
-            </div>
-            <div class="est-note">*Estimates only, provided as a guide. Import duty, AP and other costs are approximate and confirmed by Kansai Group. Total updates as the bid changes.</div>
-          </div>
-          <div class="feed">
-            <div class="feed-title"><span>Bid Activity</span><span style="color:var(--green)">● live</span></div>
-            <div id="feedList"></div>
-          </div>
-        </div>
-      </div>
+      <div class="foot"><span>${n} bid${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Bid'} →</span></div>
     </div>
-
-    <section class="more" id="moreSec" style="display:none" aria-label="More cars up for bidding">
-      <div class="more-head"><h2>More cars up for bidding</h2>
-        <div class="more-r"><button type="button" class="sl-btn" aria-label="Scroll left" onclick="slideBy(-1)">‹</button><button type="button" class="sl-btn" aria-label="Scroll right" onclick="slideBy(1)">›</button><a href="auctions.html">View all →</a></div>
-      </div>
-      <div class="slider" id="moreSlider"></div>
-    </section>
-
-    <div class="disclaimer">
-      This listing is operated by Kansai Group Malaysia. Bids are offers to purchase and are non-binding until confirmed by Kansai Group. We reserve the right to accept or decline any bid.
-    </div>
-
-    ${closed?'':`<div class="sticky-bar" id="stickyBar">
-      <div class="sb-l"><div class="sb-lbl">Current bid</div><div class="sb-pr" id="stickyPrice"><small>RM</small> ${rm(price)}</div><div class="sb-tm" id="stickyTime"></div></div>
-      <button type="button" onclick="openModal()">Place Bid</button>
-    </div>`}
-  `;
-  document.body.classList.toggle('has-sticky', !closed);
-  renderFeed(); renderBidStatus(); updateSEO(); setupSticky(closed); renderMore();
-  addSwipe(document.querySelector('.gallery-main'));
+  </a>`;
 }
 
-// ── "You're winning / outbid" banner (remembers this device's bids per auction) ──
-let memBids = {};
-function readMine(){
-  let all = {};
-  try { all = JSON.parse(localStorage.getItem('kansaiMyBids')||'{}'); } catch(e){}
-  return (all[auction.id]||[]).concat(memBids[auction.id]||[]).map(Number);
-}
-function rememberBid(amount){
-  (memBids[auction.id] = memBids[auction.id]||[]).push(amount);
-  try { const all = JSON.parse(localStorage.getItem('kansaiMyBids')||'{}'); (all[auction.id] = all[auction.id]||[]).push(amount); localStorage.setItem('kansaiMyBids', JSON.stringify(all)); } catch(e){}
-}
-function renderBidStatus(){
-  const el = document.getElementById('bidStatus'); if(!el) return;
-  const live = bids.map(b=>Number(b.amount));
-  const mine = readMine().filter(a=>live.includes(a));
-  if(!mine.length){ el.innerHTML=''; return; }
-  const myTop = Math.max(...mine), top = Math.max(...live), closed = isClosed();
-  el.innerHTML = myTop >= top
-    ? `<div class="status-banner win"><span>${closed ? '🏆 You had the highest bid. Our team will contact you.' : '✅ You are the highest bidder at RM '+rm(myTop)}</span></div>`
-    : `<div class="status-banner out"><span>${closed ? 'This auction ended. Your bid was not the highest.' : '⚠️ You have been outbid. Current bid RM '+rm(top)}</span>${closed?'':'<button type="button" onclick="openModal()">Bid again</button>'}</div>`;
+function render(){
+  const live = auctions.filter(a=>!isClosed(a)).sort((a,b)=>(a.deadline?new Date(a.deadline):Infinity)-(b.deadline?new Date(b.deadline):Infinity));
+  const ended = auctions.filter(isClosed).sort((a,b)=>new Date(b.deadline||b.created_at)-new Date(a.deadline||a.created_at)).slice(0,6);
+  document.getElementById('liveGrid').innerHTML = live.map(card).join('');
+  document.getElementById('liveMsg').innerHTML = live.length ? '' : `<div class="msg"><strong style="color:var(--ink);font-size:16px;">No auctions are live right now</strong><br>New vehicles are listed regularly. Message us and we'll let you know when the next one opens.<br><a class="btn" href="https://wa.me/${WA}?text=${encodeURIComponent("I'd like to be notified when the next live auction opens.")}">Notify me on WhatsApp</a></div>`;
+  document.getElementById('endedGrid').innerHTML = ended.map(card).join('');
+  document.getElementById('endedWrap').style.display = ended.length ? '' : 'none';
+  updateLD(live);
 }
 
-// ── Sticky bid bar (phones): hidden while the main Place Your Bid button is on screen ──
-let stickyObs = null;
-function setupSticky(closed){
-  if(stickyObs){ stickyObs.disconnect(); stickyObs=null; }
-  const btn = document.getElementById('bidBtn'), bar = document.getElementById('stickyBar');
-  if(closed || !btn || !bar || !('IntersectionObserver' in window)) return;
-  stickyObs = new IntersectionObserver(es=>{ bar.classList.toggle('hide', es[0].isIntersecting); }, {threshold:0.5});
-  stickyObs.observe(btn);
+// structured data so Google, Gemini and other AI tools can read the list of live auctions
+function updateLD(live){
+  let el = document.getElementById('ld-list');
+  if(!el){ el = document.createElement('script'); el.type='application/ld+json'; el.id='ld-list'; document.head.appendChild(el); }
+  el.textContent = JSON.stringify({ '@context':'https://schema.org', '@type':'CollectionPage',
+    name:'Live Car Auctions — Kansai Group Malaysia', url:location.origin+location.pathname,
+    description:'Live auctions for Japanese import cars from Kansai Group Malaysia, Kuala Lumpur.',
+    mainEntity:{ '@type':'ItemList', numberOfItems:live.length,
+      itemListElement: live.map((a,i)=>({ '@type':'ListItem', position:i+1,
+        url:new URL('auction-car.html?id='+a.id, location.href).href,
+        name:[a.car_name,a.year].filter(Boolean).join(' ') })) } });
 }
 
-// ── Share / ask ──
-function shareAuction(){
-  const url = pageUrl();
-  const text = `${[auction.car_name, auction.year].filter(Boolean).join(' ')} — live auction, current bid RM ${rm(currentPrice())}`;
-  if(navigator.share){ navigator.share({title:auction.car_name, text, url}).catch(()=>{}); return; }
-  window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+url), '_blank');
-}
-
-// ── More cars slider ──
-let others = [], otherTop = {};
-function shortCd(dl){
-  if(!dl) return 'Open';
-  const diff = new Date(dl).getTime() - Date.now(); if(diff<=0) return 'Ended';
-  const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60;
-  return d>0 ? `${d}d ${h}h` : (h>0 ? `${h}h ${m}m` : `${m}m`);
-}
-async function loadOthers(){
-  try {
-    const { data } = await sb.from('auctions').select('*').neq('id', auction.id).order('created_at',{ascending:false});
-    const now = new Date();
-    others = (data||[]).filter(a=>a.status!=='closed' && (!a.deadline || new Date(a.deadline)>now))
-      .sort((a,b)=>(a.deadline?new Date(a.deadline):Infinity)-(b.deadline?new Date(b.deadline):Infinity)).slice(0,8);
-    otherTop = {};
-    if(others.length){
-      const { data:bd } = await sb.from('public_bids').select('auction_id,amount').in('auction_id', others.map(a=>a.id));
-      (bd||[]).forEach(b=>{ otherTop[b.auction_id] = Math.max(otherTop[b.auction_id]||0, Number(b.amount)); });
-    }
-    renderMore();
-  } catch(e){ console.error(e); }
-}
-function renderMore(){
-  const sec = document.getElementById('moreSec'), sl = document.getElementById('moreSlider');
-  if(!sec || !sl) return;
-  if(!others.length){ sec.style.display='none'; return; }
-  sec.style.display = '';
-  sl.innerHTML = others.map(a=>{
-    const ph = (a.photos||[]).map(p=>p&&p.url).filter(Boolean)[0] || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600';
-    const price = Math.max(otherTop[a.id]||0, Number(a.starting_price)||0);
-    const nm = [a.car_name, a.year].filter(Boolean).join(' · ');
-    return `<a class="mc" href="auction-car.html?id=${esc(a.id)}">
-      <div class="mi"><img src="${esc(ph)}" alt="${esc(nm)}" loading="lazy"><span class="mt">Live</span></div>
-      <div class="mb"><div class="mn">${esc(nm)}</div>
-        <div class="mr"><div><div class="ml">Current bid</div><div class="mp"><small>RM</small> ${rm(price)}</div></div>
-        <div><div class="ml">Ends in</div><div class="mcd">${shortCd(a.deadline)}</div></div></div>
-        <span class="mg">View &amp; Bid</span></div></a>`;
-  }).join('');
-}
-function slideBy(dir){ const sl=document.getElementById('moreSlider'); if(sl) sl.scrollBy({left:dir*280, behavior:'smooth'}); }
-
-// ── SEO: title, description, canonical, social tags and structured data (JSON-LD) ──
-function metaTag(key, content, isProp){
-  const sel = isProp ? `meta[property="${key}"]` : `meta[name="${key}"]`;
-  let el = document.head.querySelector(sel);
-  if(!el){ el = document.createElement('meta'); el.setAttribute(isProp?'property':'name', key); document.head.appendChild(el); }
-  el.setAttribute('content', content);
-}
-function updateSEO(){
-  const url = pageUrl(), closed = isClosed(), price = currentPrice();
-  const nm = [auction.car_name, auction.year].filter(Boolean).join(' ');
-  const plain = String(auction.description||'').replace(/\s*•\s*/g,', ').replace(/\s+/g,' ').trim();
-  const title = `${nm} — ${closed?'Auction Ended':'Live Auction'} | Kansai Group Malaysia`;
-  const desc = `${nm} ${closed?'auction ended':'live auction'} in Malaysia. ${closed?'Final':'Current'} bid RM ${rm(price)}. ${auction.specs || plain}`.replace(/\s+/g,' ').trim().slice(0,200);
-  const img = photos[0];
-  document.title = title;
-  metaTag('description', desc);
-  metaTag('robots', closed ? 'noindex, follow' : 'index, follow');
-  let can = document.head.querySelector('link[rel="canonical"]');
-  if(!can){ can = document.createElement('link'); can.rel='canonical'; document.head.appendChild(can); }
-  can.href = url;
-  metaTag('og:title', title, true); metaTag('og:description', desc, true); metaTag('og:image', img, true); metaTag('og:url', url, true);
-  metaTag('twitter:title', title); metaTag('twitter:description', desc); metaTag('twitter:image', img);
-  const ld = { '@context':'https://schema.org', '@graph':[
-    { '@type':'Car', '@id':url+'#car', name:nm, description:(plain||auction.specs||nm).slice(0,1000), image:photos.slice(0,6), url,
-      ...(/^\d{4}$/.test(String(auction.year||'')) ? { vehicleModelDate:String(auction.year) } : {}),
-      offers:{ '@type':'Offer', url, price:String(price), priceCurrency:'MYR',
-        availability: closed ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        ...(auction.deadline ? { priceValidUntil:new Date(auction.deadline).toISOString().slice(0,10) } : {}),
-        seller:{ '@type':'AutoDealer', name:'Kansai Group Malaysia', url:'https://www.kansaigroup.my' } } },
-    { '@type':'BreadcrumbList', itemListElement:[
-      { '@type':'ListItem', position:1, name:'Home', item:location.origin+'/' },
-      { '@type':'ListItem', position:2, name:'Live Auctions', item:new URL('auctions.html', location.href).href },
-      { '@type':'ListItem', position:3, name:nm, item:url } ] } ] };
-  let s = document.getElementById('ld-auction');
-  if(!s){ s = document.createElement('script'); s.type='application/ld+json'; s.id='ld-auction'; document.head.appendChild(s); }
-  s.textContent = JSON.stringify(ld);
-}
-
-function renderFeed(){
-  const list = document.getElementById('feedList');
-  if(!list) return;
-  if(!bids.length){ list.innerHTML = `<div class="feed-empty">No bids yet. Be the first to bid.</div>`; return; }
-  const sorted = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount));
-  list.innerHTML = sorted.slice(0,8).map((b,i)=>{
-    const label = b.bidder_label || 'Bidder';
-    return `<div class="feed-item">
-      <div class="feed-bidder">
-        <div class="feed-avatar">${esc(label.charAt(0).toUpperCase())}</div>
-        <div>
-          <div class="feed-name">${esc(label)}</div>
-          <div class="feed-time">${timeAgo(b.created_at)}</div>
-        </div>
-      </div>
-      <div class="feed-amount ${i===0?'top':''}">RM ${rm(b.amount)}</div>
-    </div>`;
-  }).join('');
-}
-
-function timeAgo(ts){
-  const diff = Math.floor((Date.now()-new Date(ts).getTime())/1000);
-  if(diff<60) return 'just now';
-  if(diff<3600) return Math.floor(diff/60)+'m ago';
-  if(diff<86400) return Math.floor(diff/3600)+'h ago';
-  return Math.floor(diff/86400)+'d ago';
-}
-
-function refreshLiveBits(){
-  if(isClosed()) return;
-  const pv = document.getElementById('priceValue');
-  const bc = document.getElementById('bidCount');
-  const p = currentPrice();
-  if(pv){
-    const shown = Number(pv.textContent.replace(/[^0-9]/g,''));
-    if(p !== shown){
-      pv.innerHTML = `<span class="cur">RM</span> ${rm(p)}`;
-      pv.classList.remove('bumped'); void pv.offsetWidth; pv.classList.add('bumped');
-      updateSEO();
-    }
+async function load(){
+  const { data, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
+  if(error){ document.getElementById('liveMsg').innerHTML = '<div class="msg">Could not load auctions right now. Please refresh the page.</div>'; console.error(error); return; }
+  auctions = data || [];
+  topBid = {}; bidCount = {};
+  if(auctions.length){
+    const { data:bids } = await sb.from('public_bids').select('auction_id,amount').in('auction_id', auctions.map(a=>a.id));
+    (bids||[]).forEach(b=>{ bidCount[b.auction_id]=(bidCount[b.auction_id]||0)+1; topBid[b.auction_id]=Math.max(topBid[b.auction_id]||0, Number(b.amount)); });
   }
-  if(bc) bc.textContent = bids.length;
-  const sp = document.getElementById('stickyPrice'); if(sp) sp.innerHTML = `<small>RM</small> ${rm(p)}`;
-  const bl = document.getElementById('estBidLine');
-  const et = document.getElementById('estTotal');
-  if(bl) bl.textContent = 'RM ' + rm(p);
-  if(et) et.innerHTML = '<span class="cur">RM</span> ' + rm(landedTotal(p));
-  renderFeed(); renderBidStatus();
+  render();
 }
 
-// ── GALLERY + FULL-SCREEN VIEWER ──
-let lbEl = null;
-function setPhoto(i){
-  curPhoto = i;
-  const nm = [auction.car_name, auction.year].filter(Boolean).join(' ');
-  const m = document.getElementById('mainImg'); if(m){ m.src = photos[i]; m.alt = `${nm} photo ${i+1} of ${photos.length}`; }
-  const g = document.getElementById('gcur'); if(g) g.textContent = i+1;
-  const ts = document.querySelectorAll('.thumb');
-  ts.forEach((t,ti)=>t.classList.toggle('active',ti===i));
-  const box = document.getElementById('thumbs'), t = ts[i];
-  if(box && t) box.scrollTo({left: t.offsetLeft - (box.clientWidth - t.clientWidth)/2, behavior:'smooth'});
-  syncLightbox();
-}
-function prevPhoto(){ setPhoto((curPhoto-1+photos.length)%photos.length); }
-function nextPhoto(){ setPhoto((curPhoto+1)%photos.length); }
-function addSwipe(el){
-  if(!el) return;
-  let x0=null, y0=0;
-  el.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
-  el.addEventListener('touchend',e=>{
-    if(x0===null || photos.length<2) return;
-    const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0; x0=null;
-    if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.5){ dx<0 ? nextPhoto() : prevPhoto(); }
-  },{passive:true});
-}
-function openLightbox(){
-  if(!lbEl){
-    lbEl = document.createElement('div'); lbEl.className = 'lb';
-    lbEl.innerHTML = '<img id="lbImg" alt=""><button class="lx" aria-label="Close" onclick="closeLightbox()">×</button><button class="lp" aria-label="Previous photo" onclick="prevPhoto()">‹</button><button class="ln" aria-label="Next photo" onclick="nextPhoto()">›</button><div class="lc" id="lbC"></div>';
-    document.body.appendChild(lbEl);
-    lbEl.addEventListener('click',e=>{ if(e.target===lbEl) closeLightbox(); });
-    addSwipe(lbEl);
-  }
-  lbEl.classList.add('open'); document.body.style.overflow = 'hidden'; syncLightbox();
-}
-function syncLightbox(){
-  if(!lbEl) return;
-  document.getElementById('lbImg').src = photos[curPhoto];
-  document.getElementById('lbC').textContent = (curPhoto+1)+' / '+photos.length;
-  lbEl.querySelector('.lp').style.display = lbEl.querySelector('.ln').style.display = photos.length>1 ? 'flex' : 'none';
-}
-function closeLightbox(){ if(lbEl) lbEl.classList.remove('open'); document.body.style.overflow = ''; }
-document.addEventListener('keydown',e=>{
-  const open = lbEl && lbEl.classList.contains('open');
-  if(e.key==='Escape'){ if(open) closeLightbox(); else closeModal(); }
-  if(open && e.key==='ArrowRight') nextPhoto();
-  if(open && e.key==='ArrowLeft') prevPhoto();
-});
-
-// ── TIMER ──
-async function onAuctionEnded(){
-  if(pollInterval){ clearInterval(pollInterval); pollInterval=null; }
-  await loadBids();
-  renderPage();
-}
-function startTimer(){
-  if(isClosed()) return;
-  function tick(){
-    const t = document.getElementById('timer'); if(!t) return;
-    const diff = new Date(auction.deadline).getTime() - Date.now();
-    if(diff<=0){ clearInterval(timerInterval); timerInterval=null; onAuctionEnded(); return; }
-    const d = Math.floor(diff/86400000), h = Math.floor(diff/3600000)%24, m = Math.floor(diff/60000)%60, s = Math.floor(diff/1000)%60;
-    const seg = (n,l)=>`<div class="timer-seg"><div class="timer-num">${String(n).padStart(2,'0')}</div><div class="timer-lbl">${l}</div></div>`;
-    t.innerHTML = (d>0?seg(d,'days'):'') + seg(h,'hrs') + seg(m,'min') + seg(s,'sec');
-    const stt = document.getElementById('stickyTime'); if(stt) stt.textContent = 'Ends in ' + (d>0?d+'d ':'') + h+'h '+m+'m'+(d>0?'':' '+s+'s');
-  }
-  tick();
-  timerInterval = setInterval(tick,1000);
-}
-
-// ── BID MODAL ──
-let memBidder = null;
-function getSavedBidder(){
-  if(memBidder && memBidder.name && memBidder.phone) return memBidder;
-  try { return JSON.parse(localStorage.getItem('kansaiBidder')||'null'); } catch(e){ return null; }
-}
-function saveBidder(name, phone){
-  memBidder = { name, phone };
-  try { localStorage.setItem('kansaiBidder', JSON.stringify({name, phone})); } catch(e){}
-}
-
-function modalFormHTML(){
-  return `
-    <div class="modal-title bebas">Place Your Bid</div>
-    <div class="modal-sub" id="modalSub">Enter your offer and contact details</div>
-    <div class="known-bidder-bar" id="knownBidderBar" style="display:none;">
-      <div>Bidding as <strong id="knownBidderName"></strong></div>
-      <button type="button" onclick="editBidderDetails()">Not you?</button>
-    </div>
-    <div class="modal-field">
-      <label>Your Bid Amount (RM)</label>
-      <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
-      <div class="quick-bumps">
-        <button type="button" onclick="bumpTo(1000)">+1,000</button>
-        <button type="button" onclick="bumpTo(2000)">+2,000</button>
-        <button type="button" onclick="bumpTo(5000)">+5,000</button>
-      </div>
-      <div class="modal-hint" id="bidHint"></div>
-    </div>
-    <div id="contactFields">
-      <div class="modal-field"><label>Full Name</label><input type="text" id="bidName" placeholder="Your name" autocomplete="name"></div>
-      <div class="modal-field"><label>Mobile Number</label><input type="tel" id="bidPhone" placeholder="+60 1X-XXX XXXX" autocomplete="tel"></div>
-    </div>
-    <div class="modal-error" id="modalError"></div>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-submit" id="submitBidBtn" onclick="submitBid()">Submit Bid</button>
-    </div>
-    <div class="modal-consent">
-      By submitting, you agree that Kansai Group may contact you about this vehicle. Your details are kept private and never shown publicly.
-    </div>`;
-}
-
-function openModal(){
-  if(isClosed()) return;
-  document.getElementById('modalInner').innerHTML = modalFormHTML();
-  const price = currentPrice();
-  document.getElementById('bidAmount').value = price + 1000;
-  document.getElementById('bidHint').textContent = `Minimum bid RM ${rm(price+MIN_INCREMENT)}. Tap a button or type your amount.`;
-  document.getElementById('modalSub').textContent = `Current bid: RM ${rm(price)}`;
-
-  const saved = getSavedBidder();
-  if(saved && saved.name && saved.phone){
-    document.getElementById('bidName').value = saved.name;
-    document.getElementById('bidPhone').value = saved.phone;
-    document.getElementById('knownBidderBar').style.display = 'flex';
-    document.getElementById('knownBidderName').textContent = saved.name;
-    document.getElementById('contactFields').style.display = 'none';
-  }
-  document.getElementById('bidModal').classList.add('open');
-}
-
-function editBidderDetails(){
-  document.getElementById('contactFields').style.display='block';
-  document.getElementById('knownBidderBar').style.display='none';
-}
-
-function bumpTo(inc){
-  const price = currentPrice();
-  const cur = parseFloat(document.getElementById('bidAmount').value)||0;
-  const newVal = (cur > price ? cur : price) + inc;
-  document.getElementById('bidAmount').value = newVal;
-  document.getElementById('bidHint').textContent = `Your bid: RM ${rm(newVal)} (RM ${rm(newVal-price)} above current)`;
-}
-
-function onAmountEdit(){
-  const price = currentPrice();
-  const v = parseFloat(document.getElementById('bidAmount').value)||0;
-  document.getElementById('bidHint').textContent = v >= price+MIN_INCREMENT
-    ? `RM ${rm(v-price)} above current bid`
-    : `Minimum bid RM ${rm(price+MIN_INCREMENT)}`;
-}
-function closeModal(){ document.getElementById('bidModal').classList.remove('open'); }
-function showErr(msg){ const e=document.getElementById('modalError'); if(!e) return; e.textContent=msg; e.style.display='block'; }
-
-function maskName(name){
-  const clean = (name||'').trim();
-  if(!clean) return 'Bidder';
-  if(clean.length<=3) return clean.charAt(0).toUpperCase()+clean.slice(1)+'***';
-  return clean.charAt(0).toUpperCase()+clean.slice(1,3).toLowerCase()+'***';
-}
-
-async function submitBid(){
-  const amount = parseFloat(document.getElementById('bidAmount').value);
-  const name = document.getElementById('bidName').value.trim();
-  const phone = document.getElementById('bidPhone').value.trim();
-  const price = currentPrice();
-  const minBid = price + MIN_INCREMENT;
-
-  if(!amount || amount<=0){ showErr('Please enter a valid bid amount.'); return; }
-  if(amount < minBid){ showErr(`Your bid must be at least RM ${rm(minBid)} (current bid RM ${rm(price)} + minimum raise RM ${rm(MIN_INCREMENT)}).`); return; }
-  if(!name){ showErr('Please enter your name.'); editBidderDetails(); return; }
-  if(!phone || phone.replace(/[^0-9]/g,'').length<8){ showErr('Please enter a valid mobile number.'); editBidderDetails(); return; }
-  if(isClosed()){ showErr('This auction has closed.'); return; }
-
-  const btn = document.getElementById('submitBidBtn');
-  btn.textContent='Submitting…'; btn.disabled=true;
-
-  await loadBids();
-  const latest = currentPrice();
-  if(amount < latest + MIN_INCREMENT){
-    btn.textContent='Submit Bid'; btn.disabled=false;
-    showErr(`Someone just bid RM ${rm(latest)}. Please bid at least RM ${rm(latest+MIN_INCREMENT)}.`);
-    refreshLiveBits();
-    return;
-  }
-
-  const { error } = await sb.from('bids').insert({
-    auction_id: auction.id,
-    amount: amount,
-    bidder_name: name,
-    bidder_phone: phone,
-    bidder_label: maskName(name)
+// tick countdowns every second; refresh data every 30s
+setInterval(()=>{
+  document.querySelectorAll('.cd[data-dl]').forEach(el=>{
+    const c = countdown(el.dataset.dl);
+    el.textContent = c.t; el.classList.toggle('soon', c.soon);
   });
-
-  if(error){
-    btn.textContent='Submit Bid'; btn.disabled=false;
-    // P0001 = a rule in the database refused the bid; its message is written for customers
-    showErr(error.code==='P0001' && error.message ? error.message : 'Could not submit your bid. Please try again.');
-    if(error.code!=='P0001') console.error(error);
-    await loadBids(); refreshLiveBits();
-    return;
-  }
-
-  saveBidder(name, phone);
-  rememberBid(amount);
-  document.getElementById('modalInner').innerHTML = `
-    <div class="modal-success">
-      <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="modal-title bebas">Bid Placed!</div>
-      <div class="modal-sub">Your bid of <strong>RM ${rm(amount)}</strong> has been submitted. Our team will contact you at <strong>${esc(phone)}</strong>.</div>
-      <div class="modal-actions"><button class="modal-submit" onclick="closeModalAndRefresh()">Done</button></div>
-    </div>`;
-  await loadBids();
-  refreshLiveBits();
-}
-
-async function closeModalAndRefresh(){
-  closeModal();
-  await loadBids();
-  refreshLiveBits();
-}
-
-document.getElementById('bidModal').addEventListener('click',e=>{ if(e.target.id==='bidModal') closeModal(); });
-
-loadAuction();
+}, 1000);
+setInterval(load, 30000);
+load();
 </script>
 </body>
 </html>
