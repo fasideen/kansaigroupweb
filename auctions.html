@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
 <title>Live Car Auctions — Kansai Group Malaysia</title>
 <meta name="description" content="Bid on Japanese import cars live. See every open auction from Kansai Group Malaysia with current bids and countdown timers.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.kansaigroup.my/auctions.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kansai Group Malaysia">
+<meta property="og:locale" content="en_MY">
+<meta property="og:title" content="Live Car Auctions — Kansai Group Malaysia">
+<meta property="og:description" content="Bid on Japanese import cars live. See every open auction with current bids and countdown timers.">
+<meta property="og:url" content="https://www.kansaigroup.my/auctions.html">
+<meta property="og:image" content="https://www.kansaigroup.my/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -56,6 +65,8 @@
   .msg { text-align:center; padding:56px 20px; background:#fff; border:1px solid var(--border); border-radius:14px; color:var(--muted); font-size:14px; line-height:1.7; }
   .msg a.btn { display:inline-block; margin-top:16px; background:var(--red); color:#fff; padding:13px 26px; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
   .note { font-size:11px; color:var(--muted); text-align:center; margin-top:36px; line-height:1.6; }
+  .nav-back { padding:12px 0; }
+  @media (max-width:600px) { .wrap { padding:20px 14px 48px; } .pr { font-size:28px; } .go { padding:6px 0; } }
 </style>
 </head>
 <body>
@@ -64,6 +75,7 @@
   <a href="index.html" class="nav-back">← Back to site</a>
 </nav>
 
+<noscript><div style="padding:60px 20px;text-align:center;color:#6B7280;font-size:15px;line-height:1.7;">This page needs JavaScript to show live auctions.<br><a href="https://wa.me/601151177026" style="color:#E60012;font-weight:600;">WhatsApp Kansai Group</a> for the current list.</div></noscript>
 <div class="wrap">
   <div class="badge"><span class="dot"></span>Live Auctions</div>
   <h1>BID ON <span>JAPAN'S</span> FINEST</h1>
@@ -130,6 +142,20 @@ function render(){
   document.getElementById('liveMsg').innerHTML = live.length ? '' : `<div class="msg"><strong style="color:var(--ink);font-size:16px;">No auctions are live right now</strong><br>New vehicles are listed regularly. Message us and we'll let you know when the next one opens.<br><a class="btn" href="https://wa.me/${WA}?text=${encodeURIComponent("I'd like to be notified when the next live auction opens.")}">Notify me on WhatsApp</a></div>`;
   document.getElementById('endedGrid').innerHTML = ended.map(card).join('');
   document.getElementById('endedWrap').style.display = ended.length ? '' : 'none';
+  updateLD(live);
+}
+
+// structured data so Google, Gemini and other AI tools can read the list of live auctions
+function updateLD(live){
+  let el = document.getElementById('ld-list');
+  if(!el){ el = document.createElement('script'); el.type='application/ld+json'; el.id='ld-list'; document.head.appendChild(el); }
+  el.textContent = JSON.stringify({ '@context':'https://schema.org', '@type':'CollectionPage',
+    name:'Live Car Auctions — Kansai Group Malaysia', url:location.origin+location.pathname,
+    description:'Live auctions for Japanese import cars from Kansai Group Malaysia, Kuala Lumpur.',
+    mainEntity:{ '@type':'ItemList', numberOfItems:live.length,
+      itemListElement: live.map((a,i)=>({ '@type':'ListItem', position:i+1,
+        url:new URL('auction-car.html?id='+a.id, location.href).href,
+        name:[a.car_name,a.year].filter(Boolean).join(' ') })) } });
 }
 
 async function load(){
