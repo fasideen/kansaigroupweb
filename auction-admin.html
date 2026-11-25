@@ -74,7 +74,12 @@
   .bids-table .top-bid .amt { color:var(--green); }
   .bids-empty { color:var(--muted); font-size:12px; padding:12px 8px; }
 
-  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:13px 24px; border-radius:10px; font-size:13px; font-weight:500; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:200; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:13px 24px; border-radius:10px; font-size:13px; font-weight:500; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:200; max-width:90vw; text-align:center; }
+  .live-stat { font-size:11px; font-weight:600; color:var(--green); letter-spacing:0.3px; text-transform:none; margin-left:10px; font-family:'Inter',sans-serif; }
+  .live-stat.off { color:var(--muted); }
+  .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:14px; }
+  .tbl-wrap .bids-table { margin-top:0; min-width:520px; }
+  @media (max-width:600px) { .app { padding:16px 12px 48px; } .row2, .row3 { grid-template-columns:1fr; } .card { padding:16px; } .link-box { min-width:0; flex-basis:100%; } .auction-actions .btn { flex:1; } }
   .toast.show { opacity:1; }
 </style>
 </head>
@@ -151,7 +156,13 @@
 
   <!-- EXISTING AUCTIONS -->
   <div class="card">
-    <h3>Auctions &amp; Bids</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <h3 style="margin:0;">Auctions &amp; Bids <span id="liveStat" class="live-stat off">● Connecting…</span></h3>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" id="soundBtn" onclick="toggleSound()">🔔 Sound on</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadAuctions()">Refresh now</button>
+      </div>
+    </div>
     <div id="auctionList"><div class="bids-empty">Loading…</div></div>
   </div>
 </div>
@@ -168,7 +179,7 @@ let auctionsById = {}; // cache so Edit does not need to embed JSON in HTML
 
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function rm(n){ return Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:0,maximumFractionDigits:0}); }
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function toast(msg,ms){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms||2600); }
 
 // ── AUTH ──
 async function login(){
@@ -180,7 +191,7 @@ async function login(){
 }
 async function logout(){ await sb.auth.signOut(); location.reload(); }
 async function checkAuth(){ const { data } = await sb.auth.getSession(); if(data.session) showApp(); }
-function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); initUploader(); }
+function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); initUploader(); startLiveUpdates(); }
 
 // ── EXTRA LINES ──
 function addExtraLine(label='',amount=''){ extraLines.push({label,amount}); renderExtraLines(); }
@@ -354,11 +365,64 @@ async function deleteBid(bidId){
 }
 
 // ── LOAD + RENDER ──
-async function loadAuctions(){
+// ── LIVE UPDATES: new bids appear on their own (no manual refresh) ──
+const BASE_TITLE = document.title;
+let lastSig = '', knownBids = null, newBidCount = 0, refreshing = false, liveTimer = null, rtTimer = null;
+let soundOn = (function(){ try { return localStorage.getItem('kgSound') !== 'off'; } catch(e){ return true; } })();
+
+function setLive(ok){
+  const el = document.getElementById('liveStat'); if(!el) return;
+  if(ok){ el.className='live-stat'; el.textContent='● Live · updated '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+  else { el.className='live-stat off'; el.textContent='● Reconnecting…'; }
+}
+function setTitleBadge(){ document.title = newBidCount ? `(${newBidCount}) New bid · Auction Manager` : BASE_TITLE; }
+function renderSoundBtn(){ const b=document.getElementById('soundBtn'); if(b) b.textContent = soundOn ? '🔔 Sound on' : '🔕 Sound off'; }
+function toggleSound(){ soundOn=!soundOn; try{ localStorage.setItem('kgSound', soundOn?'on':'off'); }catch(e){} renderSoundBtn(); if(soundOn) beep(); }
+function beep(){
+  if(!soundOn) return;
+  try {
+    const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+    const c = new C(), o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination); o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.15, c.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime+0.35);
+    o.start(); o.stop(c.currentTime+0.4);
+  } catch(e){}
+}
+function announceNewBids(auctions, bids){
+  const ids = new Set(bids.map(b=>b.id));
+  if(knownBids){
+    const fresh = bids.filter(b=>!knownBids.has(b.id));
+    if(fresh.length){
+      fresh.sort((x,y)=>Number(y.amount)-Number(x.amount));
+      const top = fresh[0], a = auctions.find(x=>x.id===top.auction_id);
+      toast(`New bid: RM ${rm(top.amount)} from ${top.bidder_name||'a bidder'}${a?' on '+a.car_name:''}${fresh.length>1?' (+'+(fresh.length-1)+' more)':''}`, 7000);
+      newBidCount += fresh.length; setTitleBadge(); beep();
+    }
+  }
+  knownBids = ids;
+}
+function startLiveUpdates(){
+  if(liveTimer) return;
+  renderSoundBtn();
+  liveTimer = setInterval(()=>loadAuctions(true), 10000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ newBidCount=0; setTitleBadge(); loadAuctions(true); } });
+  window.addEventListener('focus', ()=>{ newBidCount=0; setTitleBadge(); });
+  // Instant updates too, when Realtime is switched on for the bids table in Supabase (polling covers it otherwise)
+  try { sb.channel('staff-bids').on('postgres_changes',{event:'*',schema:'public',table:'bids'},()=>{ clearTimeout(rtTimer); rtTimer=setTimeout(()=>loadAuctions(true),400); }).subscribe(); } catch(e){}
+}
+
+async function loadAuctions(silent){
+  if(refreshing) return;
+  refreshing = true;
+  try { await loadAuctionsInner(silent === true); } finally { refreshing = false; }
+}
+async function loadAuctionsInner(silent){
   const { data:auctions, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
   const list = document.getElementById('auctionList');
-  if(error){ list.innerHTML=`<div class="bids-empty">Error loading: ${esc(error.message)}</div>`; return; }
-  if(!auctions.length){ list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
+  if(error){ setLive(false); if(!silent) list.innerHTML=`<div class="bids-empty">Error loading: ${esc(error.message)}</div>`; return; }
+  if(!auctions.length){ setLive(true); list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
 
   auctionsById = {};
   auctions.forEach(a=>{ auctionsById[a.id]=a; });
@@ -367,6 +431,13 @@ async function loadAuctions(){
   const { data:allBids } = await sb.from('bids').select('*').order('amount',{ascending:false});
   const bidsByAuction = {};
   (allBids||[]).forEach(b=>{ (bidsByAuction[b.auction_id]=bidsByAuction[b.auction_id]||[]).push(b); });
+
+  setLive(true);
+  announceNewBids(auctions, allBids||[]);
+  const sig = JSON.stringify(auctions) + JSON.stringify((allBids||[]).map(b=>[b.id,b.amount]))
+    + auctions.map(a=>(a.status==='closed' || (a.deadline && new Date(a.deadline)<new Date()))?1:0).join('');
+  if(silent && sig===lastSig) return;   // nothing changed: leave the list alone
+  lastSig = sig;
 
   list.innerHTML = auctions.map(a=>{
     const bids = bidsByAuction[a.id]||[];
@@ -390,7 +461,7 @@ async function loadAuctions(){
         <button class="btn btn-ghost btn-sm" onclick="deleteAuction('${a.id}')" style="color:var(--red)">Delete</button>
       </div>
       ${bids.length?`
-        <table class="bids-table">
+        <div class="tbl-wrap"><table class="bids-table">
           <thead><tr><th>Rank</th><th>Bidder Name</th><th>Mobile</th><th>Bid Amount</th><th>Time</th><th></th></tr></thead>
           <tbody>
             ${bids.map((b,i)=>`<tr class="${i===0?'top-bid':''}">
@@ -402,7 +473,7 @@ async function loadAuctions(){
               <td><button onclick="deleteBid('${b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
             </tr>`).join('')}
           </tbody>
-        </table>
+        </table></div>
       `:`<div class="bids-empty">No bids yet.</div>`}
     </div>`;
   }).join('');
