@@ -17,6 +17,8 @@
 <meta property="og:image" content="https://www.kansaigroup.my/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="/favicon.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LKKF936237"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-LKKF936237');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -79,8 +81,9 @@
 <div class="wrap">
   <div class="badge"><span class="dot"></span>Live Auctions</div>
   <h1>BID ON <span>JAPAN'S</span> FINEST</h1>
-  <p class="sub">Pick a vehicle, watch the bidding in real time and place your bid in seconds. Highest bid when the timer ends wins the right to buy.</p>
+  <p class="sub">Pick a vehicle, watch the bidding in real time and place your bid in seconds. Offers are subject to acceptance by Kansai Group; the highest offer does not automatically confirm a sale.</p>
 
+  <div id="listConnection" role="status" aria-live="polite" style="display:none;padding:12px;background:#fff3cd;color:#664d03;border-radius:8px;margin-bottom:16px"></div>
   <div id="liveGrid" class="grid"></div>
   <div id="liveMsg"></div>
 
@@ -95,6 +98,35 @@
 <script>
 const sb = supabase.createClient('https://ieqflqzcurwfyxobprro.supabase.co', 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_');
 const WA = '601151177026';
+
+// Fetch every page in a stable order. Never turn a failed read into an empty list.
+async function readAll(buildQuery){
+  const rows = [];
+  for(let offset=0;;){
+    const {data, error} = await buildQuery().range(offset, offset+499);
+    if(error) throw error;
+    if(!Array.isArray(data)) throw new Error('Unexpected database response.');
+    if(!data.length) return rows;
+    rows.push(...data);
+    offset += data.length;
+  }
+}
+
+
+// ── Visitor analytics: Google Analytics + our own counter (shown on the staff page) ──
+function kgVisitor(){
+  try { let v = localStorage.getItem('kgVisitor'); if(!v){ v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now()+'-'+Math.random().toString(36).slice(2)); localStorage.setItem('kgVisitor', v); } return v; }
+  catch(e){ return 'anon'; }
+}
+function kgTrack(event, auctionId){
+  if(navigator.webdriver || /bot|crawl|spider|slurp|facebookexternalhit|preview/i.test(navigator.userAgent)) return;
+  try { if(window.gtag) gtag('event','auction_'+event,{auction_id:auctionId||''}); } catch(e){}
+  try {
+    let ref = 'direct'; try { if(document.referrer) ref = new URL(document.referrer).hostname; } catch(e){}
+    sb.from('auction_events').insert({ event:event, auction_id:auctionId||null, visitor_id:kgVisitor(),
+      device:/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?'mobile':'desktop', referrer:ref.slice(0,100), path:location.pathname }).then(function(){},function(){});
+  } catch(e){}
+}
 let auctions = [], topBid = {}, bidCount = {};
 
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -118,7 +150,7 @@ function card(a){
   const cover = photos[0] || 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600';
   const n = bidCount[a.id]||0;
   const cd = countdown(a.deadline);
-  return `<a class="card${closed?' ended':''}" href="auction-car.html?id=${esc(a.id)}">
+  return `<a data-listing-id="${esc(a.id)}" data-closed="${closed}" class="card${closed?' ended':''}" href="auction-car.html?id=${esc(a.id)}">
     <div class="img"><img src="${esc(cover)}" alt="${esc(a.car_name)}" loading="lazy">
       <span class="tag ${closed?'tag-end':'tag-live'}">${closed?'Closed':'<i></i>Live'}</span>
       ${photos.length>1?`<span class="pc">${photos.length} photos</span>`:''}
@@ -127,10 +159,10 @@ function card(a){
       <div class="nm">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
       ${a.specs?`<div class="sp">${esc(a.specs)}</div>`:''}
       <div class="row">
-        <div><div class="lb">${closed?(n?'Winning bid':'Final price'):'Current bid'}</div><div class="pr"><small>RM</small> ${rm(priceOf(a))}</div></div>
+        <div><div class="lb">${closed?(n?'Highest offer':'Starting price'):'Highest offer'}</div><div class="pr"><small>RM</small> ${rm(priceOf(a))}</div></div>
         <div class="rt"><div class="lb">${closed?'Status':'Ends in'}</div><div class="cd${cd.soon&&!closed?' soon':''}" ${closed?'':`data-dl="${esc(a.deadline||'')}"`}>${closed?'Ended':cd.t}</div></div>
       </div>
-      <div class="foot"><span>${n} bid${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Bid'} →</span></div>
+      <div class="foot"><span>${n} bid${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Offer'} →</span></div>
     </div>
   </a>`;
 }
@@ -158,27 +190,41 @@ function updateLD(live){
         name:[a.car_name,a.year].filter(Boolean).join(' ') })) } });
 }
 
+let loadingList=false;
 async function load(){
-  const { data, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
-  if(error){ document.getElementById('liveMsg').innerHTML = '<div class="msg">Could not load auctions right now. Please refresh the page.</div>'; console.error(error); return; }
-  auctions = data || [];
-  topBid = {}; bidCount = {};
-  if(auctions.length){
-    const { data:bids } = await sb.from('public_bids').select('auction_id,amount').in('auction_id', auctions.map(a=>a.id));
-    (bids||[]).forEach(b=>{ bidCount[b.auction_id]=(bidCount[b.auction_id]||0)+1; topBid[b.auction_id]=Math.max(topBid[b.auction_id]||0, Number(b.amount)); });
-  }
-  render();
+  if(loadingList) return;
+  loadingList=true;
+  try {
+    const nextAuctions=await readAll(()=>sb.from('auctions').select('*').order('created_at',{ascending:false}).order('id'));
+    const nextTop={},nextCounts={};
+    if(nextAuctions.length){
+      // No large URL containing every listing ID; aggregate the paginated public-safe records.
+      const nextBids=await readAll(()=>sb.from('public_bids').select('id,auction_id,amount').order('id'));
+      nextBids.forEach(b=>{ nextCounts[b.auction_id]=(nextCounts[b.auction_id]||0)+1; nextTop[b.auction_id]=Math.max(nextTop[b.auction_id]||0,Number(b.amount)); });
+    }
+    auctions=nextAuctions; topBid=nextTop; bidCount=nextCounts;
+    document.getElementById('listConnection').style.display='none';
+    render();
+    return true;
+  } catch(error){
+    console.error(error);
+    const el=document.getElementById('listConnection'); el.style.display='block';
+    el.textContent='Could not refresh listings and offers. Previously loaded prices are shown. Retrying automatically…';
+    return false;
+  } finally { loadingList=false; }
 }
 
 // tick countdowns every second; refresh data every 30s
 setInterval(()=>{
+  if(auctions.some(a=>a.deadline && new Date(a.deadline)<=new Date() && document.querySelector(`[data-listing-id="${a.id}"]`)?.dataset.closed==='false')) render();
   document.querySelectorAll('.cd[data-dl]').forEach(el=>{
     const c = countdown(el.dataset.dl);
     el.textContent = c.t; el.classList.toggle('soon', c.soon);
   });
 }, 1000);
 setInterval(load, 30000);
-load();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
+load().then(ok=>{ if(ok) kgTrack('list_view'); });
 </script>
 </body>
 </html>

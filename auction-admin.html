@@ -77,6 +77,16 @@
   .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:13px 24px; border-radius:10px; font-size:13px; font-weight:500; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:200; max-width:90vw; text-align:center; }
   .live-stat { font-size:11px; font-weight:600; color:var(--green); letter-spacing:0.3px; text-transform:none; margin-left:10px; font-family:'Inter',sans-serif; }
   .live-stat.off { color:var(--muted); }
+  a.btn { display:inline-block; text-decoration:none; }
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .tab { padding:7px 14px; border-radius:20px; border:1px solid var(--border); background:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; color:var(--muted); }
+  .tab.active { background:var(--navy); border-color:var(--navy); color:#fff; }
+  .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; }
+  .stat-box { background:var(--bg-alt); border-radius:10px; padding:12px; text-align:center; }
+  .stat-box b { display:block; font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; line-height:1.1; }
+  .stat-box span { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+  .bidder-row { border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center; }
+  .code-tag { font-family:'JetBrains Mono',monospace; font-weight:700; background:var(--bg-alt); padding:3px 8px; border-radius:6px; }
   .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:14px; }
   .tbl-wrap .bids-table { margin-top:0; min-width:520px; }
   @media (max-width:600px) { .app { padding:16px 12px 48px; } .row2, .row3 { grid-template-columns:1fr; } .card { padding:16px; } .link-box { min-width:0; flex-basis:100%; } .auction-actions .btn { flex:1; } }
@@ -129,15 +139,12 @@
       <div id="photoPreview" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
       <div class="hint" id="uploadStatus"></div>
     </div>
-    <div class="row3">
-      <div class="field"><label>Starting Price (RM)</label><input type="number" class="mono" id="startPrice" placeholder="0"></div>
-      <div class="field"><label>Est. Duty (RM)</label><input type="number" class="mono" id="dutyEst" placeholder="0"></div>
-      <div class="field"><label>Est. AP (RM)</label><input type="number" class="mono" id="apEst" placeholder="0"></div>
-    </div>
+    <div class="field"><label>Starting Price (RM, duty-paid)</label><input type="number" class="mono" id="startPrice" placeholder="0"><div class="hint">The base price bidding starts from. Import duty and AP are already included.</div></div>
     <div class="field">
-      <label>Extra Estimate Lines (optional)</label>
+      <label>Additional Charges (optional)</label>
       <div id="extraLines"></div>
       <button class="btn btn-ghost btn-sm" onclick="addExtraLine()">+ Add Line</button>
+      <div class="hint">Only for charges paid on top of an accepted offer, such as an admin fee or ownership transfer. Leave empty if none.</div>
     </div>
     <div class="field">
       <label>Bidding Deadline</label>
@@ -145,13 +152,35 @@
       <div class="hint">When the countdown hits zero, bidding closes automatically.</div>
     </div>
     <div class="field">
-      <label>Description / Notes (optional)</label>
-      <textarea id="description" rows="2" placeholder="Any extra info shown at the bottom of the auction page"></textarea>
+      <label>Description / Specs</label>
+      <textarea id="description" rows="6" placeholder="Intro lines first (Exterior: Red, Mileage: 25,000 KM, Grade 4.5B), then each spec after a • bullet"></textarea>
+      <div class="hint">Start each spec with • so it shows as its own line in the Vehicle Details on the auction page.</div>
     </div>
     <div style="display:flex; gap:10px;">
       <button class="btn" onclick="saveAuction()" id="saveBtn">Create Auction</button>
       <button class="btn btn-ghost" onclick="resetForm()" id="cancelBtn" style="display:none;">Cancel Edit</button>
     </div>
+  </div>
+
+  <!-- LAST 7 DAYS -->
+  <div class="card">
+    <h3>Last 7 Days</h3>
+    <div class="stat-row" id="weekStats"><div class="stat-box"><b>–</b><span>Visitors</span></div></div>
+  </div>
+
+  <!-- BIDDERS -->
+  <div class="card" id="biddersCard">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <h3 style="margin:0;">Bidders <span id="pendingBadge" class="badge" style="display:none;background:rgba(230,0,18,0.1);color:var(--red);margin-left:8px;"></span></h3>
+      <div class="tabs">
+        <button class="tab" data-f="pending" onclick="setBidderFilter('pending')">Pending</button>
+        <button class="tab" data-f="approved" onclick="setBidderFilter('approved')">Approved</button>
+        <button class="tab" data-f="blocked" onclick="setBidderFilter('blocked')">Blocked</button>
+        <button class="tab" data-f="all" onclick="setBidderFilter('all')">All</button>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:12px;"><input type="text" id="bidderSearch" placeholder="Search name or phone" oninput="renderBidders()"></div>
+    <div id="bidderList"><div class="bids-empty">Loading…</div></div>
   </div>
 
   <!-- EXISTING AUCTIONS -->
@@ -174,6 +203,20 @@ const SUPABASE_URL = 'https://ieqflqzcurwfyxobprro.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_G0uQ0UdiYw78SaDOcoKRbQ_CPm6r-t_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Fetch every page in a stable order. Never turn a failed read into an empty list.
+async function readAll(buildQuery){
+  const rows = [];
+  for(let offset=0;;){
+    const {data, error} = await buildQuery().range(offset, offset+499);
+    if(error) throw error;
+    if(!Array.isArray(data)) throw new Error('Unexpected database response.');
+    if(!data.length) return rows;
+    rows.push(...data);
+    offset += data.length;
+  }
+}
+
+
 let extraLines = [];
 let auctionsById = {}; // cache so Edit does not need to embed JSON in HTML
 
@@ -182,15 +225,30 @@ function rm(n){ return Number(n||0).toLocaleString('en-MY',{minimumFractionDigit
 function toast(msg,ms){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),ms||2600); }
 
 // ── AUTH ──
-async function login(){
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if(error){ const e=document.getElementById('gateErr'); e.textContent=error.message; e.style.display='block'; return; }
-  showApp();
+async function requireOwner(){
+  const {data,error}=await sb.rpc('is_staff');
+  if(error || data!==true) throw new Error('This account is not authorised to manage listings. Check the owner allowlist.');
 }
-async function logout(){ await sb.auth.signOut(); location.reload(); }
-async function checkAuth(){ const { data } = await sb.auth.getSession(); if(data.session) showApp(); }
+async function login(){
+  const gateErr=document.getElementById('gateErr');
+  gateErr.style.display='none';
+  try {
+    const {error}=await sb.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value});
+    if(error) throw error;
+    await requireOwner(); showApp();
+  } catch(error){ gateErr.textContent=error.message||'Could not sign in. Please try again.'; gateErr.style.display='block'; }
+}
+async function logout(){
+  if(uploadsInProgress || savingAuction){ toast('Please wait for the current upload or save to finish.'); return; }
+  const {error}=await sb.auth.signOut();
+  if(error){ toast('Sign out failed. Please try again.'); return; }
+  location.reload();
+}
+async function checkAuth(){
+  try { const {data,error}=await sb.auth.getSession(); if(error) throw error; if(data.session){ await requireOwner(); showApp(); } }
+  catch(error){ const el=document.getElementById('gateErr'); el.textContent=error.message; el.style.display='block'; }
+}
+
 function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); initUploader(); startLiveUpdates(); }
 
 // ── EXTRA LINES ──
@@ -199,13 +257,14 @@ function removeExtraLine(i){ extraLines.splice(i,1); renderExtraLines(); }
 function renderExtraLines(){
   document.getElementById('extraLines').innerHTML = extraLines.map((l,i)=>`
     <div class="extra-row">
-      <input type="text" value="${esc(l.label)}" placeholder="Label e.g. Shipping" oninput="extraLines[${i}].label=this.value">
+      <input type="text" value="${esc(l.label)}" placeholder="Label e.g. Admin fee" oninput="extraLines[${i}].label=this.value">
       <input type="number" class="mono" value="${esc(l.amount)}" placeholder="RM" oninput="extraLines[${i}].amount=this.value">
       <button onclick="removeExtraLine(${i})">×</button>
     </div>`).join('');
 }
 
 // ── PHOTO UPLOAD (drag-drop, auto-compress, upload to Supabase storage) ──
+let uploadsInProgress=0, savingAuction=false;
 let uploadedPhotos = []; // array of {url}
 
 function initUploader(){
@@ -220,22 +279,29 @@ function initUploader(){
   input.addEventListener('change', ()=>handleFiles(input.files));
 }
 
+function syncSaveButton(){ document.getElementById('saveBtn').disabled=uploadsInProgress>0 || savingAuction; }
 async function handleFiles(files){
-  const status = document.getElementById('uploadStatus');
-  for(const file of files){
-    if(!file.type.startsWith('image/')) continue;
-    status.textContent = 'Uploading '+file.name+'…';
+  if(savingAuction){ toast('Wait for the listing to finish saving before adding photos.'); return; }
+  const images=Array.from(files).filter(file=>file.type.startsWith('image/'));
+  if(!images.length){ toast('Please choose image files.'); return; }
+  const status=document.getElementById('uploadStatus');
+  uploadsInProgress+=images.length; syncSaveButton();
+  const failures=[];
+  for(const file of images){
+    status.textContent='Uploading '+file.name+'…';
     try {
-      const compressed = await compressImage(file);
-      const fileName = 'auction/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
-      const { error } = await sb.storage.from('car-photos').upload(fileName, compressed, { contentType:'image/jpeg', upsert:false });
-      if(error){ status.textContent='Upload failed: '+error.message; continue; }
-      const { data } = sb.storage.from('car-photos').getPublicUrl(fileName);
-      uploadedPhotos.push({ url: data.publicUrl });
-      renderPhotoPreview();
-      status.textContent = uploadedPhotos.length+' photo(s) ready';
-    } catch(err){ status.textContent='Error: '+err.message; }
+      const compressed=await compressImage(file);
+      const fileName='auction/'+crypto.randomUUID()+'.jpg';
+      const {error}=await sb.storage.from('car-photos').upload(fileName,compressed,{contentType:'image/jpeg',upsert:false});
+      if(error) throw error;
+      const {data}=sb.storage.from('car-photos').getPublicUrl(fileName);
+      uploadedPhotos.push({url:data.publicUrl}); renderPhotoPreview();
+    } catch(error){ failures.push(file.name); console.error(error); }
+    finally { uploadsInProgress--; syncSaveButton(); }
   }
+  status.textContent=uploadedPhotos.length+' photo(s) ready'+(failures.length?'. Failed: '+failures.join(', ')+'. Add these photos again before saving.':'');
+  if(failures.length) toast('Some photos failed to upload. Review the photo list before saving.',7000);
+  document.getElementById('photoInput').value='';
 }
 
 function compressImage(file){
@@ -262,7 +328,7 @@ function compressImage(file){
 function renderPhotoPreview(){
   document.getElementById('photoPreview').innerHTML = uploadedPhotos.map((p,i)=>`
     <div style="position:relative; width:72px; height:56px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
-      <img src="${p.url}" style="width:100%; height:100%; object-fit:cover;">
+      <img src="${esc(p.url)}" style="width:100%; height:100%; object-fit:cover;">
       <button onclick="removePhoto(${i})" style="position:absolute; top:2px; right:2px; background:rgba(230,0,18,0.9); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:11px; cursor:pointer; line-height:1;">×</button>
       ${i===0?'<div style="position:absolute; bottom:0; left:0; right:0; background:rgba(17,24,39,0.8); color:#fff; font-size:8px; text-align:center; padding:1px;">COVER</div>':''}
     </div>`).join('');
@@ -271,49 +337,49 @@ function removePhoto(i){ uploadedPhotos.splice(i,1); renderPhotoPreview(); docum
 
 // ── SAVE / EDIT ──
 async function saveAuction(){
+  if(uploadsInProgress || savingAuction){ toast('Please wait until the current uploads or save finish.'); return; }
   const carName = document.getElementById('carName').value.trim();
   if(!carName){ toast('Enter a car name'); return; }
   const photos = uploadedPhotos.slice();
   const cleanExtra = extraLines.filter(l=>l.label && l.amount).map(l=>({label:l.label, amount:parseFloat(l.amount)||0}));
   const deadlineVal = document.getElementById('deadline').value;
+  const start=Number(document.getElementById('startPrice').value||0);
+  if(!Number.isFinite(start) || start<0 || start>100000000){ toast('Enter a valid non-negative starting price.'); return; }
+  if(extraLines.some(l=>!l.label.trim() || !Number.isFinite(Number(l.amount)) || Number(l.amount)<0)){ toast('Each charge needs a label and a non-negative amount.'); return; }
+  if(deadlineVal && (!Number.isFinite(new Date(deadlineVal).getTime()) || new Date(deadlineVal)<=new Date())){ toast('Choose a future deadline, or leave it empty for an open listing.'); return; }
 
   const payload = {
     car_name: carName,
     year: document.getElementById('year').value.trim(),
     specs: document.getElementById('specs').value.trim(),
     photos: photos,
-    starting_price: parseFloat(document.getElementById('startPrice').value)||0,
-    duty_est: parseFloat(document.getElementById('dutyEst').value)||0,
-    ap_est: parseFloat(document.getElementById('apEst').value)||0,
+    starting_price: start,
     extra_lines: cleanExtra,
     deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
     description: document.getElementById('description').value.trim()
   };
 
   const editId = document.getElementById('editId').value;
-  const btn = document.getElementById('saveBtn'); btn.textContent='Saving…'; btn.disabled=true;
+  const btn = document.getElementById('saveBtn'); savingAuction=true; btn.textContent='Saving…'; syncSaveButton();
 
-  let error;
-  if(editId){
-    // FIX: editing no longer touches status, so a closed auction stays closed.
-    // Use the Close Now / Reopen buttons to change status.
-    ({ error } = await sb.from('auctions').update(payload).eq('id', editId));
-  } else {
-    payload.status = 'live';
-    ({ error } = await sb.from('auctions').insert(payload));
-  }
-
-  btn.disabled=false;
-  if(error){ toast('Error: '+error.message); btn.textContent = editId?'Save Changes':'Create Auction'; return; }
-  toast(editId?'Auction updated':'Auction created');
-  resetForm();
-  loadAuctions();
+  try {
+    const query=editId ? sb.from('auctions').update(payload).eq('id',editId) : sb.from('auctions').insert({...payload,status:'live'});
+    const {data,error}=await query.select('id');
+    if(error) throw error;
+    if(!data || data.length!==1) throw new Error('No listing was saved. Check owner permissions.');
+    savingAuction=false;
+    toast(editId?'Listing updated':'Listing created'); resetForm(); await loadAuctions();
+  } catch(error){
+    toast('Save not confirmed: '+(error.message||'Connection problem.')+' Refresh the listing list before retrying.',7000);
+    btn.textContent=editId?'Save Changes':'Create Auction';
+  } finally { savingAuction=false; syncSaveButton(); }
 }
 
 function resetForm(){
+  if(uploadsInProgress || savingAuction){ toast('Please wait for uploads or saving to finish.'); return; }
   document.getElementById('editId').value='';
   // FIX: removed the non-existent 'photos' id that made this function crash
-  ['carName','year','specs','startPrice','dutyEst','apEst','deadline','description'].forEach(id=>{
+  ['carName','year','specs','startPrice','deadline','description'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.value='';
   });
   extraLines=[]; renderExtraLines();
@@ -324,6 +390,7 @@ function resetForm(){
 }
 
 function editAuction(id){
+  if(uploadsInProgress || savingAuction){ toast('Please wait for uploads or saving to finish before switching listings.'); return; }
   const a = auctionsById[id];
   if(!a){ toast('Auction not found, refresh the page'); return; }
   document.getElementById('editId').value=a.id;
@@ -332,8 +399,6 @@ function editAuction(id){
   document.getElementById('specs').value=a.specs||'';
   uploadedPhotos=(a.photos||[]).map(p=>({url:p.url})); renderPhotoPreview();
   document.getElementById('startPrice').value=a.starting_price||'';
-  document.getElementById('dutyEst').value=a.duty_est||'';
-  document.getElementById('apEst').value=a.ap_est||'';
   document.getElementById('description').value=a.description||'';
   extraLines=(a.extra_lines||[]).map(l=>({label:l.label,amount:l.amount})); renderExtraLines();
   if(a.deadline){ const d=new Date(a.deadline); const off=d.getTimezoneOffset(); const local=new Date(d.getTime()-off*60000); document.getElementById('deadline').value=local.toISOString().slice(0,16); }
@@ -344,24 +409,124 @@ function editAuction(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-async function closeAuction(id){ await sb.from('auctions').update({status:'closed'}).eq('id',id); toast('Auction closed'); loadAuctions(); }
-async function reopenAuction(id){ await sb.from('auctions').update({status:'live'}).eq('id',id); toast('Auction reopened'); loadAuctions(); }
-async function deleteAuction(id){ if(!confirm('Delete this auction and all its bids? This cannot be undone.')) return; await sb.from('auctions').delete().eq('id',id); toast('Auction deleted'); loadAuctions(); }
+const pendingActions=new Set();
+async function mutateListing(id,operation,success){
+  if(pendingActions.has(id)) return false;
+  pendingActions.add(id);
+  try {
+    const {data,error}=await operation().select('id');
+    if(error) throw error;
+    if(!data || data.length!==1) throw new Error('No listing changed. Refresh and check owner permissions.');
+    toast(success); await loadAuctions(); return true;
+  } catch(error){ toast('Not confirmed: '+(error.message||'Connection problem. Refresh before retrying.'),6000); return false; }
+  finally { pendingActions.delete(id); }
+}
+async function closeAuction(id){ return mutateListing(id,()=>sb.from('auctions').update({status:'closed'}).eq('id',id),'Listing closed'); }
+async function reopenAuction(id){
+  const a=auctionsById[id];
+  if(!a){ toast('Refresh the listing first.'); return false; }
+  if(a.deadline && new Date(a.deadline)<=new Date()){
+    toast('Set a future deadline or clear it, save, then click Reopen.',7000); editAuction(id); return false;
+  }
+  return mutateListing(id,()=>sb.from('auctions').update({status:'live'}).eq('id',id),'Listing reopened');
+}
+async function deleteAuction(id){
+  if(!confirm('Permanently delete this listing? This cannot be undone.')) return false;
+  return mutateListing(id,()=>sb.from('auctions').delete().eq('id',id),'Listing deleted');
+}
 
 function copyLink(id){
-  const url = `${location.origin}/auction-car.html?id=${id}`;
+  const url = new URL('auction-car.html?id='+encodeURIComponent(id),location.href).href;
   navigator.clipboard.writeText(url).then(()=>toast('Link copied')).catch(()=>toast(url));
 }
 
-// ── DELETE A BID (remove fake/troll bids; price drops back automatically) ──
-// FIX: single definition (the old file had two) and it now confirms a row was really deleted.
+// ── REMOVE A BID (kept in the record: who, when and why) ──
 async function deleteBid(bidId){
-  if(!confirm('Delete this bid? The auction price will drop back to the next highest bid. This cannot be undone.')) return;
-  const { data, error } = await sb.from('bids').delete().eq('id', bidId).select();
-  if(error){ toast('Error deleting: '+error.message); return; }
-  if(!data || !data.length){ toast('Bid was not deleted. Check staff permissions.'); return; }
-  toast('Bid deleted');
-  loadAuctions();
+  const reason = prompt('Why are you removing this bid? (for example: fake bid). It stays in the record.');
+  if(reason === null) return;
+  if(pendingActions.has(bidId)) return;
+  pendingActions.add(bidId);
+  try {
+    const {data:sess,error:sessionError}=await sb.auth.getSession();
+    if(sessionError || !sess.session) throw sessionError || new Error('Please sign in again.');
+    const who=sess.session.user.email;
+    const {data,error}=await sb.from('bids').update({deleted_at:new Date().toISOString(),deleted_by:who,delete_reason:reason.trim()||'No reason given'}).eq('id',bidId).select('id');
+    if(error) throw error;
+    if(!data || data.length!==1) throw new Error('No offer was removed. Check owner permissions.');
+    toast('Offer removed'); await loadAuctions();
+  } catch(error){ toast('Removal not confirmed: '+(error.message||'Connection problem. Refresh before retrying.'),6000); }
+  finally { pendingActions.delete(bidId); }
+}
+function removedHtml(list){
+  if(!list.length) return '';
+  return `<details style="margin-top:12px;font-size:12px;color:var(--muted)"><summary style="cursor:pointer">${list.length} removed bid${list.length===1?'':'s'}</summary>${list.map(b=>`<div style="padding:6px 0;border-bottom:1px solid var(--border)">RM ${rm(b.amount)} · ${esc(b.bidder_name)} · ${esc(b.bidder_phone)} · removed ${new Date(b.deleted_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} by ${esc(b.deleted_by||'staff')} (${esc(b.delete_reason||'')})</div>`).join('')}</details>`;
+}
+
+// ── BIDDERS: approve, confirm deposit, send code, block ──
+let bidders = [], bidderFilter = 'pending', knownBidders = null;
+async function loadBidders(){
+  const data=await readAll(()=>sb.from('bidders').select('*').order('created_at',{ascending:false}).order('id'));
+  bidders = data || [];
+  if(knownBidders){
+    const fresh = bidders.filter(b=>!knownBidders.has(b.id));
+    if(fresh.length){ toast(`New bidder awaiting approval: ${fresh[0].name}${fresh.length>1?' (+'+(fresh.length-1)+' more)':''}`, 7000); newBidCount += fresh.length; setTitleBadge(); beep(); }
+  }
+  knownBidders = new Set(bidders.map(b=>b.id));
+  renderBidders();
+}
+function setBidderFilter(f){ bidderFilter = f; renderBidders(); }
+function renderBidders(){
+  const box = document.getElementById('bidderList'); if(!box) return;
+  const pending = bidders.filter(b=>b.status==='pending').length;
+  const pb = document.getElementById('pendingBadge');
+  if(pb){ pb.style.display = pending ? '' : 'none'; pb.textContent = pending+' waiting'; }
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.f===bidderFilter));
+  const q = (document.getElementById('bidderSearch')||{}).value || '';
+  const qs = q.trim().toLowerCase(), dig = qs.replace(/\D/g,'');
+  let list = bidders.filter(b=>bidderFilter==='all' || b.status===bidderFilter);
+  if(qs) list = list.filter(b=>(b.name||'').toLowerCase().includes(qs) || (dig && (b.phone||'').includes(dig)));
+  if(!list.length){ box.innerHTML = `<div class="bids-empty">${bidders.length?'No bidders in this list.':'No bidders have registered yet.'}</div>`; return; }
+  box.innerHTML = list.map(b=>{
+    const when = new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const msg = `Hi ${b.name}, you are approved to submit offers at Kansai Group Malaysia. Your bidder code is ${b.code}. Open a stock listing, tap Submit an Offer and enter this code. Listings: ${new URL('auctions.html',location.href).href} . Please keep your code private.`;
+    let btns = '';
+    if(b.status==='pending') btns = `<button class="btn btn-sm" onclick="approveBidder('${b.id}')">Confirm deposit &amp; approve</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
+    else if(b.status==='approved') btns = `<a class="btn btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(msg)}">Send code on WhatsApp</a><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{deposit_confirmed:${!b.deposit_confirmed}})">${b.deposit_confirmed?'Deposit not received':'Mark deposit received'}</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
+    else btns = `<button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'pending'})">Unblock</button>`;
+    return `<div class="bidder-row"><div>
+        <div style="font-weight:600">${esc(b.name)} <span class="badge ${b.status==='approved'?'live':'closed'}">${esc(b.status)}</span>${b.status==='approved'?(b.deposit_confirmed?' <span class="badge live">deposit ✓</span>':' <span class="badge closed">no deposit</span>'):''}</div>
+        <div class="auction-meta"><a href="https://wa.me/${esc(b.phone)}" target="_blank" rel="noopener" style="color:var(--red)">+${esc(b.phone)}</a> · registered ${when}${b.status==='approved'?` · code <span class="code-tag">${esc(b.code)}</span>`:''}</div>
+      </div><div class="auction-actions" style="margin:0">${btns}</div></div>`;
+  }).join('');
+}
+async function setBidder(id,fields,success='Saved'){
+  if(pendingActions.has(id)) return false;
+  pendingActions.add(id);
+  try {
+    const {data,error}=await sb.from('bidders').update(fields).eq('id',id).select('id');
+    if(error) throw error;
+    if(!data || data.length!==1) throw new Error('No bidder changed. Check owner permissions.');
+    toast(success,6000);
+    try { await loadBidders(); } catch(error){ toast('Saved, but could not refresh the bidder list. Please refresh.',6000); }
+    return true;
+  } catch(error){ toast('Not saved: '+(error.message||'Connection problem.'),6000); return false; }
+  finally { pendingActions.delete(id); }
+}
+async function approveBidder(id){
+  return setBidder(id,{status:'approved',deposit_confirmed:true,approved_at:new Date().toISOString()},'Approved. Use Send code on WhatsApp to give them their bidder code.');
+}
+
+// ── ANALYTICS shown on the staff page ──
+async function loadStats(){
+  try {
+    const [stats, wk] = await Promise.all([ readAll(()=>sb.from('auction_stats').select('*').order('auction_id')), sb.from('auction_week').select('*') ]);
+    if(wk.error) throw wk.error;
+    stats.forEach(r=>{ const el = document.getElementById('st-'+r.auction_id); if(el) el.textContent = `Views ${r.views} · Visitors ${r.visitors} · Offer window opened ${r.bid_opens} · Bidders ${r.bidders}`; });
+    const w = (wk.data && wk.data[0]) || {};
+    const box = (n,l)=>`<div class="stat-box"><b>${Number(n||0).toLocaleString('en-MY')}</b><span>${l}</span></div>`;
+    const el = document.getElementById('weekStats');
+    if(el) el.innerHTML = box(w.visitors,'Visitors') + box(w.pageviews,'Page views') + box(w.bid_opens,'Bid window opened') + box(w.registrations,'Registrations') + box(w.bids,'Bids placed');
+  } catch(e){ console.error(e); document.getElementById('weekStats').textContent='Statistics unavailable. Retrying on the next refresh.'; }
 }
 
 // ── LOAD + RENDER ──
@@ -375,7 +540,7 @@ function setLive(ok){
   if(ok){ el.className='live-stat'; el.textContent='● Live · updated '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
   else { el.className='live-stat off'; el.textContent='● Reconnecting…'; }
 }
-function setTitleBadge(){ document.title = newBidCount ? `(${newBidCount}) New bid · Auction Manager` : BASE_TITLE; }
+function setTitleBadge(){ document.title = newBidCount ? `(${newBidCount}) New alert · Auction Manager` : BASE_TITLE; }
 function renderSoundBtn(){ const b=document.getElementById('soundBtn'); if(b) b.textContent = soundOn ? '🔔 Sound on' : '🔕 Sound off'; }
 function toggleSound(){ soundOn=!soundOn; try{ localStorage.setItem('kgSound', soundOn?'on':'off'); }catch(e){} renderSoundBtn(); if(soundOn) beep(); }
 function beep(){
@@ -410,39 +575,39 @@ function startLiveUpdates(){
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ newBidCount=0; setTitleBadge(); loadAuctions(true); } });
   window.addEventListener('focus', ()=>{ newBidCount=0; setTitleBadge(); });
   // Instant updates too, when Realtime is switched on for the bids table in Supabase (polling covers it otherwise)
-  try { sb.channel('staff-bids').on('postgres_changes',{event:'*',schema:'public',table:'bids'},()=>{ clearTimeout(rtTimer); rtTimer=setTimeout(()=>loadAuctions(true),400); }).subscribe(); } catch(e){}
+  try { const cb=()=>{ clearTimeout(rtTimer); rtTimer=setTimeout(()=>loadAuctions(true),400); }; sb.channel('staff-live').on('postgres_changes',{event:'*',schema:'public',table:'bids'},cb).on('postgres_changes',{event:'*',schema:'public',table:'bidders'},cb).subscribe(); } catch(e){}
 }
 
 async function loadAuctions(silent){
   if(refreshing) return;
   refreshing = true;
-  try { await loadAuctionsInner(silent === true); } finally { refreshing = false; }
+  try { await loadAuctionsInner(silent===true); await loadBidders(); await loadStats(); setLive(true); }
+  catch(error){ console.error(error); setLive(false); if(!silent) toast('Could not refresh. Previous data is kept. Please try again.',6000); }
+  finally { refreshing=false; }
 }
 async function loadAuctionsInner(silent){
-  const { data:auctions, error } = await sb.from('auctions').select('*').order('created_at',{ascending:false});
+  const auctions=await readAll(()=>sb.from('auctions').select('*').order('created_at',{ascending:false}).order('id'));
   const list = document.getElementById('auctionList');
-  if(error){ setLive(false); if(!silent) list.innerHTML=`<div class="bids-empty">Error loading: ${esc(error.message)}</div>`; return; }
-  if(!auctions.length){ setLive(true); list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
+  if(!auctions.length){ auctionsById={}; knownBids=null; lastSig=''; setLive(true); list.innerHTML=`<div class="bids-empty">No auctions yet. Create one above.</div>`; return; }
 
-  auctionsById = {};
-  auctions.forEach(a=>{ auctionsById[a.id]=a; });
 
   // Load all bids (staff can read full details)
-  const { data:allBids } = await sb.from('bids').select('*').order('amount',{ascending:false});
-  const bidsByAuction = {};
-  (allBids||[]).forEach(b=>{ (bidsByAuction[b.auction_id]=bidsByAuction[b.auction_id]||[]).push(b); });
+  const allBids=await readAll(()=>sb.from('bids').select('*').order('amount',{ascending:false}).order('id'));
+  auctionsById={}; auctions.forEach(a=>{ auctionsById[a.id]=a; });
+  const bidsByAuction = {}, removedByAuction = {};
+  (allBids||[]).forEach(b=>{ const m = b.deleted_at ? removedByAuction : bidsByAuction; (m[b.auction_id]=m[b.auction_id]||[]).push(b); });
 
   setLive(true);
-  announceNewBids(auctions, allBids||[]);
-  const sig = JSON.stringify(auctions) + JSON.stringify((allBids||[]).map(b=>[b.id,b.amount]))
-    + auctions.map(a=>(a.status==='closed' || (a.deadline && new Date(a.deadline)<new Date()))?1:0).join('');
+  announceNewBids(auctions, (allBids||[]).filter(b=>!b.deleted_at));
+  const sig = JSON.stringify(auctions) + JSON.stringify((allBids||[]).map(b=>[b.id,b.amount,b.deleted_at]))
+    + auctions.map(a=>(a.status==='closed' || (a.deadline && new Date(a.deadline)<=new Date()))?1:0).join('');
   if(silent && sig===lastSig) return;   // nothing changed: leave the list alone
   lastSig = sig;
 
   list.innerHTML = auctions.map(a=>{
     const bids = bidsByAuction[a.id]||[];
     const closed = a.status==='closed' || (a.deadline && new Date(a.deadline)<new Date());
-    const topPrice = bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : Number(a.starting_price)||0;
+    const topPrice = Math.max(Number(a.starting_price)||0, bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : 0);
     const deadlineStr = a.deadline ? new Date(a.deadline).toLocaleString('en-MY',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'No deadline';
 
     return `<div class="auction-item">
@@ -450,11 +615,12 @@ async function loadAuctionsInner(silent){
         <div>
           <div class="auction-name">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
           <div class="auction-meta">Current: RM ${rm(topPrice)} · ${bids.length} bid${bids.length===1?'':'s'} · Closes ${deadlineStr}</div>
+          <div class="auction-meta" id="st-${a.id}"></div>
         </div>
         <span class="badge ${closed?'closed':'live'}">${closed?'Closed':'Live'}</span>
       </div>
       <div class="auction-actions">
-        <div class="link-box">${location.origin}/auction-car.html?id=${a.id}</div>
+        <div class="link-box">${esc(new URL('auction-car.html?id='+encodeURIComponent(a.id),location.href).href)}</div>
         <button class="btn btn-sm" onclick="copyLink('${a.id}')">Copy Link</button>
         <button class="btn btn-ghost btn-sm" onclick="editAuction('${a.id}')">Edit</button>
         ${closed?`<button class="btn btn-ghost btn-sm" onclick="reopenAuction('${a.id}')">Reopen</button>`:`<button class="btn btn-ghost btn-sm" onclick="closeAuction('${a.id}')">Close Now</button>`}
@@ -475,6 +641,7 @@ async function loadAuctionsInner(silent){
           </tbody>
         </table></div>
       `:`<div class="bids-empty">No bids yet.</div>`}
+      ${removedHtml(removedByAuction[a.id]||[])}
     </div>`;
   }).join('');
 }
