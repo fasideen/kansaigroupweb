@@ -249,7 +249,7 @@ async function checkAuth(){
   catch(error){ const el=document.getElementById('gateErr'); el.textContent=error.message; el.style.display='block'; }
 }
 
-function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions(); initUploader(); startLiveUpdates(); }
+function showApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; renderExtraLines(); loadAuctions().then(()=>{ if(location.hash==='#biddersCard') document.getElementById('biddersCard').scrollIntoView({behavior:'smooth'}); }); initUploader(); startLiveUpdates(); }
 
 // ── EXTRA LINES ──
 function addExtraLine(label='',amount=''){ extraLines.push({label,amount}); renderExtraLines(); }
@@ -463,6 +463,7 @@ function removedHtml(list){
 }
 
 // ── BIDDERS: approve, confirm deposit, send code, block ──
+function registrationRef(b){ return b.registration_number ? 'KG-'+String(b.registration_number).padStart(6,'0') : 'Existing registration'; }
 let bidders = [], bidderFilter = 'pending', knownBidders = null;
 async function loadBidders(){
   const data=await readAll(()=>sb.from('bidders').select('*').order('created_at',{ascending:false}).order('id'));
@@ -488,14 +489,16 @@ function renderBidders(){
   if(!list.length){ box.innerHTML = `<div class="bids-empty">${bidders.length?'No bidders in this list.':'No bidders have registered yet.'}</div>`; return; }
   box.innerHTML = list.map(b=>{
     const when = new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    const msg = `Hi ${b.name}, you are approved to submit offers at Kansai Group Malaysia. Your bidder code is ${b.code}. Open a stock listing, tap Submit an Offer and enter this code. Listings: ${new URL('auctions.html',location.href).href} . Please keep your code private.`;
+    const listing=b.registration_auction_id ? new URL('auction-car.html?id='+encodeURIComponent(b.registration_auction_id)+'&enter_code=1',location.href).href : new URL('auctions.html',location.href).href;
+    const msg=`Hi ${b.name}, your refundable deposit has been verified and your account is approved. Your bidder code is ${b.code}. Open ${listing} and enter your code to submit offers. Offers use whole RM 500 steps and are subject to acceptance. Please keep your code private.`;
+    const depositMsg=`Hi ${b.name}, thank you for registering with Kansai Group. Your reference is ${registrationRef(b)}. We will confirm the refundable deposit amount, payment instructions and refund conditions here. Please send your receipt in this chat after payment. We will verify it before approving your access.`;
     let btns = '';
-    if(b.status==='pending') btns = `<button class="btn btn-sm" onclick="approveBidder('${b.id}')">Confirm deposit &amp; approve</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
-    else if(b.status==='approved') btns = `<a class="btn btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(msg)}">Send code on WhatsApp</a><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{deposit_confirmed:${!b.deposit_confirmed}})">${b.deposit_confirmed?'Deposit not received':'Mark deposit received'}</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
+    if(b.status==='pending') btns = `<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(depositMsg)}">Discuss deposit on WhatsApp</a><button class="btn btn-sm" onclick="approveBidder('${b.id}')">Confirm deposit &amp; approve</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
+    else if(b.status==='approved') btns = `${b.deposit_confirmed?`<a class="btn btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(msg)}">Send code on WhatsApp</a>`:''}<button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{deposit_confirmed:${!b.deposit_confirmed}})">${b.deposit_confirmed?'Deposit not received':'Mark deposit received'}</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
     else btns = `<button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'pending'})">Unblock</button>`;
     return `<div class="bidder-row"><div>
         <div style="font-weight:600">${esc(b.name)} <span class="badge ${b.status==='approved'?'live':'closed'}">${esc(b.status)}</span>${b.status==='approved'?(b.deposit_confirmed?' <span class="badge live">deposit ✓</span>':' <span class="badge closed">no deposit</span>'):''}</div>
-        <div class="auction-meta"><a href="https://wa.me/${esc(b.phone)}" target="_blank" rel="noopener" style="color:var(--red)">+${esc(b.phone)}</a> · registered ${when}${b.status==='approved'?` · code <span class="code-tag">${esc(b.code)}</span>`:''}</div>
+        <div class="auction-meta"><a href="https://wa.me/${esc(b.phone)}" target="_blank" rel="noopener" style="color:var(--red)">+${esc(b.phone)}</a> · ${esc(registrationRef(b))} · registered ${when}${b.status==='approved'?` · code <span class="code-tag">${esc(b.code)}</span>`:''}</div>
       </div><div class="auction-actions" style="margin:0">${btns}</div></div>`;
   }).join('');
 }
@@ -513,6 +516,7 @@ async function setBidder(id,fields,success='Saved'){
   finally { pendingActions.delete(id); }
 }
 async function approveBidder(id){
+  if(!confirm('Have you verified this customer’s refundable deposit? Approve only after confirming payment.')) return false;
   return setBidder(id,{status:'approved',deposit_confirmed:true,approved_at:new Date().toISOString()},'Approved. Use Send code on WhatsApp to give them their bidder code.');
 }
 

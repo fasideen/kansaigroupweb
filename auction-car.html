@@ -313,6 +313,7 @@ function connectionState(ok){
   const el = document.getElementById('connectionNotice');
   el.style.display = ok ? 'none' : 'block';
   el.textContent = ok ? '' : 'Unable to refresh. Previously loaded prices are shown. Offers are paused until the connection returns. Retrying automatically…';
+  if(document.getElementById('bidAmount')) onAmountEdit();
 }
 async function refreshAuction(){
   if(refreshPromise) return refreshPromise;
@@ -350,7 +351,7 @@ async function refreshAuction(){
 async function loadAuction(){
   if(!getAuctionId()){ setLoading('No listing specified.'); return; }
   const ok = await refreshAuction();
-  if(ok){ kgTrack('view',auction.id); loadOthers(); }
+  if(ok){ kgTrack('view',auction.id); loadOthers(); if(new URLSearchParams(location.search).get('enter_code')==='1'){ document.getElementById('bidModal').classList.add('open'); showCodeScreen(); } }
   if(!pollInterval){
     // Keep polling ended listings too: the owner may reopen them or correct an offer.
     pollInterval = setInterval(refreshAuction,5000);
@@ -680,6 +681,7 @@ function refreshLiveBits(){
   if(bc) bc.textContent = bids.length;
   const sp = document.getElementById('stickyPrice'); if(sp) sp.innerHTML = `<small>RM</small> ${rm(p)}`;
   renderFeed(); renderBidStatus();
+  if(document.getElementById('bidAmount')) onAmountEdit();
 }
 
 // ── GALLERY + FULL-SCREEN VIEWER ──
@@ -761,7 +763,8 @@ function startTimer(){
 
 // ── BID MODAL: register → staff approval + deposit → bidder code → bid ──
 const WA_NUMBER = '601151177026';
-const TERMS_VERSION = '2026-11-offers-1';
+const TERMS_VERSION = '2026-11-whatsapp-2';
+let registrationContext=null;
 let bidderCode = null, bidderInfo = null;
 try { bidderCode = localStorage.getItem('kansaiBidderCode'); } catch(e){}
 
@@ -770,18 +773,18 @@ function modalErr(msg){ const e=document.getElementById('modalError'); if(!e) re
 function closeModal(){ document.getElementById('bidModal').classList.remove('open'); }
 function termsLinks(){ return '<a href="auction-terms.html" target="_blank" rel="noopener">Auction Terms</a>'; }
 function waHref(text){ return 'https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(text); }
-function forgetBidder(){ bidderCode=null; bidderInfo=null; try{ localStorage.removeItem('kansaiBidderCode'); localStorage.removeItem('kansaiMyBids'); }catch(e){} renderBidStatus(); }
+function forgetBidder(){ bidderCode=null; bidderInfo=null; registrationContext=null; try{ localStorage.removeItem('kansaiBidderCode'); localStorage.removeItem('kansaiMyBids'); }catch(e){} renderBidStatus(); }
 
 function registerHTML(){
   return `
     <div class="modal-title bebas">Register to Bid</div>
-    <div class="modal-sub">One-time step, takes a minute</div>
-    <div class="modal-note">To keep bidding fair, new bidders are approved by our team and place a refundable deposit before they can bid. We will contact you on WhatsApp.</div>
+    <div class="modal-sub">Register once, then continue on WhatsApp</div>
+    <div class="modal-note">A refundable deposit is required before you can make offers. Register below, then message us on WhatsApp for the deposit amount, payment instructions and refund conditions. After we verify payment, we will approve you and send your bidder code on WhatsApp. Registration alone does not activate bidding.</div>
     <div class="modal-field"><label>Full Name</label><input type="text" id="regName" placeholder="Your name" autocomplete="name"></div>
     <div class="modal-field"><label>Mobile / WhatsApp Number</label><input type="tel" id="regPhone" placeholder="+60 1X-XXX XXXX" autocomplete="tel"></div>
     <label class="chk"><input type="checkbox" id="regAgree"><span>I agree to the ${termsLinks()} and the <a href="auction-privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.</span></label>
     <div class="modal-error" id="modalError"></div>
-    <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="regBtn" onclick="submitRegister()">Register</button></div>
+    <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="regBtn" onclick="submitRegister()">Register &amp; Continue</button></div>
     <div style="text-align:center;margin-top:6px"><button type="button" class="link-btn" onclick="showCodeScreen()">I already have a bidder code</button></div>`;
 }
 function codeHTML(){
@@ -793,21 +796,30 @@ function codeHTML(){
     <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="codeBtn" onclick="submitCode()">Verify</button></div>
     <div style="text-align:center;margin-top:6px"><button type="button" class="link-btn" onclick="setModal(registerHTML())">Not registered yet? Register</button></div>`;
 }
-function pendingHTML(name, mode){
-  const nm = [auction.car_name, auction.year].filter(Boolean).join(' ');
-  const texts = {
-    new: `Thank you${name?', '+esc(name):''}. You are registered. Our team will WhatsApp you to arrange the refundable deposit and approve your account. Once approved, you will receive a bidder code on WhatsApp. Enter it here to start bidding.`,
-    existing_pending: 'This number is already registered and waiting for approval. Our team will contact you on WhatsApp to arrange the refundable deposit.',
-    approved_existing: 'This number is already registered. Enter the bidder code we sent you on WhatsApp.',
-    account_pending: `Your account is not ready to bid yet. It is waiting for approval and deposit confirmation. Our team will contact you on WhatsApp.`,
-    blocked: 'This bidder account is not active. Please contact Kansai Group.'
-  };
-  return `
-    <div class="modal-title bebas">${mode==='blocked'?'Account Not Active':(mode==='approved_existing'?'Already Registered':'Waiting for Approval')}</div>
-    <div class="modal-sub" style="line-height:1.6">${texts[mode]||texts.new}</div>
-    <a class="wa-btn" target="_blank" rel="noopener" onclick="kgTrack('whatsapp',auction.id)" href="${waHref('Hi Kansai Group, I registered to bid on the '+nm+'. Please confirm my deposit and approval.')}">WhatsApp Kansai Group</a>
-    <div class="modal-actions">${mode==='blocked'?'':'<button class="modal-cancel" onclick="showCodeScreen()">I have my code</button>'}<button class="modal-submit" onclick="closeModal()">Close</button></div>`;
+function pendingHTML(name,mode){
+  const nm=[auction.car_name,auction.year].filter(Boolean).join(' ');
+  const ref=registrationContext && registrationContext.reference;
+  const knownName=name || (registrationContext && registrationContext.name) || '';
+  const message=[
+    'Hi Kansai Group, I registered to submit offers.',
+    knownName ? 'Name: '+knownName : '',
+    ref ? 'Registration reference: '+ref : '',
+    registrationContext && registrationContext.phone ? 'Registered WhatsApp: '+registrationContext.phone : '',
+    'Vehicle: '+nm,
+    'Listing: '+pageUrl(),
+    mode==='approved_existing' ? 'Please help me access my bidder code.' : 'Please send the refundable deposit amount, payment instructions and refund conditions. I will send my payment receipt here for verification.'
+  ].filter(Boolean).join('\n');
+  const blocked=mode==='blocked',approved=mode==='approved_existing';
+  const text=blocked ? 'This account is not active. Contact us on WhatsApp for assistance.' : approved ? 'You are already registered. Enter your bidder code, or message us on WhatsApp if you need help.' : 'Your registration is saved. Next, message us on WhatsApp to arrange your refundable deposit. We will verify payment, approve your account and send your bidder code in the same chat.';
+  return `<div class="modal-title bebas">${blocked?'Account Not Active':approved?'Already Registered':'Registration Received'}</div>
+    <div class="modal-sub" style="line-height:1.6">${esc(text)}</div>
+    ${ref?`<div class="modal-note">Your registration reference: <strong>${esc(ref)}</strong></div>`:''}
+    ${!blocked&&!approved?'<div class="modal-note"><strong>Next steps</strong><br>1. Tap Continue on WhatsApp and send the prepared message.<br>2. Arrange the deposit and send your receipt in the chat.<br>3. Receive your code after payment verification. Registration alone does not confirm payment.</div>':''}
+    <a class="wa-btn" target="_blank" rel="noopener" onclick="kgTrack('whatsapp',auction.id)" href="${waHref(message)}">${blocked?'Contact us on WhatsApp':approved?'Get help on WhatsApp':'Continue on WhatsApp'}</a>
+    <p class="modal-consent">WhatsApp opens with a prepared message. Tap Send there so our team receives it. Keep your bidder code private.</p>
+    <div class="modal-actions">${blocked?'':'<button class="modal-cancel" onclick="showCodeScreen()">I have my code</button>'}<button class="modal-submit" onclick="closeModal()">Close</button></div>`;
 }
+
 function bidFormHTML(){
   return `
     <div class="modal-title bebas">Submit an Offer</div>
@@ -815,11 +827,11 @@ function bidFormHTML(){
     <div class="known-bidder-bar"><div>Submitting as <strong>${esc(bidderInfo.name)}</strong></div><button type="button" onclick="notYou()">Not you?</button></div>
     <div class="modal-field">
       <label>Your Offer Amount (RM)</label>
-      <input type="number" class="mono" id="bidAmount" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
+      <input type="number" class="mono" id="bidAmount" min="${nextMinimumOffer()}" step="500" max="100000000" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
       <div class="quick-bumps">
+        <button type="button" onclick="bumpTo(500)">+500</button>
         <button type="button" onclick="bumpTo(1000)">+1,000</button>
         <button type="button" onclick="bumpTo(2000)">+2,000</button>
-        <button type="button" onclick="bumpTo(5000)">+5,000</button>
       </div>
       <div class="modal-hint" id="bidHint"></div>
     </div>
@@ -830,11 +842,16 @@ function bidFormHTML(){
 
 function showCodeScreen(){ setModal(codeHTML()); }
 function notYou(){ forgetBidder(); showCodeScreen(); }
+function nextMinimumOffer(){
+  return Math.ceil((currentPrice()+MIN_INCREMENT)/MIN_INCREMENT)*MIN_INCREMENT;
+}
+function validOfferAmount(amount){
+  return Number.isSafeInteger(amount) && amount>0 && amount<=100000000 && amount%MIN_INCREMENT===0 && amount>=nextMinimumOffer();
+}
 function showBidForm(){
   setModal(bidFormHTML());
-  const price = currentPrice();
-  document.getElementById('bidAmount').value = price + 1000;
-  document.getElementById('bidHint').textContent = `Minimum bid RM ${rm(price+MIN_INCREMENT)}. Tap a button or type your amount.`;
+  document.getElementById('bidAmount').value=nextMinimumOffer();
+  onAmountEdit();
 }
 
 async function verifyCode(code){
@@ -867,13 +884,14 @@ async function submitRegister(){
   if(!document.getElementById('regAgree').checked){ modalErr('Please tick the box to agree to the Auction Terms and Privacy Notice.'); return; }
   const btn = document.getElementById('regBtn'); btn.textContent='Registering…'; btn.disabled=true;
   let data,error;
-  try { ({data,error}=await sb.rpc('register_bidder',{p_name:name,p_phone:phone,p_terms:TERMS_VERSION})); }
+  try { ({data,error}=await sb.rpc('register_bidder',{p_name:name,p_phone:phone,p_terms:TERMS_VERSION,p_auction:auction.id})); }
   catch(e){ error=e; }
   if(error || !data){
-    btn.textContent='Register'; btn.disabled=false;
+    btn.textContent='Register & Continue'; btn.disabled=false;
     modalErr(error && error.code==='P0001' && error.message ? error.message : 'Could not register right now. Please try again.');
     return;
   }
+  registrationContext={name,phone,reference:data.registration_ref||null};
   kgTrack('register_submit', auction.id);
   const mode = data.existing ? (data.status==='approved' ? 'approved_existing' : (data.status==='blocked' ? 'blocked' : 'existing_pending')) : 'new';
   setModal(pendingHTML(name, mode));
@@ -887,38 +905,39 @@ async function submitCode(){
   btn.textContent='Verify'; btn.disabled=false;
   if(r.error){ modalErr('Could not check the code. Please try again.'); return; }
   if(!r.ok){ modalErr('That code was not recognised. Please check it and try again.'); return; }
-  bidderCode = code; bidderInfo = r;
+  bidderCode = code; bidderInfo = r; registrationContext=null;
   try { localStorage.setItem('kansaiBidderCode', code); } catch(e){}
   if(r.can_bid) showBidForm(); else setModal(pendingHTML(r.name, r.status==='blocked' ? 'blocked' : 'account_pending'));
 }
 
 function bumpTo(inc){
-  const price = currentPrice();
-  const cur = parseFloat(document.getElementById('bidAmount').value)||0;
-  const newVal = (cur > price ? cur : price) + inc;
-  document.getElementById('bidAmount').value = newVal;
-  document.getElementById('bidHint').textContent = `Your bid: RM ${rm(newVal)} (RM ${rm(newVal-price)} above current)`;
+  const input=document.getElementById('bidAmount');
+  const current=Number(input.value);
+  const base=validOfferAmount(current)?current:nextMinimumOffer()-MIN_INCREMENT;
+  input.value=base+inc;
+  onAmountEdit();
 }
 function onAmountEdit(){
-  const price = currentPrice();
-  const v = parseFloat(document.getElementById('bidAmount').value)||0;
-  document.getElementById('bidHint').textContent = v >= price+MIN_INCREMENT ? `RM ${rm(v-price)} above current bid` : `Minimum bid RM ${rm(price+MIN_INCREMENT)}`;
+  const input=document.getElementById('bidAmount'); if(!input) return;
+  const minimum=nextMinimumOffer(),amount=Number(input.value);
+  input.min=minimum;
+  const valid=validOfferAmount(amount);
+  document.getElementById('bidHint').textContent=valid ? `Offer RM ${rm(amount)}. Only whole RM 500 steps are accepted.` : `Minimum offer RM ${rm(minimum)}. Use whole RM 500 steps (for example RM ${rm(minimum)} or RM ${rm(minimum+MIN_INCREMENT)}).`;
+  const button=document.getElementById('submitBidBtn'); if(button) button.disabled=!valid || submittingBid || !dataFresh || isClosed();
 }
 
 let submittingBid=false;
 async function submitBid(){
   if(submittingBid) return;
   const amount=Number(document.getElementById('bidAmount').value);
-  if(!Number.isFinite(amount) || amount<=0 || amount>100000000 || Math.round(amount*100)/100!==amount){
-    modalErr('Enter a valid amount up to RM 100,000,000, with at most two decimal places.'); return;
-  }
+  if(!validOfferAmount(amount)){ onAmountEdit(); modalErr('Use whole RM 500 steps at or above the displayed minimum offer.'); return; }
   const btn=document.getElementById('submitBidBtn');
   submittingBid=true; btn.textContent='Submitting…'; btn.disabled=true;
   try {
     if(!(await refreshAuction())){ modalErr('Could not verify the latest price. Please reconnect and try again.'); return; }
     if(isClosed()){ modalErr('This listing is closed to new offers.'); return; }
-    const minimum=currentPrice()+MIN_INCREMENT;
-    if(amount<minimum){ modalErr(`The latest minimum offer is RM ${rm(minimum)}. Please review your amount.`); return; }
+    const minimum=nextMinimumOffer();
+    if(!validOfferAmount(amount)){ modalErr(`The latest minimum offer is RM ${rm(minimum)}. Please review your amount.`); return; }
     const {data,error}=await sb.rpc('place_bid',{p_auction:auction.id,p_amount:amount,p_code:bidderCode});
     if(error){
       modalErr(error.code==='P0001' ? error.message : 'We could not confirm your offer. Refresh and check the offer activity before trying again.');
@@ -933,7 +952,7 @@ async function submitBid(){
     modalErr('We could not confirm your offer. Refresh and check the offer activity before trying again.');
   } finally {
     submittingBid=false;
-    if(btn.isConnected){ btn.textContent='Submit Offer'; btn.disabled=false; }
+    if(btn.isConnected){ btn.textContent='Submit Offer'; onAmountEdit(); }
   }
 }
 
