@@ -867,7 +867,8 @@ async function openModal(){
   kgTrack('bid_open', auction.id);
   document.getElementById('bidModal').classList.add('open');
   if(!bidderCode){ setModal(registerHTML()); return; }
-  if(bidderInfo && bidderInfo.can_bid){ showBidForm(); return; }
+  // Recheck a saved code every time: the owner may have removed the registration
+  // or changed deposit/approval status since this page was opened.
   setModal('<div class="loading" style="padding:40px 10px">Checking your account…</div>');
   const r = await verifyCode(bidderCode);
   if(r.error){ setModal(`<div class="modal-title bebas">Connection Problem</div><div class="modal-sub">We could not check your account. Please check your connection and try again.</div><div class="modal-actions"><button class="modal-submit" onclick="closeModal()">Close</button></div>`); return; }

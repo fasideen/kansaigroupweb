@@ -496,6 +496,7 @@ function renderBidders(){
     if(b.status==='pending') btns = `<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(depositMsg)}">Discuss deposit on WhatsApp</a><button class="btn btn-sm" onclick="approveBidder('${b.id}')">Confirm deposit &amp; approve</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
     else if(b.status==='approved') btns = `${b.deposit_confirmed?`<a class="btn btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(msg)}">Send code on WhatsApp</a>`:''}<button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{deposit_confirmed:${!b.deposit_confirmed}})">${b.deposit_confirmed?'Deposit not received':'Mark deposit received'}</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
     else btns = `<button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'pending'})">Unblock</button>`;
+    btns += `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeBidder('${b.id}')" ${pendingActions.has(b.id)?'disabled':''}>Remove registration</button>`;
     return `<div class="bidder-row"><div>
         <div style="font-weight:600">${esc(b.name)} <span class="badge ${b.status==='approved'?'live':'closed'}">${esc(b.status)}</span>${b.status==='approved'?(b.deposit_confirmed?' <span class="badge live">deposit ✓</span>':' <span class="badge closed">no deposit</span>'):''}</div>
         <div class="auction-meta"><a href="https://wa.me/${esc(b.phone)}" target="_blank" rel="noopener" style="color:var(--red)">+${esc(b.phone)}</a> · ${esc(registrationRef(b))} · registered ${when}${b.status==='approved'?` · code <span class="code-tag">${esc(b.code)}</span>`:''}</div>
@@ -518,6 +519,33 @@ async function setBidder(id,fields,success='Saved'){
 async function approveBidder(id){
   if(!confirm('Have you verified this customer’s refundable deposit? Approve only after confirming payment.')) return false;
   return setBidder(id,{status:'approved',deposit_confirmed:true,approved_at:new Date().toISOString()},'Approved. Use Send code on WhatsApp to give them their bidder code.');
+}
+
+// Owner-only removal lets unused/test phone numbers register afresh. The server
+// refuses removal if any offer history exists, including removed offers.
+async function removeBidder(id){
+  if(pendingActions.has(id)) return false;
+  const bidder=bidders.find(b=>b.id===id);
+  if(!bidder){ toast('Registration not found. Refresh the list first.'); return false; }
+  const depositNote=bidder.deposit_confirmed ? '\n\nA deposit is marked received. Settle any refund before removing this registration. This action does not refund money.' : '';
+  if(!confirm(`Remove registration for ${bidder.name} (+${bidder.phone})?\n\nTheir code will stop working and this number can register again. Offer history prevents removal.${depositNote}`)) return false;
+  pendingActions.add(id); renderBidders();
+  try {
+    const {data,error}=await sb.rpc('remove_bidder_registration',{p_bidder:id});
+    if(error) throw error;
+    if(!data || data.ok!==true) throw new Error('No removal confirmation received. Refresh the list before retrying.');
+    bidders=bidders.filter(b=>b.id!==id);
+    if(knownBidders) knownBidders.delete(id);
+    renderBidders();
+    toast('Registration removed. This number can register again.',6000);
+    try { await loadBidders(); }
+    catch(error){ toast('Registration removed, but the list could not refresh. Please refresh when connected.',6000); }
+    return true;
+  } catch(error){
+    const message=error.code==='P0001' ? error.message : 'Removal not confirmed. Refresh before retrying. Check that auction-remove-registration.sql ran successfully.';
+    toast(message,7000);
+    return false;
+  } finally { pendingActions.delete(id); renderBidders(); }
 }
 
 // ── ANALYTICS shown on the staff page ──
