@@ -521,14 +521,14 @@ async function approveBidder(id){
   return setBidder(id,{status:'approved',deposit_confirmed:true,approved_at:new Date().toISOString()},'Approved. Use Send code on WhatsApp to give them their bidder code.');
 }
 
-// Owner-only removal lets unused/test phone numbers register afresh. The server
-// refuses removal if any offer history exists, including removed offers.
+// Owner-confirmed removal works for every registration. Its offers are removed
+// from live bidding and retained in history; the number can register afresh.
 async function removeBidder(id){
   if(pendingActions.has(id)) return false;
   const bidder=bidders.find(b=>b.id===id);
   if(!bidder){ toast('Registration not found. Refresh the list first.'); return false; }
   const depositNote=bidder.deposit_confirmed ? '\n\nA deposit is marked received. Settle any refund before removing this registration. This action does not refund money.' : '';
-  if(!confirm(`Remove registration for ${bidder.name} (+${bidder.phone})?\n\nTheir code will stop working and this number can register again. Offer history prevents removal.${depositNote}`)) return false;
+  if(!confirm(`Remove registration for ${bidder.name} (+${bidder.phone})?\n\nTheir code will stop working and this number can register again. Their offers will be removed from live bidding and kept in history. The highest offer may change.${depositNote}`)) return false;
   pendingActions.add(id); renderBidders();
   try {
     const {data,error}=await sb.rpc('remove_bidder_registration',{p_bidder:id});
@@ -537,12 +537,14 @@ async function removeBidder(id){
     bidders=bidders.filter(b=>b.id!==id);
     if(knownBidders) knownBidders.delete(id);
     renderBidders();
-    toast('Registration removed. This number can register again.',6000);
-    try { await loadBidders(); }
-    catch(error){ toast('Registration removed, but the list could not refresh. Please refresh when connected.',6000); }
+    toast('Registration and live offers removed. This number can register again.',6000);
+    try {
+      const refreshed=await loadAuctions();
+      if(refreshed===false) toast('Registration removed, but the list could not refresh. Please refresh when connected.',6000);
+    } catch(error){ toast('Registration removed, but the list could not refresh. Please refresh when connected.',6000); }
     return true;
   } catch(error){
-    const message=error.code==='P0001' ? error.message : 'Removal not confirmed. Refresh before retrying. Check that auction-remove-registration.sql ran successfully.';
+    const message=error.code==='P0001' ? error.message : 'Removal not confirmed. Refresh before retrying. Check that auction-remove-any-registration.sql ran successfully.';
     toast(message,7000);
     return false;
   } finally { pendingActions.delete(id); renderBidders(); }
@@ -613,8 +615,8 @@ function startLiveUpdates(){
 async function loadAuctions(silent){
   if(refreshing) return;
   refreshing = true;
-  try { await loadAuctionsInner(silent===true); await loadBidders(); await loadStats(); setLive(true); }
-  catch(error){ console.error(error); setLive(false); if(!silent) toast('Could not refresh. Previous data is kept. Please try again.',6000); }
+  try { await loadAuctionsInner(silent===true); await loadBidders(); await loadStats(); setLive(true); return true; }
+  catch(error){ console.error(error); setLive(false); if(!silent) toast('Could not refresh. Previous data is kept. Please try again.',6000); return false; }
   finally { refreshing=false; }
 }
 async function loadAuctionsInner(silent){
