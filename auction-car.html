@@ -1055,7 +1055,7 @@ function normPhone(v){
   else if(d.startsWith('0')) out = '60'+d.slice(1);
   else if(d.startsWith('1') && d.length>=9 && d.length<=10) out = '60'+d;
   else return null;
-  return (out.length>=9 && out.length<=15) ? out : null;
+  return (out.length>=10 && out.length<=14) ? out : null;   // same limits as register_bidder()
 }
 function showPhone(d){
   if(/^60\d{8,10}$/.test(d)){ const r = d.slice(2); return '+60 '+r.slice(0,2)+'-'+r.slice(2,r.length-4)+' '+r.slice(-4); }

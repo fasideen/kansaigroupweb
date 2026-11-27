@@ -4,6 +4,8 @@
 **From:** the front-end session, 28 Nov 2026.
 **Goal:** make the database match the new auction offer flow the front end already implements. Front-end changes after you deploy should be one constant (see §7).
 
+> **Status (28 Nov 2026, later):** the Supabase CLI is linked in this repo (`npx supabase@latest`, read-only by default). The migration `supabase/migrations/20261128000000_instant_offers.sql` has been **rewritten against the live definitions**: it's no longer a draft, and each changed live function differs by exactly one line. A rolled-back dry run with 8 end-to-end checks is prepared. **Not yet applied:** waiting for the owner's approval. §3–§4 below are kept for reference.
+
 ---
 
 ## 0. Ground rules (from the project owner)
@@ -97,15 +99,15 @@ The draft for each lives in `supabase/migrations/20261128000000_instant_offers.s
 
 | # | Task | Done when |
 |---|---|---|
-| B1 | `bids.verified boolean not null default true` (+ `bidder_id uuid` if there's no link yet). The default keeps old bids and `place_bid` public. | Existing bids still public; `place_bid` unchanged |
+| B1 | `bids.verified boolean not null default true` (`bidder_id` already exists). The default keeps old bids and `place_bid` public. | Existing bids still public; `place_bid` unchanged |
 | B2 | `public_bids` adds `and b.verified`. **Keep its columns and name masking exactly**: the front end reads `id, auction_id, amount, bidder_label, created_at`. | Unverified rows are invisible to anon |
 | B3 | `validate_bid()`: "current highest" counts only `verified and deleted_at is null`. Trigger must be **BEFORE INSERT only**. | A fake unverified high offer doesn't raise the public minimum; publishing an older, lower offer doesn't fail |
 | B4 | Accept terms `2026-11-28-offer-1` in `register_bidder` (and `submit_offer`). Keep accepting the old value until the front-end constant is removed. | Calling `register_bidder` with the new version succeeds |
 | B5 | New RPC `submit_offer` (contract in §5), `security definer`, `grant execute to anon, authenticated`. It reuses `register_bidder` and inserts the bid with `verified=false`. | §8 steps 1–3 pass |
-| B6 | Trigger on `bidders` status → `approved`: set `verified=true` on that bidder's live offers (by `bidder_id`, or phone when `bidder_id` is null). | Approving in the admin page makes the offers appear on the leaderboard within 5 s |
+| B6 | Trigger on `bidders` (status / deposit_confirmed): when a bidder becomes approved **with deposit confirmed** (the same rule as `place_bid`), set `verified=true` on their live offers. | Approving in the admin page makes the offers appear on the leaderboard within 5 s |
 | B7 | Staff **Make live** button: `update bids set verified=true where id=…` via the staff session. Make sure the staff UPDATE policy on `bids` allows the `verified` column. | The button works with no error toast |
-| B8 | `remove_bidder_registration` still soft-deletes **all** of the bidder's offers, unverified included. | Removing a pending test bidder clears their offers |
-| B9 | Staff alerts (Telegram or other) on new bids: include verified / unverified, and fire for `submit_offer` inserts. | Staff are told about unverified offers |
+| B8 | `remove_bidder_registration` still soft-deletes **all** of the bidder's offers, unverified included. Already true in the live function (matches by `bidder_id` or phone), so no change is needed. | Removing a pending test bidder clears their offers |
+| B9 | Staff alerts: `place_bid` calls `notify_staff()` (Telegram, a no-op when not configured). `submit_offer` calls it too, with "New UNVERIFIED offer … (+phone)". | Staff are told about unverified offers |
 | B10 | Stats views (`auction_week`, `auction_stats`): decide whether `bids` counts include unverified. Suggest yes, labelled "offers received". | Owner agrees |
 | B11 | Spam guard in `submit_offer`: the draft allows 10 offers per number per hour. Tune as needed. Consider a per-auction cap too. | |
 
