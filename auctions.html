@@ -81,7 +81,7 @@
 <div class="wrap">
   <div class="badge"><span class="dot"></span>Live Auctions</div>
   <h1>BID ON <span>JAPAN'S</span> FINEST</h1>
-  <p class="sub">Pick a vehicle, watch the bidding in real time and place your bid in seconds. Offers are subject to acceptance by Kansai Group; the highest offer does not automatically confirm a sale.</p>
+  <p class="sub">Make an offer in under a minute with just your name and WhatsApp number. We verify every bidder before their offer goes live. Offers are subject to acceptance by Kansai Group.</p>
 
   <div id="listConnection" role="status" aria-live="polite" style="display:none;padding:12px;background:#fff3cd;color:#664d03;border-radius:8px;margin-bottom:16px"></div>
   <div id="liveGrid" class="grid"></div>
@@ -92,7 +92,7 @@
     <div id="endedGrid" class="grid"></div>
   </div>
 
-  <p class="note">Bids are offers to purchase and are non-binding until confirmed by Kansai Group Malaysia. We reserve the right to accept or decline any bid.</p>
+  <p class="note">Offers are offers to purchase and are non-binding on Kansai Group Malaysia until we confirm them. Prices shown include verified offers only. We reserve the right to accept or decline any offer.</p>
 </div>
 
 <script>
@@ -162,7 +162,7 @@ function card(a){
         <div><div class="lb">${closed?(n?'Highest offer':'Starting price'):'Highest offer'}</div><div class="pr"><small>RM</small> ${rm(priceOf(a))}</div></div>
         <div class="rt"><div class="lb">${closed?'Status':'Ends in'}</div><div class="cd${cd.soon&&!closed?' soon':''}" ${closed?'':`data-dl="${esc(a.deadline||'')}"`}>${closed?'Ended':cd.t}</div></div>
       </div>
-      <div class="foot"><span>${n} bid${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Offer'} →</span></div>
+      <div class="foot"><span>${n} offer${n===1?'':'s'}</span><span class="go">${closed?'View result':'View &amp; Offer'} →</span></div>
     </div>
   </a>`;
 }

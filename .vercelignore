@@ -1,0 +1,5 @@
+# Internal files: keep out of the public Vercel deployment
+HANDOVER.md
+supabase/
+docs/
+.claude/
