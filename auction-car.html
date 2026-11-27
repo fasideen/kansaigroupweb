@@ -473,6 +473,8 @@ async function loadBids(){
   } catch(error){ connectionState(false); console.error(error); return false; }
 }
 
+// Highest amount first; on equal amounts (possible once older offers are approved) the earlier offer ranks higher.
+function byRank(a,b){ return (Number(b.amount)-Number(a.amount)) || (new Date(a.created_at)-new Date(b.created_at)); }
 function currentPrice(){
   const top = bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : 0;
   return Math.max(top, Number(auction.starting_price)||0);
@@ -485,7 +487,7 @@ function extrasTotal(){
 function landedTotal(bid){ return Number(bid||0) + extrasTotal(); }
 function topBidderLabel(){
   if(!bids.length) return '';
-  const top = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount))[0];
+  const top = [...bids].sort(byRank)[0];
   return top.bidder_label || 'Bidder';
 }
 function isClosed(){
@@ -809,7 +811,7 @@ function renderFeed(){
   const list = document.getElementById('feedList');
   if(!list) return;
   const closed = isClosed(), now = Date.now();
-  const sorted = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount));
+  const sorted = [...bids].sort(byRank);
   trackBoardEvents(sorted);
   renderChips(sorted);
   const mine = myOffer();

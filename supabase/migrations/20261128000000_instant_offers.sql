@@ -2,7 +2,7 @@
 -- UNVERIFIED and becomes public when staff approve the bidder (or click "Make live").
 --
 -- DRAFT. Written without access to the live schema. Every line marked ASSUMPTION must be
--- checked against the real definitions before running. See docs/auction-offer-flow-backend.md.
+-- checked against the real definitions before running. See HANDOVER.md at the repo root.
 -- Run in one transaction; it is safe to re-run.
 
 begin;
