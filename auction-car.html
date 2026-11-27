@@ -1005,9 +1005,6 @@ function startTimer(){
 // register_bidder and the offer itself reaches staff on WhatsApp. No offer is ever lost.
 const WA_NUMBER = '601151177026';
 const TERMS_VERSION = '2026-11-28-offer-1';
-// register_bidder() on the live database only accepts the previous terms version. Used by the
-// temporary fallback until submit_offer (which accepts TERMS_VERSION) is deployed.
-const LEGACY_TERMS_VERSION = '2026-11-whatsapp-2';
 const OFFERER_KEY = 'kansaiOfferer', MY_OFFERS_KEY = 'kansaiMyOffers', CODE_KEY = 'kansaiBidderCode';
 
 function readStore(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
@@ -1289,7 +1286,7 @@ async function sendOffer(o){
   if(res.error.code==='P0001') throw userError(res.error.message);
   if(res.error.code!=='PGRST202') throw res.error;
   // submit_offer is not deployed yet: save the registration; the offer travels on WhatsApp.
-  const r = await sb.rpc('register_bidder',{p_name:o.name, p_phone:o.phone, p_terms:LEGACY_TERMS_VERSION, p_auction:auction.id});
+  const r = await sb.rpc('register_bidder',{p_name:o.name, p_phone:o.phone, p_terms:TERMS_VERSION, p_auction:auction.id});
   if(r.error){ if(r.error.code==='P0001') throw userError(r.error.message); throw r.error; }
   const st = (r.data && r.data.status) || 'pending';
   if(st==='blocked'){ const e = userError('blocked'); e.blocked = true; throw e; }

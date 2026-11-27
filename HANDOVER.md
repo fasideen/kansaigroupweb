@@ -4,7 +4,13 @@
 **From:** the front-end session, 28 Nov 2026.
 **Goal:** make the database match the new auction offer flow the front end already implements. Front-end changes after you deploy should be one constant (see §7).
 
-> **Status (28 Nov 2026, later):** the Supabase CLI is linked in this repo (`npx supabase@latest`, read-only by default). The migration `supabase/migrations/20261128000000_instant_offers.sql` has been **rewritten against the live definitions**: it's no longer a draft, and each changed live function differs by exactly one line. A rolled-back dry run with 8 end-to-end checks is prepared. **Not yet applied:** waiting for the owner's approval. §3–§4 below are kept for reference.
+> **Status (28 Nov 2026): BACKEND APPLIED TO PRODUCTION.** `supabase/migrations/20261128000000_instant_offers.sql` was written against the live definitions, dry-run checked (8/8 passed, rolled back), then applied. Verified afterwards: `bids.verified` exists; `submit_offer` and the `bidders_publish_offers` trigger exist; `public_bids` filters verified; anon can execute `submit_offer` but not the trigger function. A real offer from the new page was saved as unverified and stayed hidden from the public. Tasks B1–B9 are done; B10 and B11 are owner decisions (§10). The §7 front-end follow-up is done (`LEGACY_TERMS_VERSION` removed).
+>
+> **The live site still runs the old front end.** That's fine: it only uses `register_bidder` (old terms version still accepted) and `place_bid` (inserts stay verified), so it behaves exactly as before. The new front end (this branch) goes live only when the owner approves a push and deploy.
+>
+> **Telegram alerts:** `notify_staff` is a no-op because the `telegram_token` / `telegram_chat_id` keys are not set in `private_config`.
+>
+> **Test data to remove:** registration **KG-000006** "TEST Claude (delete me)" (+60 11-0000 0000) and its unverified RM 215,500 offer. Use **Remove registration** in the Auction Manager. Until then, the *old* admin page counts that offer in "Current".
 
 ---
 
