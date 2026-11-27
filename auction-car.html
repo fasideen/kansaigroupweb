@@ -235,6 +235,56 @@
   .wa-btn { display:flex; align-items:center; justify-content:center; min-height:48px; background:#25D366; color:#fff; border-radius:10px; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; letter-spacing:1px; text-transform:uppercase; margin-top:12px; text-align:center; }
   .modal-field input.code-in { text-transform:uppercase; letter-spacing:3px; text-align:center; font-family:'JetBrains Mono',monospace; }
   .inc-main { font-size:14px; line-height:1.9; font-weight:600; color:var(--ink); }
+  /* ===== offer flow ===== */
+  body.modal-open { overflow:hidden; }
+  .how { list-style:none; margin-top:14px; display:grid; gap:8px; }
+  .how li { display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--muted); line-height:1.4; }
+  .how li span { flex:0 0 22px; height:22px; border-radius:50%; background:var(--bg-alt); border:1px solid var(--border); color:var(--ink); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .status-banner.pending { background:rgba(200,162,60,0.1); border:1px solid rgba(200,162,60,0.35); color:#7A5D12; }
+  .status-banner span { line-height:1.45; font-weight:500; }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .modal-head .modal-title { line-height:1; }
+  .modal-x { flex:0 0 40px; width:40px; height:40px; border-radius:50%; border:none; background:var(--bg-alt); font-size:24px; line-height:1; color:var(--muted); cursor:pointer; }
+  .modal-x:hover { color:var(--ink); }
+  .offer-car { display:flex; gap:12px; align-items:center; padding:10px; border:1px solid var(--border); border-radius:12px; margin-bottom:18px; }
+  .offer-car img { width:64px; height:48px; border-radius:8px; object-fit:cover; flex:0 0 auto; background:#ECEDF0; }
+  .oc-txt { min-width:0; }
+  .oc-name { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; line-height:1.15; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .oc-price { font-size:12px; color:var(--muted); margin-top:3px; }
+  .oc-price strong { color:var(--ink); font-family:'JetBrains Mono',monospace; }
+  .amt-wrap { position:relative; }
+  .amt-cur { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--gold); pointer-events:none; }
+  .modal-field .amt-wrap input { padding:12px 14px 12px 48px; font-size:24px; font-weight:700; height:58px; }
+  .modal-field input[aria-invalid] { border-color:var(--red); background:#fff; }
+  .modal-hint.bad { color:var(--red); }
+  .field-pair { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .field-err { display:none; font-size:11.5px; color:var(--red); margin-top:5px; }
+  .field-err.show { display:block; }
+  .known-bidder-bar.neutral { background:var(--bg-alt); border-color:var(--border); }
+  .kb-sub { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  .modal-submit.full, .modal-cancel.full { display:block; width:100%; min-height:52px; margin-top:16px; border-radius:10px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; border:1.5px solid transparent; }
+  .modal-cancel.full { margin-top:10px; font-size:14px; background:#fff; color:var(--ink); border-color:var(--border); }
+  .modal-submit.full:disabled { background:#C4C7CE; cursor:not-allowed; }
+  .modal-error { line-height:1.5; }
+  .err-wa { display:block; margin-top:8px; color:#128C4B; font-weight:700; text-decoration:underline; }
+  .steps { list-style:none; display:flex; gap:6px; margin-top:16px; }
+  .steps li { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; font-size:11px; line-height:1.3; color:var(--muted); position:relative; }
+  .steps li span { width:24px; height:24px; border-radius:50%; background:var(--bg-alt); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; color:var(--muted); position:relative; z-index:1; }
+  .steps li:not(:last-child)::after { content:''; position:absolute; top:12px; left:calc(50% + 14px); right:calc(-50% + 14px); height:1px; background:var(--border); }
+  .steps li.now { color:var(--ink); font-weight:600; } .steps li.now span { background:var(--red); border-color:var(--red); color:#fff; }
+  .steps li.done span { background:var(--green); border-color:var(--green); color:#fff; }
+  .alt-row { text-align:center; margin-top:4px; }
+  .offer-done { text-align:center; padding:6px 0 4px; }
+  .offer-done .check { width:52px; height:52px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; }
+  .od-amt { font-size:40px; line-height:1; } .od-amt small { font-size:18px; color:var(--gold); }
+  .od-car { font-size:13px; color:var(--muted); margin-top:4px; }
+  .od-ref { display:inline-block; margin-top:10px; font-size:12px; background:var(--bg-alt); border-radius:6px; padding:5px 10px; color:var(--muted); }
+  .od-ref strong { color:var(--ink); font-family:'JetBrains Mono',monospace; letter-spacing:1px; }
+  .od-lead { font-size:13.5px; line-height:1.6; margin-top:14px; text-align:center; }
+  .modal .wa-btn { min-height:52px; font-size:15px; background:#128C4B; }
+  .modal .wa-btn:hover { background:#0E7A40; }
+  .modal .wa-btn.ghost { background:#fff; color:#128C4B; border:1.5px solid #128C4B; }
+  @media (max-width:420px) { .field-pair { grid-template-columns:1fr; gap:0; } }
   .dp-tag { display:inline-block; margin-top:10px; background:rgba(22,163,74,0.1); border:1px solid rgba(22,163,74,0.25); color:#166534; font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:6px; letter-spacing:0.3px; }
 </style>
 </head>
@@ -255,7 +305,7 @@
 </div>
 
 <div class="modal-overlay" id="bidModal">
-  <div class="modal" id="modalInner"></div>
+  <div class="modal" id="modalInner" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
 </div>
 
 <script>
@@ -351,7 +401,7 @@ async function refreshAuction(){
 async function loadAuction(){
   if(!getAuctionId()){ setLoading('No listing specified.'); return; }
   const ok = await refreshAuction();
-  if(ok){ kgTrack('view',auction.id); loadOthers(); if(new URLSearchParams(location.search).get('enter_code')==='1'){ document.getElementById('bidModal').classList.add('open'); showCodeScreen(); } }
+  if(ok){ kgTrack('view',auction.id); loadOthers(); if(new URLSearchParams(location.search).get('enter_code')==='1'){ document.getElementById('bidModal').classList.add('open'); document.body.classList.add('modal-open'); showCodeScreen(); } }
   if(!pollInterval){
     // Keep polling ended listings too: the owner may reopen them or correct an offer.
     pollInterval = setInterval(refreshAuction,5000);
@@ -473,7 +523,7 @@ function renderPage(){
           <div class="price-block">
             <div class="price-label">${closed?'Highest Offer Received':'Current Highest Offer'}</div>
             <div class="price-value bebas" id="priceValue"><span class="cur">RM</span> ${rm(price)}</div>
-            <div class="price-sub"><span class="bid-count" id="bidCount">${bids.length}</span> bid${bids.length===1?'':'s'} · Starting RM ${rm(auction.starting_price)}</div>
+            <div class="price-sub"><span class="bid-count" id="bidCount">${bids.length}</span> <span id="bidCountLbl">verified offer${bids.length===1?'':'s'}</span> · Starting RM ${rm(auction.starting_price)}</div>
             ${closed ? `
               <div class="winner-box">
                 ${bids.length ? `
@@ -488,7 +538,12 @@ function renderPage(){
             ` : '<div id="timerZone"><div class="timer" id="timer"></div></div>'}
             ${endsAtText(closed)?`<div class="ends-at">${esc(endsAtText(closed))}</div>`:''}
           </div>
-          <button class="bid-btn" id="bidBtn" ${closed?'disabled':''} onclick="openModal()">${closed?'Auction Closed':'Submit an Offer'}</button>
+          <button class="bid-btn" id="bidBtn" ${closed?'disabled':''} onclick="openModal()">${closed?'Auction Closed':'Make an Offer'}</button>
+          ${closed?'':`<ol class="how" aria-label="How offers work">
+            <li><span>1</span>Enter your offer, name and WhatsApp number</li>
+            <li><span>2</span>Send it to us on WhatsApp in one tap</li>
+            <li><span>3</span>We verify you, then your offer goes live</li>
+          </ol>`}
           <div class="actions2">
             <button type="button" onclick="shareAuction()">Share</button>
             <a class="wa" target="_blank" rel="noopener" onclick="kgTrack('whatsapp',auction.id)" href="https://wa.me/601151177026?text=${encodeURIComponent('Hi Kansai Group, I have a question about the '+nm+' ('+pageUrl()+')')}">Ask about this car</a>
@@ -500,10 +555,10 @@ function renderPage(){
             <div class="est-title">About this price</div>
             <div class="inc-main">✓ Duty-paid and AP cleared<br>✓ Vehicle is already in Malaysia</div>
             ${extraLines.length?`<div class="est-title" style="margin-top:14px">Additional charges</div>${extraLines.map(l=>`<div class="est-row"><span>${esc(l.label)}</span><span class="val">RM ${rm(l.amount)}</span></div>`).join('')}<div class="est-note">Confirmed by Kansai Group before purchase.</div>`:''}
-            <div class="est-note" style="margin-top:12px">Bids are offers to purchase and are non-binding until confirmed by Kansai Group.</div>
+            <div class="est-note" style="margin-top:12px">Only verified offers are shown here. New offers appear once we verify the bidder. All offers are subject to acceptance by Kansai Group.</div>
           </div>
           <div class="feed">
-            <div class="feed-title"><span>Offer Activity</span><span>Updates every 5s</span></div>
+            <div class="feed-title"><span>Verified Offers</span><span>Updates every 5s</span></div>
             <div id="feedList"></div>
           </div>
         </div>
@@ -518,12 +573,12 @@ function renderPage(){
     </section>
 
     <div class="disclaimer">
-      This listing is operated by Kansai Group Malaysia. Bids are offers to purchase and are non-binding until confirmed by Kansai Group. We reserve the right to accept or decline any bid. <a href="auction-terms.html" style="text-decoration:underline">Auction Terms</a> · <a href="auction-privacy.html" style="text-decoration:underline">Privacy</a>
+      This listing is operated by Kansai Group Malaysia. Offers are offers to purchase and are non-binding on Kansai Group until we confirm them. We verify every bidder before their offer is shown, and we may accept or decline any offer. <a href="auction-terms.html" style="text-decoration:underline">Auction Terms</a> · <a href="auction-privacy.html" style="text-decoration:underline">Privacy</a>
     </div>
 
     ${closed?'':`<div class="sticky-bar" id="stickyBar">
-      <div class="sb-l"><div class="sb-lbl">Current bid</div><div class="sb-pr" id="stickyPrice"><small>RM</small> ${rm(price)}</div><div class="sb-tm" id="stickyTime"></div></div>
-      <button type="button" onclick="openModal()">Submit Offer</button>
+      <div class="sb-l"><div class="sb-lbl">Highest offer</div><div class="sb-pr" id="stickyPrice"><small>RM</small> ${rm(price)}</div><div class="sb-tm" id="stickyTime"></div></div>
+      <button type="button" onclick="openModal()">Make Offer</button>
     </div>`}
   `;
   document.body.classList.toggle('has-sticky', !closed);
@@ -531,14 +586,21 @@ function renderPage(){
   addSwipe(document.querySelector('.gallery-main'));
 }
 
-// Offer ownership is not inferred from amounts saved on a shared device.
-// Confirmation is shown only after the server accepts this particular submission.
+// Status of the offer sent from this device (stored locally after the server or WhatsApp step).
 function renderBidStatus(){
-  const el=document.getElementById('bidStatus');
-  if(el) el.textContent='';
+  const el = document.getElementById('bidStatus'); if(!el) return;
+  const mine = myOffer();
+  if(!mine || !auction){ el.innerHTML=''; return; }
+  const p = currentPrice(), closed = isClosed();
+  let cls = 'pending', txt;
+  if(closed) txt = `You offered <strong>RM ${rm(mine.amount)}</strong>. We will contact you on WhatsApp if your offer is accepted.`;
+  else if(p > mine.amount){ cls = 'out'; txt = `You offered <strong>RM ${rm(mine.amount)}</strong>. A higher offer is now leading.`; }
+  else if(mine.verified){ cls = 'win'; txt = `Your offer of <strong>RM ${rm(mine.amount)}</strong> is live.`; }
+  else txt = `You offered <strong>RM ${rm(mine.amount)}</strong>. It goes live once we verify you on WhatsApp.`;
+  el.innerHTML = `<div class="status-banner ${cls}"><span>${txt}</span>${closed?'':`<button type="button" onclick="openModal()">${cls==='out'?'Raise':'Update'}</button>`}</div>`;
 }
 
-// ── Sticky bid bar (phones): hidden while the main Submit an Offer button is on screen ──
+// ── Sticky bid bar (phones): hidden while the main Make an Offer button is on screen ──
 let stickyObs = null;
 function setupSticky(closed){
   if(stickyObs){ stickyObs.disconnect(); stickyObs=null; }
@@ -640,7 +702,7 @@ function updateSEO(){
 function renderFeed(){
   const list = document.getElementById('feedList');
   if(!list) return;
-  if(!bids.length){ list.innerHTML = `<div class="feed-empty">No bids yet. Be the first to bid.</div>`; return; }
+  if(!bids.length){ list.innerHTML = `<div class="feed-empty">No verified offers yet. Make the first offer.</div>`; return; }
   const sorted = [...bids].sort((a,b)=>Number(b.amount)-Number(a.amount));
   list.innerHTML = sorted.slice(0,8).map((b,i)=>{
     const label = b.bidder_label || 'Bidder';
@@ -679,6 +741,7 @@ function refreshLiveBits(){
     }
   }
   if(bc) bc.textContent = bids.length;
+  const bl = document.getElementById('bidCountLbl'); if(bl) bl.textContent = 'verified offer'+(bids.length===1?'':'s');
   const sp = document.getElementById('stickyPrice'); if(sp) sp.innerHTML = `<small>RM</small> ${rm(p)}`;
   renderFeed(); renderBidStatus();
   if(document.getElementById('bidAmount')) onAmountEdit();
@@ -761,102 +824,213 @@ function startTimer(){
   tick();
 }
 
-// ── BID MODAL: register → staff approval + deposit → bidder code → bid ──
+// ── OFFER FLOW ──────────────────────────────────────────────────────────────
+// 1. The visitor enters an amount, their name and WhatsApp number, and taps Send.
+// 2. The offer is saved as UNVERIFIED (rpc submit_offer). Staff see it at once in the
+//    Auction Manager; it is not shown publicly until staff approve that bidder.
+// 3. WhatsApp opens with the offer prepared for our sales number. The visitor taps Send.
+// Approved bidders can still enter their bidder code: their offers go live at once (rpc place_bid).
+//
+// Until submit_offer is deployed (PostgREST answers PGRST202), the registration is saved with
+// register_bidder and the offer itself reaches staff on WhatsApp. No offer is ever lost.
 const WA_NUMBER = '601151177026';
-const TERMS_VERSION = '2026-11-whatsapp-2';
-let registrationContext=null;
+const TERMS_VERSION = '2026-11-28-offer-1';
+// register_bidder() on the live database only accepts the previous terms version. Used by the
+// temporary fallback until submit_offer (which accepts TERMS_VERSION) is deployed.
+const LEGACY_TERMS_VERSION = '2026-11-whatsapp-2';
+const OFFERER_KEY = 'kansaiOfferer', MY_OFFERS_KEY = 'kansaiMyOffers', CODE_KEY = 'kansaiBidderCode';
+
+function readStore(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
+function writeStore(k,v){ try { if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
 let bidderCode = null, bidderInfo = null;
-try { bidderCode = localStorage.getItem('kansaiBidderCode'); } catch(e){}
+try { bidderCode = localStorage.getItem(CODE_KEY); } catch(e){}
+let formMode = 'offer';        // 'offer' (name + phone) or 'code' (approved bidder code)
+let editIdentity = false;      // show the name/phone fields even when we remember them
+let submittingBid = false;
+
+function offerer(){ const o = readStore(OFFERER_KEY); return o && o.name && o.phone ? o : null; }
+function myOffer(){ const m = readStore(MY_OFFERS_KEY) || {}; return auction ? m[auction.id] || null : null; }
+function saveMyOffer(rec){ const m = readStore(MY_OFFERS_KEY) || {}; m[auction.id] = rec; writeStore(MY_OFFERS_KEY, m); }
 
 function setModal(html){ document.getElementById('modalInner').innerHTML = html; }
-function modalErr(msg){ const e=document.getElementById('modalError'); if(!e) return; e.textContent=msg; e.style.display='block'; }
-function closeModal(){ document.getElementById('bidModal').classList.remove('open'); }
+function modalErr(msg, waUrl){
+  const e = document.getElementById('modalError'); if(!e) return;
+  e.textContent = msg;
+  if(waUrl){ const a = document.createElement('a'); a.href = waUrl; a.target = '_blank'; a.rel = 'noopener'; a.className = 'err-wa'; a.textContent = 'Send this offer on WhatsApp instead'; e.appendChild(a); }
+  e.style.display = 'block';
+}
+function clearErr(){ const e = document.getElementById('modalError'); if(e){ e.textContent=''; e.style.display='none'; } }
+function closeModal(){ document.getElementById('bidModal').classList.remove('open'); document.body.classList.remove('modal-open'); }
 function termsLinks(){ return '<a href="auction-terms.html" target="_blank" rel="noopener">Auction Terms</a>'; }
 function waHref(text){ return 'https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(text); }
-function forgetBidder(){ bidderCode=null; bidderInfo=null; registrationContext=null; try{ localStorage.removeItem('kansaiBidderCode'); localStorage.removeItem('kansaiMyBids'); }catch(e){} renderBidStatus(); }
-
-function registerHTML(){
-  return `
-    <div class="modal-title bebas">Register to Bid</div>
-    <div class="modal-sub">Register once, then continue on WhatsApp</div>
-    <div class="modal-note">A refundable deposit is required before you can make offers. Register below, then message us on WhatsApp for the deposit amount, payment instructions and refund conditions. After we verify payment, we will approve you and send your bidder code on WhatsApp. Registration alone does not activate bidding.</div>
-    <div class="modal-field"><label>Full Name</label><input type="text" id="regName" placeholder="Your name" autocomplete="name"></div>
-    <div class="modal-field"><label>Mobile / WhatsApp Number</label><input type="tel" id="regPhone" placeholder="+60 1X-XXX XXXX" autocomplete="tel"></div>
-    <label class="chk"><input type="checkbox" id="regAgree"><span>I agree to the ${termsLinks()} and the <a href="auction-privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.</span></label>
-    <div class="modal-error" id="modalError"></div>
-    <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="regBtn" onclick="submitRegister()">Register &amp; Continue</button></div>
-    <div style="text-align:center;margin-top:6px"><button type="button" class="link-btn" onclick="showCodeScreen()">I already have a bidder code</button></div>`;
-}
-function codeHTML(){
-  return `
-    <div class="modal-title bebas">Enter Bidder Code</div>
-    <div class="modal-sub">We send it to you on WhatsApp once you are approved</div>
-    <div class="modal-field"><label>Bidder Code</label><input type="text" id="codeIn" class="code-in" placeholder="XXXX-XXXX" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
-    <div class="modal-error" id="modalError"></div>
-    <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="codeBtn" onclick="submitCode()">Verify</button></div>
-    <div style="text-align:center;margin-top:6px"><button type="button" class="link-btn" onclick="setModal(registerHTML())">Not registered yet? Register</button></div>`;
-}
-function pendingHTML(name,mode){
-  const nm=[auction.car_name,auction.year].filter(Boolean).join(' ');
-  const ref=registrationContext && registrationContext.reference;
-  const knownName=name || (registrationContext && registrationContext.name) || '';
-  const message=[
-    'Hi Kansai Group, I registered to submit offers.',
-    knownName ? 'Name: '+knownName : '',
-    ref ? 'Registration reference: '+ref : '',
-    registrationContext && registrationContext.phone ? 'Registered WhatsApp: '+registrationContext.phone : '',
-    'Vehicle: '+nm,
-    'Listing: '+pageUrl(),
-    mode==='approved_existing' ? 'Please help me access my bidder code.' : 'Please send the refundable deposit amount, payment instructions and refund conditions. I will send my payment receipt here for verification.'
-  ].filter(Boolean).join('\n');
-  const blocked=mode==='blocked',approved=mode==='approved_existing';
-  const text=blocked ? 'This account is not active. Contact us on WhatsApp for assistance.' : approved ? 'You are already registered. Enter your bidder code, or message us on WhatsApp if you need help.' : 'Your registration is saved. Next, message us on WhatsApp to arrange your refundable deposit. We will verify payment, approve your account and send your bidder code in the same chat.';
-  return `<div class="modal-title bebas">${blocked?'Account Not Active':approved?'Already Registered':'Registration Received'}</div>
-    <div class="modal-sub" style="line-height:1.6">${esc(text)}</div>
-    ${ref?`<div class="modal-note">Your registration reference: <strong>${esc(ref)}</strong></div>`:''}
-    ${!blocked&&!approved?'<div class="modal-note"><strong>Next steps</strong><br>1. Tap Continue on WhatsApp and send the prepared message.<br>2. Arrange the deposit and send your receipt in the chat.<br>3. Receive your code after payment verification. Registration alone does not confirm payment.</div>':''}
-    <a class="wa-btn" target="_blank" rel="noopener" onclick="kgTrack('whatsapp',auction.id)" href="${waHref(message)}">${blocked?'Contact us on WhatsApp':approved?'Get help on WhatsApp':'Continue on WhatsApp'}</a>
-    <p class="modal-consent">WhatsApp opens with a prepared message. Tap Send there so our team receives it. Keep your bidder code private.</p>
-    <div class="modal-actions">${blocked?'':'<button class="modal-cancel" onclick="showCodeScreen()">I have my code</button>'}<button class="modal-submit" onclick="closeModal()">Close</button></div>`;
+function carTitle(){ return [auction.car_name, auction.year].filter(Boolean).join(' '); }
+function forgetBidder(){
+  bidderCode = null; bidderInfo = null; editIdentity = false; formMode = 'offer';
+  writeStore(OFFERER_KEY, null); writeStore(MY_OFFERS_KEY, null);
+  try { localStorage.removeItem(CODE_KEY); localStorage.removeItem('kansaiMyBids'); } catch(e){}
+  renderBidStatus();
 }
 
-function bidFormHTML(){
-  return `
-    <div class="modal-title bebas">Submit an Offer</div>
-    <div class="modal-sub" id="modalSub">Current bid: RM ${rm(currentPrice())}</div>
-    <div class="known-bidder-bar"><div>Submitting as <strong>${esc(bidderInfo.name)}</strong></div><button type="button" onclick="notYou()">Not you?</button></div>
-    <div class="modal-field">
-      <label>Your Offer Amount (RM)</label>
-      <input type="number" class="mono" id="bidAmount" min="${nextMinimumOffer()}" step="500" max="100000000" placeholder="0" inputmode="numeric" oninput="onAmountEdit()">
-      <div class="quick-bumps">
-        <button type="button" onclick="bumpTo(500)">+500</button>
-        <button type="button" onclick="bumpTo(1000)">+1,000</button>
-        <button type="button" onclick="bumpTo(2000)">+2,000</button>
-      </div>
-      <div class="modal-hint" id="bidHint"></div>
-    </div>
-    <div class="modal-error" id="modalError"></div>
-    <div class="modal-actions"><button class="modal-cancel" onclick="closeModal()">Cancel</button><button class="modal-submit" id="submitBidBtn" onclick="submitBid()">Submit Offer</button></div>
-    <div class="modal-consent">By bidding you agree to the ${termsLinks()}. A bid is an offer to purchase and cannot be withdrawn once placed.</div>`;
+// "+60 12-345 6789" / "012 345 6789" / "0060..." → "60123456789"; null when the country is unclear.
+function normPhone(v){
+  let p = String(v||'').normalize('NFKC').replace(/\(0\)/g,'');
+  const plus = p.trim().startsWith('+');
+  const d = p.replace(/\D/g,'');
+  if(!d) return null;
+  let out;
+  if(plus) out = d;
+  else if(d.startsWith('00')) out = d.slice(2);
+  else if(d.startsWith('60')) out = d;
+  else if(d.startsWith('0')) out = '60'+d.slice(1);
+  else if(d.startsWith('1') && d.length>=9 && d.length<=10) out = '60'+d;
+  else return null;
+  return (out.length>=9 && out.length<=15) ? out : null;
+}
+function showPhone(d){
+  if(/^60\d{8,10}$/.test(d)){ const r = d.slice(2); return '+60 '+r.slice(0,2)+'-'+r.slice(2,r.length-4)+' '+r.slice(-4); }
+  return '+'+d;
+}
+function makeRef(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', buf = new Uint32Array(6);
+  (window.crypto||window.msCrypto).getRandomValues(buf);
+  return 'KG-'+Array.from(buf, n=>chars[n%chars.length]).join('');
 }
 
-function showCodeScreen(){ setModal(codeHTML()); }
-function notYou(){ forgetBidder(); showCodeScreen(); }
-function nextMinimumOffer(){
-  return Math.ceil((currentPrice()+MIN_INCREMENT)/MIN_INCREMENT)*MIN_INCREMENT;
-}
+function nextMinimumOffer(){ return Math.ceil((currentPrice()+MIN_INCREMENT)/MIN_INCREMENT)*MIN_INCREMENT; }
 function validOfferAmount(amount){
   return Number.isSafeInteger(amount) && amount>0 && amount<=100000000 && amount%MIN_INCREMENT===0 && amount>=nextMinimumOffer();
 }
-function showBidForm(){
-  setModal(bidFormHTML());
-  document.getElementById('bidAmount').value=nextMinimumOffer();
-  onAmountEdit();
+
+// ── Screens ──
+function stepsHTML(active){
+  const steps = ['Send your offer','Confirm on WhatsApp','We verify you, then it goes live'];
+  return `<ol class="steps" aria-label="How offers work">${steps.map((s,i)=>`<li class="${i<active?'done':i===active?'now':''}"><span>${i<active?'✓':i+1}</span>${esc(s)}</li>`).join('')}</ol>`;
 }
+function headHTML(title){
+  return `<div class="modal-head"><h2 class="modal-title bebas" id="modalTitle">${esc(title)}</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal()">×</button></div>`;
+}
+function carStripHTML(){
+  return `<div class="offer-car"><img src="${esc(photos[0])}" alt=""><div class="oc-txt"><div class="oc-name">${esc(carTitle())}</div><div class="oc-price">Current highest offer <strong id="ocPrice">RM ${rm(currentPrice())}</strong></div></div></div>`;
+}
+
+function offerFormHTML(prevAmount){
+  const me = offerer();
+  const isCode = formMode==='code' && bidderInfo;
+  const askIdentity = !isCode && (!me || editIdentity);
+  const agreed = !!(me && me.terms===TERMS_VERSION);
+  let who = '';
+  if(isCode) who = `<div class="known-bidder-bar"><div>Verified bidder <strong>${esc(bidderInfo.name)}</strong><br><span class="kb-sub">Your offer goes live straight away</span></div><button type="button" onclick="notYou()">Not you?</button></div>`;
+  else if(!askIdentity) who = `<div class="known-bidder-bar neutral"><div>Sending as <strong>${esc(me.name)}</strong><br><span class="kb-sub">${esc(showPhone(me.phone))}</span></div><button type="button" onclick="changeIdentity()">Change</button></div>`;
+  else who = `
+    <div class="field-pair">
+      <div class="modal-field"><label for="regName">Full name</label><input type="text" id="regName" placeholder="Your full name" autocomplete="name" maxlength="80" value="${esc(me?me.name:'')}" oninput="fieldOk('regName')"><div class="field-err" id="regNameErr"></div></div>
+      <div class="modal-field"><label for="regPhone">WhatsApp number</label><input type="tel" id="regPhone" placeholder="012-345 6789" autocomplete="tel" inputmode="tel" maxlength="24" value="${esc(me?showPhone(me.phone):'')}" oninput="fieldOk('regPhone')"><div class="field-err" id="regPhoneErr"></div></div>
+    </div>`;
+  return `
+    ${headHTML(isCode ? 'Place your offer' : 'Make an offer')}
+    ${carStripHTML()}
+    <div class="modal-field">
+      <label for="bidAmount">Your offer</label>
+      <div class="amt-wrap"><span class="amt-cur">RM</span><input type="text" class="mono" id="bidAmount" inputmode="numeric" autocomplete="off" aria-describedby="bidHint" value="${rm(prevAmount||nextMinimumOffer())}" oninput="onAmountInput(this)"></div>
+      <div class="quick-bumps">
+        <button type="button" onclick="bumpTo(500)">+500</button>
+        <button type="button" onclick="bumpTo(1000)">+1,000</button>
+        <button type="button" onclick="bumpTo(5000)">+5,000</button>
+      </div>
+      <div class="modal-hint" id="bidHint"></div>
+    </div>
+    ${who}
+    ${isCode ? '' : `<label class="chk"><input type="checkbox" id="regAgree" ${agreed?'checked':''} onchange="clearErr()"><span>I agree to the ${termsLinks()} and <a href="auction-privacy.html" target="_blank" rel="noopener">Privacy Notice</a>. My offer is binding on me once sent.</span></label>`}
+    <div class="modal-error" id="modalError" role="alert"></div>
+    <button type="button" class="modal-submit full" id="submitBidBtn" onclick="${isCode?'submitBid()':'submitOffer()'}">Send offer</button>
+    ${isCode ? '<p class="modal-consent">A bid is an offer to purchase and cannot be withdrawn once placed. It is subject to acceptance by Kansai Group.</p>'
+      : `${stepsHTML(0)}<p class="modal-consent">No payment is taken on this page. We arrange a refundable deposit with you on WhatsApp before your offer goes live.</p>
+         <div class="alt-row"><button type="button" class="link-btn" onclick="showCodeScreen()">Have a bidder code?</button></div>`}`;
+}
+
+function codeHTML(){
+  return `
+    ${headHTML('Enter bidder code')}
+    <p class="modal-sub">We send your code on WhatsApp after you are verified. With a code, your offers go live straight away.</p>
+    <div class="modal-field"><label for="codeIn">Bidder code</label><input type="text" id="codeIn" class="code-in" placeholder="XXXX-XXXX" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" onkeydown="if(event.key==='Enter')submitCode()"></div>
+    <div class="modal-error" id="modalError" role="alert"></div>
+    <button type="button" class="modal-submit full" id="codeBtn" onclick="submitCode()">Verify code</button>
+    <div class="alt-row"><button type="button" class="link-btn" onclick="showOfferForm()">No code? Make an offer with your name and number</button></div>`;
+}
+
+function offerMessage(o, ref){
+  const lines = ['Hi Kansai Group, I would like to make an offer.', '',
+    'Vehicle: '+carTitle(), 'My offer: RM '+rm(o.amount), 'Name: '+o.name, 'WhatsApp: '+showPhone(o.phone)];
+  if(ref) lines.push('Reference: '+ref);
+  lines.push('Listing: '+pageUrl(), 'Agreed to Auction Terms '+TERMS_VERSION, '', 'Please verify me and let me know the refundable deposit details.');
+  return lines.join('\n');
+}
+
+function successHTML(o, res, opened){
+  const url = waHref(offerMessage(o, res.ref));
+  const saved = res.mode==='saved';
+  const already = res.status==='approved';
+  const lead = saved
+    ? (opened ? 'Your offer is saved. WhatsApp has opened with the details: tap <strong>Send</strong> there so our team can verify you.' : 'Your offer is saved. Now send it to us on WhatsApp so our team can verify you.')
+    : (opened ? 'WhatsApp has opened with your offer. Tap <strong>Send</strong> there: that is how your offer reaches our team.' : 'One more tap: send your offer to us on WhatsApp. That is how it reaches our team.');
+  return `
+    ${headHTML(saved ? 'Offer received' : 'Almost done')}
+    <div class="offer-done">
+      <div class="check" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="od-amt bebas"><small>RM</small> ${rm(o.amount)}</div>
+      <div class="od-car">${esc(carTitle())}</div>
+      ${res.ref?`<div class="od-ref">Reference <strong>${esc(res.ref)}</strong></div>`:''}
+    </div>
+    <p class="od-lead">${lead}</p>
+    <a class="wa-btn" target="_blank" rel="noopener" href="${url}" onclick="kgTrack('whatsapp',auction.id)">${opened?'Open WhatsApp again':'Send on WhatsApp'}</a>
+    ${stepsHTML(1)}
+    <p class="modal-consent">${already ? 'You are already verified. Enter your bidder code next time and your offers go live straight away.' : 'Your offer shows publicly once we verify you and confirm your refundable deposit. We will contact you on WhatsApp if your offer is accepted.'}</p>
+    <button type="button" class="modal-cancel full" onclick="closeModalAndRefresh()">Done</button>`;
+}
+
+function liveSuccessHTML(amount){
+  const msg = ['Hi Kansai Group, I placed an offer with my bidder code.','','Vehicle: '+carTitle(),'My offer: RM '+rm(amount),'Listing: '+pageUrl()].join('\n');
+  return `
+    ${headHTML('Offer placed')}
+    <div class="offer-done">
+      <div class="check" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="od-amt bebas"><small>RM</small> ${rm(amount)}</div>
+      <div class="od-car">${esc(carTitle())}</div>
+    </div>
+    <p class="od-lead">Your offer is live on this page. It is subject to acceptance by Kansai Group. We will contact you on WhatsApp if we accept it.</p>
+    <a class="wa-btn ghost" target="_blank" rel="noopener" href="${waHref(msg)}" onclick="kgTrack('whatsapp',auction.id)">Message us on WhatsApp</a>
+    <button type="button" class="modal-cancel full" onclick="closeModalAndRefresh()">Done</button>`;
+}
+
+function blockedHTML(){
+  return `${headHTML('We could not take this offer')}
+    <p class="modal-sub">This number cannot submit offers online. Please contact our team on WhatsApp.</p>
+    <a class="wa-btn" target="_blank" rel="noopener" href="${waHref('Hi Kansai Group, I could not submit an offer for '+carTitle()+' ('+pageUrl()+').')}">Contact us on WhatsApp</a>
+    <button type="button" class="modal-cancel full" onclick="closeModal()">Close</button>`;
+}
+
+function focusFirst(){
+  const el = document.querySelector('#modalInner input:not([type=checkbox])');
+  if(el && window.matchMedia('(hover:hover)').matches) el.focus();
+}
+function showOfferForm(prevAmount){
+  if(formMode==='code' && !bidderInfo) formMode = 'offer';
+  setModal(offerFormHTML(prevAmount));
+  onAmountEdit(); focusFirst();
+}
+function showCodeScreen(){ setModal(codeHTML()); focusFirst(); }
+function notYou(){ forgetBidder(); showOfferForm(); }
+function changeIdentity(){
+  const a = amountVal();
+  editIdentity = true; showOfferForm(a||undefined);
+}
+function fieldOk(id){ const e=document.getElementById(id+'Err'); if(e){ e.textContent=''; e.classList.remove('show'); } const i=document.getElementById(id); if(i) i.removeAttribute('aria-invalid'); clearErr(); }
+function fieldBad(id,msg){ const e=document.getElementById(id+'Err'); if(e){ e.textContent=msg; e.classList.add('show'); } const i=document.getElementById(id); if(i){ i.setAttribute('aria-invalid','true'); } }
 
 async function verifyCode(code){
   try {
-    const {data,error}=await sb.rpc('verify_bidder',{p_code:code});
+    const {data,error} = await sb.rpc('verify_bidder',{p_code:code});
     if(error || !data) return {ok:false,error:true};
     return data;
   } catch(error){ return {ok:false,error:true}; }
@@ -866,36 +1040,15 @@ async function openModal(){
   if(!(await refreshAuction()) || isClosed()) return;
   kgTrack('bid_open', auction.id);
   document.getElementById('bidModal').classList.add('open');
-  if(!bidderCode){ setModal(registerHTML()); return; }
-  // Recheck a saved code every time: the owner may have removed the registration
-  // or changed deposit/approval status since this page was opened.
-  setModal('<div class="loading" style="padding:40px 10px">Checking your account…</div>');
+  document.body.classList.add('modal-open');
+  editIdentity = false;
+  if(!bidderCode){ formMode='offer'; showOfferForm(); return; }
+  // Recheck a saved code every time: staff may have removed or blocked the bidder since.
+  setModal('<div class="loading" style="padding:40px 10px">Checking your bidder code…</div>');
   const r = await verifyCode(bidderCode);
-  if(r.error){ setModal(`<div class="modal-title bebas">Connection Problem</div><div class="modal-sub">We could not check your account. Please check your connection and try again.</div><div class="modal-actions"><button class="modal-submit" onclick="closeModal()">Close</button></div>`); return; }
-  if(!r.ok){ forgetBidder(); setModal(registerHTML()); modalErr('Your saved bidder code is no longer valid. Please register, or enter a new code.'); return; }
-  bidderInfo = r;
-  if(r.can_bid) showBidForm(); else setModal(pendingHTML(r.name, r.status==='blocked' ? 'blocked' : 'account_pending'));
-}
-
-async function submitRegister(){
-  const name = document.getElementById('regName').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  if(!name){ modalErr('Please enter your name.'); return; }
-  if(phone.replace(/[^0-9]/g,'').length < 9){ modalErr('Please enter a valid mobile number.'); return; }
-  if(!document.getElementById('regAgree').checked){ modalErr('Please tick the box to agree to the Auction Terms and Privacy Notice.'); return; }
-  const btn = document.getElementById('regBtn'); btn.textContent='Registering…'; btn.disabled=true;
-  let data,error;
-  try { ({data,error}=await sb.rpc('register_bidder',{p_name:name,p_phone:phone,p_terms:TERMS_VERSION,p_auction:auction.id})); }
-  catch(e){ error=e; }
-  if(error || !data){
-    btn.textContent='Register & Continue'; btn.disabled=false;
-    modalErr(error && error.code==='P0001' && error.message ? error.message : 'Could not register right now. Please try again.');
-    return;
-  }
-  registrationContext={name,phone,reference:data.registration_ref||null};
-  kgTrack('register_submit', auction.id);
-  const mode = data.existing ? (data.status==='approved' ? 'approved_existing' : (data.status==='blocked' ? 'blocked' : 'existing_pending')) : 'new';
-  setModal(pendingHTML(name, mode));
+  if(!r.error && r.ok && r.can_bid){ bidderInfo = r; formMode='code'; showOfferForm(); return; }
+  if(!r.error){ bidderCode=null; bidderInfo=null; try{ localStorage.removeItem(CODE_KEY); }catch(e){} }
+  formMode='offer'; showOfferForm();
 }
 
 async function submitCode(){
@@ -903,57 +1056,149 @@ async function submitCode(){
   if(code.length < 8){ modalErr('Please enter your full bidder code.'); return; }
   const btn = document.getElementById('codeBtn'); btn.textContent='Checking…'; btn.disabled=true;
   const r = await verifyCode(code);
-  btn.textContent='Verify'; btn.disabled=false;
-  if(r.error){ modalErr('Could not check the code. Please try again.'); return; }
-  if(!r.ok){ modalErr('That code was not recognised. Please check it and try again.'); return; }
-  bidderCode = code; bidderInfo = r; registrationContext=null;
-  try { localStorage.setItem('kansaiBidderCode', code); } catch(e){}
-  if(r.can_bid) showBidForm(); else setModal(pendingHTML(r.name, r.status==='blocked' ? 'blocked' : 'account_pending'));
+  btn.textContent='Verify code'; btn.disabled=false;
+  if(r.error){ modalErr('Could not check the code. Please check your connection and try again.'); return; }
+  if(!r.ok){ modalErr('That code was not recognised. Check it and try again, or make an offer with your name and number.'); return; }
+  if(!r.can_bid){
+    modalErr(r.status==='blocked' ? 'This bidder code is not active. Please contact us on WhatsApp.' : 'This code is not active yet. Make an offer with your name and number and we will verify you on WhatsApp.');
+    return;
+  }
+  bidderCode = code; bidderInfo = r; formMode='code';
+  try { localStorage.setItem(CODE_KEY, code); } catch(e){}
+  showOfferForm();
 }
 
+function amountVal(){ const i = document.getElementById('bidAmount'); return i ? Number(String(i.value).replace(/[^0-9]/g,'')) : 0; }
+function onAmountInput(el){
+  const n = String(el.value).replace(/[^0-9]/g,'').slice(0,9);
+  el.value = n ? Number(n).toLocaleString('en-MY') : '';
+  onAmountEdit();
+}
 function bumpTo(inc){
-  const input=document.getElementById('bidAmount');
-  const current=Number(input.value);
-  const base=validOfferAmount(current)?current:nextMinimumOffer()-MIN_INCREMENT;
-  input.value=base+inc;
+  const input = document.getElementById('bidAmount');
+  const current = amountVal();
+  const base = validOfferAmount(current) ? current : nextMinimumOffer()-MIN_INCREMENT;
+  input.value = rm(base+inc);
   onAmountEdit();
 }
 function onAmountEdit(){
-  const input=document.getElementById('bidAmount'); if(!input) return;
-  const minimum=nextMinimumOffer(),amount=Number(input.value);
-  input.min=minimum;
-  const valid=validOfferAmount(amount);
-  document.getElementById('bidHint').textContent=valid ? `Offer RM ${rm(amount)}. Only whole RM 500 steps are accepted.` : `Minimum offer RM ${rm(minimum)}. Use whole RM 500 steps (for example RM ${rm(minimum)} or RM ${rm(minimum+MIN_INCREMENT)}).`;
-  const button=document.getElementById('submitBidBtn'); if(button) button.disabled=!valid || submittingBid || !dataFresh || isClosed();
+  const input = document.getElementById('bidAmount'); if(!input) return;
+  const minimum = nextMinimumOffer(), amount = amountVal();
+  const valid = validOfferAmount(amount);
+  const hint = document.getElementById('bidHint');
+  hint.textContent = valid ? `Minimum RM ${rm(minimum)} · in steps of RM ${rm(MIN_INCREMENT)}` : `Enter RM ${rm(minimum)} or more, in steps of RM ${rm(MIN_INCREMENT)}.`;
+  hint.classList.toggle('bad', !valid && input.value!=='');
+  input.toggleAttribute('aria-invalid', !valid && input.value!=='');
+  const oc = document.getElementById('ocPrice'); if(oc) oc.textContent = 'RM '+rm(currentPrice());
+  const button = document.getElementById('submitBidBtn');
+  if(button && !submittingBid){
+    button.disabled = !valid || !dataFresh || isClosed();
+    button.textContent = isClosed() ? 'Listing closed' : !dataFresh ? 'Reconnecting…' : valid ? `Send offer · RM ${rm(amount)}` : 'Send offer';
+  }
 }
 
-let submittingBid=false;
+// Open the WhatsApp tab during the tap itself, so phone browsers do not block it.
+function openPending(){
+  let w = null;
+  try { w = window.open('', '_blank'); if(w){ w.document.title='Opening WhatsApp…'; w.document.body.innerHTML='<p style="font-family:sans-serif;padding:24px;color:#444">Opening WhatsApp…</p>'; } } catch(e){ w = null; }
+  return w;
+}
+function routePopup(w,url){ if(w && !w.closed){ try { w.opener=null; w.location.href=url; return true; } catch(e){} } return false; }
+function closePopup(w){ try { if(w && !w.closed) w.close(); } catch(e){} }
+function userError(message){ const e = new Error(message); e.userFacing = true; return e; }
+
+async function sendOffer(o){
+  const res = await sb.rpc('submit_offer',{p_auction:auction.id, p_amount:o.amount, p_name:o.name, p_phone:o.phone, p_terms:TERMS_VERSION});
+  if(!res.error){
+    const d = res.data;
+    if(!d || d.ok!==true) throw new Error('No offer confirmation received.');
+    return {mode:'saved', ref:d.reference||null, status:d.bidder_status||'pending', verified:d.verified===true};
+  }
+  if(res.error.code==='P0001') throw userError(res.error.message);
+  if(res.error.code!=='PGRST202') throw res.error;
+  // submit_offer is not deployed yet: save the registration; the offer travels on WhatsApp.
+  const r = await sb.rpc('register_bidder',{p_name:o.name, p_phone:o.phone, p_terms:LEGACY_TERMS_VERSION, p_auction:auction.id});
+  if(r.error){ if(r.error.code==='P0001') throw userError(r.error.message); throw r.error; }
+  const st = (r.data && r.data.status) || 'pending';
+  if(st==='blocked'){ const e = userError('blocked'); e.blocked = true; throw e; }
+  return {mode:'whatsapp', ref:(r.data && r.data.registration_ref) || makeRef(), status:st, verified:false};
+}
+
+async function submitOffer(){
+  if(submittingBid) return;
+  clearErr();
+  const amount = amountVal();
+  const me = offerer();
+  const nameEl = document.getElementById('regName'), phoneEl = document.getElementById('regPhone');
+  const name = nameEl ? nameEl.value.trim().replace(/\s+/g,' ') : me.name;
+  const phone = phoneEl ? normPhone(phoneEl.value) : me.phone;
+  let bad = false;
+  if(!validOfferAmount(amount)){ onAmountEdit(); modalErr(`Enter RM ${rm(nextMinimumOffer())} or more, in steps of RM ${rm(MIN_INCREMENT)}.`); bad = true; }
+  if(nameEl && name.length < 2){ fieldBad('regName','Enter your name.'); bad = true; }
+  if(phoneEl && !phoneEl.value.trim()){ fieldBad('regPhone','Enter your WhatsApp number.'); bad = true; }
+  else if(phoneEl && !phone){ fieldBad('regPhone','Check the number. Outside Malaysia, start with + and the country code.'); bad = true; }
+  const agree = document.getElementById('regAgree');
+  if(!bad && agree && !agree.checked){ modalErr('Please tick the box to agree to the Auction Terms and Privacy Notice.'); bad = true; }
+  if(bad){ const first = document.querySelector('#modalInner [aria-invalid="true"]'); if(first) first.focus(); return; }
+
+  const o = {amount, name, phone};
+  const btn = document.getElementById('submitBidBtn');
+  submittingBid = true; btn.disabled = true; btn.textContent = 'Sending…';
+  const popup = openPending();
+  try {
+    if(!(await refreshAuction())) throw userError('Could not check the latest price. Please check your connection and try again.');
+    if(isClosed()) throw userError('This listing has just closed to new offers.');
+    if(!validOfferAmount(amount)) throw userError(`Another offer just came in. The minimum is now RM ${rm(nextMinimumOffer())}.`);
+    const res = await sendOffer(o);
+    writeStore(OFFERER_KEY, {name, phone, terms:TERMS_VERSION});
+    saveMyOffer({amount, ref:res.ref, at:new Date().toISOString(), saved:res.mode==='saved', verified:res.verified});
+    editIdentity = false;
+    kgTrack(res.mode==='saved' ? 'bid_submit' : 'register_submit', auction.id);
+    const opened = routePopup(popup, waHref(offerMessage(o, res.ref)));
+    if(opened) kgTrack('whatsapp', auction.id);
+    setModal(successHTML(o, res, opened));
+    renderBidStatus();
+  } catch(error){
+    closePopup(popup);
+    if(error.blocked){ setModal(blockedHTML()); return; }
+    console.error(error);
+    if(error.userFacing){ modalErr(error.message); }
+    else modalErr('We could not save your offer right now.', waHref(offerMessage(o, null)));
+    refreshAuction();
+  } finally {
+    submittingBid = false;
+    if(btn.isConnected) onAmountEdit();
+  }
+}
+
+// Approved bidder with a code: the offer goes live at once.
 async function submitBid(){
   if(submittingBid) return;
-  const amount=Number(document.getElementById('bidAmount').value);
-  if(!validOfferAmount(amount)){ onAmountEdit(); modalErr('Use whole RM 500 steps at or above the displayed minimum offer.'); return; }
-  const btn=document.getElementById('submitBidBtn');
-  submittingBid=true; btn.textContent='Submitting…'; btn.disabled=true;
+  clearErr();
+  const amount = amountVal();
+  if(!validOfferAmount(amount)){ onAmountEdit(); modalErr(`Enter RM ${rm(nextMinimumOffer())} or more, in steps of RM ${rm(MIN_INCREMENT)}.`); return; }
+  const btn = document.getElementById('submitBidBtn');
+  submittingBid = true; btn.textContent = 'Sending…'; btn.disabled = true;
   try {
-    if(!(await refreshAuction())){ modalErr('Could not verify the latest price. Please reconnect and try again.'); return; }
-    if(isClosed()){ modalErr('This listing is closed to new offers.'); return; }
-    const minimum=nextMinimumOffer();
-    if(!validOfferAmount(amount)){ modalErr(`The latest minimum offer is RM ${rm(minimum)}. Please review your amount.`); return; }
-    const {data,error}=await sb.rpc('place_bid',{p_auction:auction.id,p_amount:amount,p_code:bidderCode});
+    if(!(await refreshAuction())){ modalErr('Could not check the latest price. Please check your connection and try again.'); return; }
+    if(isClosed()){ modalErr('This listing has just closed to new offers.'); return; }
+    if(!validOfferAmount(amount)){ modalErr(`Another offer just came in. The minimum is now RM ${rm(nextMinimumOffer())}.`); return; }
+    const {data,error} = await sb.rpc('place_bid',{p_auction:auction.id, p_amount:amount, p_code:bidderCode});
     if(error){
-      modalErr(error.code==='P0001' ? error.message : 'We could not confirm your offer. Refresh and check the offer activity before trying again.');
+      modalErr(error.code==='P0001' ? error.message : 'We could not confirm your offer. Refresh and check the offer list before trying again.');
       await refreshAuction(); return;
     }
     if(!data || data.ok!==true) throw new Error('No offer confirmation received.');
-    kgTrack('bid_submit',auction.id);
-    setModal(`<div class="modal-success"><div class="modal-title bebas">Offer Received</div><div class="modal-sub">Your offer of <strong>RM ${rm(amount)}</strong> has been received. It is subject to acceptance by Kansai Group. Our team will contact you if we accept it.</div><div class="modal-actions"><button class="modal-submit" onclick="closeModalAndRefresh()">Done</button></div></div>`);
+    kgTrack('bid_submit', auction.id);
+    saveMyOffer({amount, ref:null, at:new Date().toISOString(), saved:true, verified:true});
+    setModal(liveSuccessHTML(amount));
     await refreshAuction();
   } catch(error){
     console.error(error);
-    modalErr('We could not confirm your offer. Refresh and check the offer activity before trying again.');
+    modalErr('We could not confirm your offer. Refresh and check the offer list before trying again.');
   } finally {
-    submittingBid=false;
-    if(btn.isConnected){ btn.textContent='Submit Offer'; onAmountEdit(); }
+    submittingBid = false;
+    if(btn.isConnected) onAmountEdit();
   }
 }
 

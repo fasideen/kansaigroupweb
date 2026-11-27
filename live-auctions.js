@@ -69,7 +69,7 @@
     if (label) label.textContent = n > 0 ? n + (n === 1 ? ' Auction Live Now' : ' Auctions Live Now') : 'Live Auctions';
     if (desc) desc.textContent = n === 0
       ? 'No auction is live at the moment. New vehicles are listed regularly, so check back soon or message us to be notified.'
-      : 'Bid on hand-picked vehicles from Japan. Watch the price move in real time and place your bid in seconds.';
+      : 'Make an offer on hand-picked vehicles in under a minute. Enter your amount, name and number, then confirm on WhatsApp.';
     if (acts) acts.innerHTML =
       '<a href="' + LINK + '" class="btn-primary">' + (n === 0 ? 'View Auctions' : 'View Live Auctions') + '</a>' +
       '<a href="' + notifyHref + '" class="auction-notify">Notify me →</a>';

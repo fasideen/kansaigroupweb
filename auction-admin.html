@@ -63,6 +63,11 @@
   .badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:12px; text-transform:uppercase; letter-spacing:0.5px; }
   .badge.live { background:rgba(22,163,74,0.1); color:var(--green); }
   .badge.closed { background:var(--bg-alt); color:var(--muted); }
+  .badge.unv { background:rgba(200,162,60,0.16); color:#7A5D12; }
+  .bids-table tr.unverified { background:rgba(200,162,60,0.06); }
+  .bids-table tr.unverified .amt { color:#7A5D12; }
+  .offer-list { margin-top:6px; font-size:12px; color:var(--ink); }
+  .offer-list span { display:inline-block; margin:3px 6px 0 0; padding:3px 8px; border-radius:6px; background:rgba(200,162,60,0.12); font-family:'JetBrains Mono',monospace; font-size:11.5px; }
   .auction-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
   .link-box { background:var(--bg-alt); border:1px solid var(--border); border-radius:7px; padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:11px; flex:1; min-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
@@ -457,12 +462,34 @@ async function deleteBid(bidId){
   } catch(error){ toast('Removal not confirmed: '+(error.message||'Connection problem. Refresh before retrying.'),6000); }
   finally { pendingActions.delete(bidId); }
 }
+// Publish one unverified offer without changing the bidder (e.g. an approved bidder who offered without their code).
+async function publishBid(bidId){
+  if(!confirm('Show this offer publicly now? Only do this once you have confirmed the bidder.')) return;
+  if(pendingActions.has(bidId)) return;
+  pendingActions.add(bidId);
+  try {
+    const {data,error}=await sb.from('bids').update({verified:true}).eq('id',bidId).select('id');
+    if(error) throw error;
+    if(!data || data.length!==1) throw new Error('No offer changed. Check owner permissions.');
+    toast('Offer is now live'); await loadAuctions();
+  } catch(error){ toast('Not confirmed: '+(error.message||'Connection problem. Refresh before retrying.'),6000); }
+  finally { pendingActions.delete(bidId); }
+}
 function removedHtml(list){
   if(!list.length) return '';
   return `<details style="margin-top:12px;font-size:12px;color:var(--muted)"><summary style="cursor:pointer">${list.length} removed bid${list.length===1?'':'s'}</summary>${list.map(b=>`<div style="padding:6px 0;border-bottom:1px solid var(--border)">RM ${rm(b.amount)} · ${esc(b.bidder_name)} · ${esc(b.bidder_phone)} · removed ${new Date(b.deleted_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})} by ${esc(b.deleted_by||'staff')} (${esc(b.delete_reason||'')})</div>`).join('')}</details>`;
 }
 
 // ── BIDDERS: approve, confirm deposit, send code, block ──
+// Offers from bidders who are not yet approved are saved with verified=false (submit_offer).
+// They are visible here only; the public page shows verified offers. Older offers have no flag and count as verified.
+function isUnverified(b){ return b.verified === false; }
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+let liveBids = [];
+function offersOf(bidder){
+  const ph = digits(bidder.phone);
+  return liveBids.filter(x => (x.bidder_id && x.bidder_id===bidder.id) || (!x.bidder_id && ph && digits(x.bidder_phone)===ph));
+}
 function registrationRef(b){ return b.registration_number ? 'KG-'+String(b.registration_number).padStart(6,'0') : 'Existing registration'; }
 let bidders = [], bidderFilter = 'pending', knownBidders = null;
 async function loadBidders(){
@@ -490,7 +517,7 @@ function renderBidders(){
   box.innerHTML = list.map(b=>{
     const when = new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
     const listing=b.registration_auction_id ? new URL('auction-car.html?id='+encodeURIComponent(b.registration_auction_id)+'&enter_code=1',location.href).href : new URL('auctions.html',location.href).href;
-    const msg=`Hi ${b.name}, your refundable deposit has been verified and your account is approved. Your bidder code is ${b.code}. Open ${listing} and enter your code to submit offers. Offers use whole RM 500 steps and are subject to acceptance. Please keep your code private.`;
+    const msg=`Hi ${b.name}, your refundable deposit has been verified and your account is approved. Any offer you already sent is now live. Your bidder code is ${b.code}. Open ${listing} and enter your code: offers you make with it go live straight away. Offers use whole RM 500 steps and are subject to acceptance. Please keep your code private.`;
     const depositMsg=`Hi ${b.name}, thank you for registering with Kansai Group. Your reference is ${registrationRef(b)}. We will confirm the refundable deposit amount, payment instructions and refund conditions here. Please send your receipt in this chat after payment. We will verify it before approving your access.`;
     let btns = '';
     if(b.status==='pending') btns = `<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/${esc(b.phone)}?text=${encodeURIComponent(depositMsg)}">Discuss deposit on WhatsApp</a><button class="btn btn-sm" onclick="approveBidder('${b.id}')">Confirm deposit &amp; approve</button><button class="btn btn-ghost btn-sm" onclick="setBidder('${b.id}',{status:'blocked'})">Block</button>`;
@@ -500,6 +527,7 @@ function renderBidders(){
     return `<div class="bidder-row"><div>
         <div style="font-weight:600">${esc(b.name)} <span class="badge ${b.status==='approved'?'live':'closed'}">${esc(b.status)}</span>${b.status==='approved'?(b.deposit_confirmed?' <span class="badge live">deposit ✓</span>':' <span class="badge closed">no deposit</span>'):''}</div>
         <div class="auction-meta"><a href="https://wa.me/${esc(b.phone)}" target="_blank" rel="noopener" style="color:var(--red)">+${esc(b.phone)}</a> · ${esc(registrationRef(b))} · registered ${when}${b.status==='approved'?` · code <span class="code-tag">${esc(b.code)}</span>`:''}</div>
+        ${(()=>{ const of=offersOf(b).filter(isUnverified); if(!of.length) return ''; return `<div class="offer-list">Waiting to go live: ${of.map(x=>{ const a=auctionsById[x.auction_id]; return `<span>RM ${rm(x.amount)}${a?' · '+esc(a.car_name):''}</span>`; }).join('')}</div>`; })()}
       </div><div class="auction-actions" style="margin:0">${btns}</div></div>`;
   }).join('');
 }
@@ -517,7 +545,7 @@ async function setBidder(id,fields,success='Saved'){
   finally { pendingActions.delete(id); }
 }
 async function approveBidder(id){
-  if(!confirm('Have you verified this customer’s refundable deposit? Approve only after confirming payment.')) return false;
+  if(!confirm('Have you verified this customer’s refundable deposit? Approve only after confirming payment.\n\nApproving makes this bidder’s offers public on the auction page.')) return false;
   return setBidder(id,{status:'approved',deposit_confirmed:true,approved_at:new Date().toISOString()},'Approved. Use Send code on WhatsApp to give them their bidder code.');
 }
 
@@ -596,7 +624,7 @@ function announceNewBids(auctions, bids){
     if(fresh.length){
       fresh.sort((x,y)=>Number(y.amount)-Number(x.amount));
       const top = fresh[0], a = auctions.find(x=>x.id===top.auction_id);
-      toast(`New bid: RM ${rm(top.amount)} from ${top.bidder_name||'a bidder'}${a?' on '+a.car_name:''}${fresh.length>1?' (+'+(fresh.length-1)+' more)':''}`, 7000);
+      toast(`${isUnverified(top)?'New unverified offer':'New bid'}: RM ${rm(top.amount)} from ${top.bidder_name||'a bidder'}${a?' on '+a.car_name:''}${fresh.length>1?' (+'+(fresh.length-1)+' more)':''}`, 7000);
       newBidCount += fresh.length; setTitleBadge(); beep();
     }
   }
@@ -632,8 +660,9 @@ async function loadAuctionsInner(silent){
   (allBids||[]).forEach(b=>{ const m = b.deleted_at ? removedByAuction : bidsByAuction; (m[b.auction_id]=m[b.auction_id]||[]).push(b); });
 
   setLive(true);
-  announceNewBids(auctions, (allBids||[]).filter(b=>!b.deleted_at));
-  const sig = JSON.stringify(auctions) + JSON.stringify((allBids||[]).map(b=>[b.id,b.amount,b.deleted_at]))
+  liveBids = (allBids||[]).filter(b=>!b.deleted_at);
+  announceNewBids(auctions, liveBids);
+  const sig = JSON.stringify(auctions) + JSON.stringify((allBids||[]).map(b=>[b.id,b.amount,b.deleted_at,b.verified]))
     + auctions.map(a=>(a.status==='closed' || (a.deadline && new Date(a.deadline)<=new Date()))?1:0).join('');
   if(silent && sig===lastSig) return;   // nothing changed: leave the list alone
   lastSig = sig;
@@ -641,14 +670,17 @@ async function loadAuctionsInner(silent){
   list.innerHTML = auctions.map(a=>{
     const bids = bidsByAuction[a.id]||[];
     const closed = a.status==='closed' || (a.deadline && new Date(a.deadline)<new Date());
-    const topPrice = Math.max(Number(a.starting_price)||0, bids.length ? Math.max(...bids.map(b=>Number(b.amount))) : 0);
+    const verified = bids.filter(b=>!isUnverified(b)), unverified = bids.filter(isUnverified);
+    const topPrice = Math.max(Number(a.starting_price)||0, verified.length ? Math.max(...verified.map(b=>Number(b.amount))) : 0);
+    const topUnv = unverified.length ? Math.max(...unverified.map(b=>Number(b.amount))) : 0;
+    const topVerifiedId = verified.length ? verified[0].id : null;
     const deadlineStr = a.deadline ? new Date(a.deadline).toLocaleString('en-MY',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'No deadline';
 
     return `<div class="auction-item">
       <div class="auction-head">
         <div>
           <div class="auction-name">${esc(a.car_name)}${a.year?' · '+esc(a.year):''}</div>
-          <div class="auction-meta">Current: RM ${rm(topPrice)} · ${bids.length} bid${bids.length===1?'':'s'} · Closes ${deadlineStr}</div>
+          <div class="auction-meta">Public price: RM ${rm(topPrice)} · ${verified.length} live offer${verified.length===1?'':'s'}${unverified.length?` · <strong style="color:#7A5D12">${unverified.length} unverified (highest RM ${rm(topUnv)})</strong>`:''} · Closes ${deadlineStr}</div>
           <div class="auction-meta" id="st-${a.id}"></div>
         </div>
         <span class="badge ${closed?'closed':'live'}">${closed?'Closed':'Live'}</span>
@@ -662,15 +694,16 @@ async function loadAuctionsInner(silent){
       </div>
       ${bids.length?`
         <div class="tbl-wrap"><table class="bids-table">
-          <thead><tr><th>Rank</th><th>Bidder Name</th><th>Mobile</th><th>Bid Amount</th><th>Time</th><th></th></tr></thead>
+          <thead><tr><th>Rank</th><th>Bidder Name</th><th>Mobile</th><th>Bid Amount</th><th>Status</th><th>Time</th><th></th></tr></thead>
           <tbody>
-            ${bids.map((b,i)=>`<tr class="${i===0?'top-bid':''}">
-              <td>#${i+1}${i===0?' 🏆':''}</td>
+            ${bids.map((b,i)=>`<tr class="${b.id===topVerifiedId?'top-bid':''}${isUnverified(b)?' unverified':''}">
+              <td>#${i+1}${b.id===topVerifiedId?' 🏆':''}</td>
               <td>${esc(b.bidder_name)}</td>
               <td><a href="https://wa.me/${esc((b.bidder_phone||'').replace(/[^0-9]/g,''))}" target="_blank" rel="noopener" style="color:var(--red)">${esc(b.bidder_phone)}</a></td>
               <td class="amt">RM ${rm(b.amount)}</td>
+              <td>${isUnverified(b)?'<span class="badge unv" title="Shown publicly once you approve this bidder">Unverified</span>':'<span class="badge live">Live</span>'}</td>
               <td style="color:var(--muted);font-size:12px">${new Date(b.created_at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
-              <td><button onclick="deleteBid('${b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
+              <td style="white-space:nowrap">${isUnverified(b)?`<button class="btn btn-ghost btn-sm" onclick="publishBid('${b.id}')" title="Show this offer publicly now">Make live</button>`:''}<button onclick="deleteBid('${b.id}')" title="Delete this bid (e.g. if fake)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;">✕</button></td>
             </tr>`).join('')}
           </tbody>
         </table></div>
